@@ -1,12 +1,20 @@
 "use client";
 
 import { FiSearch, FiEdit, FiTrash2, FiPlus } from "react-icons/fi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const ArticlePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sample data - replace with actual data from your backend
   const articles = [
@@ -35,14 +43,14 @@ const ArticlePage = () => {
   return (
     <>
       {/* Header */}
-      <header className="bg-white app-header border-b border-gray-200">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="app-text-2xl font-bold text-black">Kelola Berita</h1>
-            <p className="text-gray-600 text-xs mt-1">Kelola dan atur berita desa</p>
+      <header className={`bg-white app-header border-b border-gray-200 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+          <div className="min-w-0">
+            <h1 className="app-text-2xl font-bold text-black smooth-transition">Kelola Berita</h1>
+            <p className="text-gray-600 text-xs mt-1 smooth-transition">Kelola dan atur berita desa</p>
           </div>
           <Link href="/dashboard/article/create">
-            <button className="bg-[#1B3A6D] text-white app-button hover:bg-[#152f5a] transition-colors flex items-center gap-2">
+            <button className="bg-[#1B3A6D] text-white app-button hover:bg-[#152f5a] smooth-transition hover-lift flex items-center gap-2 whitespace-nowrap">
               <FiPlus size={14} />
               Tambah Berita
             </button>
@@ -51,27 +59,27 @@ const ArticlePage = () => {
       </header>
 
       {/* Content */}
-      <div className="app-content">
-        <div className="bg-white app-card shadow-sm border border-gray-100">
+      <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+        <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
           {/* Search and Filter Bar */}
           <div className="pb-4 border-b border-gray-100">
-            <div className="flex justify-between items-center gap-4">
-              <h3 className="app-text-lg font-semibold text-black">Berita</h3>
-              <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h3 className="app-text-lg font-semibold text-black smooth-transition">Berita</h3>
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <div className="relative">
-                  <FiSearch className="absolute search-icon top-1/2 transform -translate-y-1/2 text-gray-500" size={14} />
+                  <FiSearch className="absolute search-icon top-1/2 transform -translate-y-1/2 text-gray-500 smooth-transition" size={14} />
                   <input
                     type="text"
-                    placeholder="Cari"
+                    placeholder="Cari berita..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="form-input app-form-input search-input w-48 pr-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent"
+                    className="form-input app-form-input search-input w-full sm:w-48 pr-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent smooth-transition"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="form-input app-form-input app-select border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent bg-white"
+                  className="form-input app-form-input app-select border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent bg-white smooth-transition"
                 >
                   <option>All Status</option>
                   <option>Lorem Ipsum</option>
@@ -88,27 +96,30 @@ const ArticlePage = () => {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Created</th>
-                  <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Date Created</th>
+                  <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
                   <th className="app-table-cell text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {filteredArticles.map((article) => (
-                  <tr key={article.id} className="hover:bg-gray-50">
-                    <td className="app-table-cell whitespace-nowrap text-xs font-medium text-black">{article.title}</td>
-                    <td className="app-table-cell whitespace-nowrap text-xs text-gray-600">{article.dateCreated}</td>
-                    <td className="app-table-cell whitespace-nowrap">
-                      <span className="app-button-small bg-orange-100 text-orange-800 font-medium">{article.status}</span>
+                {filteredArticles.map((article, index) => (
+                  <tr key={article.id} className="hover:bg-gray-50 smooth-transition">
+                    <td className="app-table-cell text-xs font-medium text-black">
+                      <div className="max-w-xs truncate">{article.title}</div>
+                      <div className="sm:hidden text-gray-500 text-xs mt-1">{article.dateCreated}</div>
+                    </td>
+                    <td className="app-table-cell whitespace-nowrap text-xs text-gray-600 hidden sm:table-cell">{article.dateCreated}</td>
+                    <td className="app-table-cell whitespace-nowrap hidden sm:table-cell">
+                      <span className="app-button-small bg-orange-100 text-orange-800 font-medium smooth-transition hover:bg-orange-200">{article.status}</span>
                     </td>
                     <td className="app-table-cell whitespace-nowrap text-xs text-gray-600">
                       <div className="flex gap-1">
                         <Link href={`/dashboard/article/update?id=${article.id}`}>
-                          <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                          <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
                             <FiEdit size={14} />
                           </button>
                         </Link>
-                        <button className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors">
+                        <button className="p-1.5 text-red-600 hover:bg-red-50 rounded smooth-transition hover-lift">
                           <FiTrash2 size={14} />
                         </button>
                       </div>

@@ -110,6 +110,201 @@ textarea:focus::placeholder {
   box-shadow: 0 0 0 2px rgba(27, 58, 109, 0.2);
 }
 
+/* Custom animations and transitions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+/* Stagger animation delays - smaller increments */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+/* Initial hidden state for animations */
+.animate-on-load {
+  opacity: 0;
+}
+
+/* Smooth reveal without jarring movements */
+.smooth-reveal {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Hover animations */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Smooth transitions for all interactive elements */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced button animations */
+.btn-animate {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading state animations */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Micro-interactions */
+.micro-bounce {
+  transition: transform 0.1s ease-in-out;
+}
+
+.micro-bounce:active {
+  transform: scale(0.98);
+}
+
+/* Floating animation for special elements */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient animation for special effects */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #1b3a6d, #152f5a, #1b3a6d, #152f5a);
+  background-size: 400% 400%;
+  animation: gradient 3s ease infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -130,16 +325,34 @@ textarea:focus::placeholder {
 
 /* Consistent spacing and sizing utilities */
 .app-header {
-  padding: 1rem 2rem; /* px-8 py-4 */
+  padding: 0.75rem 1rem; /* More compact padding */
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    padding: 1rem 2rem; /* px-8 py-4 for desktop */
+  }
 }
 
 .app-content {
-  padding: 1.5rem; /* p-6 */
+  padding: 0.75rem; /* More compact on mobile */
+}
+
+@media (min-width: 768px) {
+  .app-content {
+    padding: 1.5rem; /* p-6 for desktop */
+  }
 }
 
 .app-card {
-  padding: 1rem; /* p-4 */
+  padding: 0.875rem; /* Slightly less padding for mobile */
   border-radius: 0.5rem; /* rounded-lg */
+}
+
+@media (min-width: 768px) {
+  .app-card {
+    padding: 1rem; /* Full padding on desktop */
+  }
 }
 
 .app-form-input {
@@ -165,16 +378,142 @@ textarea:focus::placeholder {
 }
 
 .app-text-lg {
-  font-size: 1rem; /* text-base instead of text-lg */
+  font-size: 1rem; /* text-base on mobile */
   line-height: 1.5rem;
 }
 
+@media (min-width: 768px) {
+  .app-text-lg {
+    font-size: 1.125rem; /* text-lg on desktop */
+    line-height: 1.75rem;
+  }
+}
+
 .app-text-xl {
-  font-size: 1.125rem; /* text-lg instead of text-xl */
+  font-size: 1.125rem; /* text-lg on mobile */
   line-height: 1.75rem;
 }
 
+@media (min-width: 768px) {
+  .app-text-xl {
+    font-size: 1.25rem; /* text-xl on desktop */
+    line-height: 1.75rem;
+  }
+}
+
 .app-text-2xl {
-  font-size: 1.25rem; /* text-xl instead of text-2xl */
+  font-size: 1.25rem; /* text-xl on mobile */
   line-height: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .app-text-2xl {
+    font-size: 1.5rem; /* text-2xl on desktop */
+    line-height: 2rem;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .app-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem; /* Reduce padding on mobile */
+  }
+
+  .app-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .app-content {
+    padding: 0.75rem; /* Reduce content padding on mobile */
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure proper text wrapping */
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Mobile grid adjustments */
+  .grid {
+    gap: 1rem; /* Better gap spacing on mobile */
+  }
+
+  /* Dashboard cards mobile styling */
+  .app-card {
+    min-height: auto;
+    padding: 1rem; /* Consistent padding */
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  }
+
+  /* Mobile responsive text */
+  .app-text-2xl {
+    font-size: 1.125rem; /* Smaller on mobile */
+    line-height: 1.5rem;
+  }
+
+  .app-text-xl {
+    font-size: 1rem; /* Smaller on mobile */
+    line-height: 1.25rem;
+    font-weight: 700; /* Ensure bold text */
+  }
+
+  /* Better mobile text handling */
+  .break-words {
+    word-break: break-word;
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  /* Ensure proper flex behavior in cards */
+  .app-card .flex-grow {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Mobile button adjustments */
+  .app-button {
+    padding: 0.5rem 0.75rem; /* Smaller padding on mobile */
+    font-size: 0.75rem; /* Smaller text on mobile */
+  }
+
+  /* Mobile header improvements */
+  .app-header h1 {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  /* Mobile activity improvements */
+  .space-y-0 > * + * {
+    margin-top: 0;
+  }
+
+  /* Ensure proper flex behavior on mobile */
+  .flex-1 {
+    min-width: 0;
+  }
+
+  .flex-shrink-0 {
+    flex-shrink: 0;
+  }
+
+  /* Dashboard card specific mobile improvements */
+  .min-h-\[100px\] {
+    min-height: 110px; /* Slightly taller on mobile for better spacing */
+  }
+
+  /* Better mobile card content spacing */
+  .app-card > div {
+    height: 100%;
+  }
 }
