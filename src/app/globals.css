@@ -130,16 +130,34 @@ textarea:focus::placeholder {
 
 /* Consistent spacing and sizing utilities */
 .app-header {
-  padding: 1rem 2rem; /* px-8 py-4 */
+  padding: 0.75rem 1rem; /* More compact padding */
+}
+
+@media (min-width: 768px) {
+  .app-header {
+    padding: 1rem 2rem; /* px-8 py-4 for desktop */
+  }
 }
 
 .app-content {
-  padding: 1.5rem; /* p-6 */
+  padding: 0.75rem; /* More compact on mobile */
+}
+
+@media (min-width: 768px) {
+  .app-content {
+    padding: 1.5rem; /* p-6 for desktop */
+  }
 }
 
 .app-card {
-  padding: 1rem; /* p-4 */
+  padding: 0.875rem; /* Slightly less padding for mobile */
   border-radius: 0.5rem; /* rounded-lg */
+}
+
+@media (min-width: 768px) {
+  .app-card {
+    padding: 1rem; /* Full padding on desktop */
+  }
 }
 
 .app-form-input {
@@ -165,16 +183,142 @@ textarea:focus::placeholder {
 }
 
 .app-text-lg {
-  font-size: 1rem; /* text-base instead of text-lg */
+  font-size: 1rem; /* text-base on mobile */
   line-height: 1.5rem;
 }
 
+@media (min-width: 768px) {
+  .app-text-lg {
+    font-size: 1.125rem; /* text-lg on desktop */
+    line-height: 1.75rem;
+  }
+}
+
 .app-text-xl {
-  font-size: 1.125rem; /* text-lg instead of text-xl */
+  font-size: 1.125rem; /* text-lg on mobile */
   line-height: 1.75rem;
 }
 
+@media (min-width: 768px) {
+  .app-text-xl {
+    font-size: 1.25rem; /* text-xl on desktop */
+    line-height: 1.75rem;
+  }
+}
+
 .app-text-2xl {
-  font-size: 1.25rem; /* text-xl instead of text-2xl */
+  font-size: 1.25rem; /* text-xl on mobile */
   line-height: 1.75rem;
+}
+
+@media (min-width: 768px) {
+  .app-text-2xl {
+    font-size: 1.5rem; /* text-2xl on desktop */
+    line-height: 2rem;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+  .app-header {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem; /* Reduce padding on mobile */
+  }
+
+  .app-card {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+  }
+
+  .app-content {
+    padding: 0.75rem; /* Reduce content padding on mobile */
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure proper text wrapping */
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  /* Mobile grid adjustments */
+  .grid {
+    gap: 1rem; /* Better gap spacing on mobile */
+  }
+
+  /* Dashboard cards mobile styling */
+  .app-card {
+    min-height: auto;
+    padding: 1rem; /* Consistent padding */
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06);
+  }
+
+  /* Mobile responsive text */
+  .app-text-2xl {
+    font-size: 1.125rem; /* Smaller on mobile */
+    line-height: 1.5rem;
+  }
+
+  .app-text-xl {
+    font-size: 1rem; /* Smaller on mobile */
+    line-height: 1.25rem;
+    font-weight: 700; /* Ensure bold text */
+  }
+
+  /* Better mobile text handling */
+  .break-words {
+    word-break: break-word;
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
+
+  /* Ensure proper flex behavior in cards */
+  .app-card .flex-grow {
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Mobile button adjustments */
+  .app-button {
+    padding: 0.5rem 0.75rem; /* Smaller padding on mobile */
+    font-size: 0.75rem; /* Smaller text on mobile */
+  }
+
+  /* Mobile header improvements */
+  .app-header h1 {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+
+  /* Mobile activity improvements */
+  .space-y-0 > * + * {
+    margin-top: 0;
+  }
+
+  /* Ensure proper flex behavior on mobile */
+  .flex-1 {
+    min-width: 0;
+  }
+
+  .flex-shrink-0 {
+    flex-shrink: 0;
+  }
+
+  /* Dashboard card specific mobile improvements */
+  .min-h-\[100px\] {
+    min-height: 110px; /* Slightly taller on mobile for better spacing */
+  }
+
+  /* Better mobile card content spacing */
+  .app-card > div {
+    height: 100%;
+  }
 }

@@ -14,14 +14,26 @@ const DashboardCard = ({ title, value, percentage, change, isPositive }: Dashboa
   const Icon = isPositive ? FiArrowUp : FiArrowDown;
 
   return (
-    <div className="bg-white app-card shadow-sm border border-gray-100">
-      <p className="text-gray-600 text-xs mb-2">{title}</p>
-      <h3 className="app-text-xl font-bold text-black mb-3">{value}</h3>
+    <div className="bg-white app-card shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+      <div className="flex flex-col justify-between h-full min-h-[100px] sm:min-h-[120px]">
+        {/* Title */}
+        <div className="mb-2">
+          <p className="text-gray-600 text-xs font-medium leading-tight">{title}</p>
+        </div>
 
-      <div className="flex items-center">
-        <Icon className={`${textColor} mr-1`} size={12} />
-        <span className={`${textColor} text-xs font-medium mr-1`}>{percentage}</span>
-        <span className="text-gray-400 text-xs">{change}</span>
+        {/* Value */}
+        <div className="mb-3 flex-grow flex items-center">
+          <h3 className="app-text-xl font-bold text-black leading-tight break-words">{value}</h3>
+        </div>
+
+        {/* Change indicator */}
+        <div className="flex items-center justify-start gap-1">
+          <div className="flex items-center flex-shrink-0">
+            <Icon className={`${textColor} mr-1`} size={12} />
+            <span className={`${textColor} text-xs font-medium`}>{percentage}</span>
+          </div>
+          <span className="text-gray-400 text-xs truncate ml-1">{change}</span>
+        </div>
       </div>
     </div>
   );
