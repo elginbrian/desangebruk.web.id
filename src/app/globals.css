@@ -110,6 +110,201 @@ textarea:focus::placeholder {
   box-shadow: 0 0 0 2px rgba(27, 58, 109, 0.2);
 }
 
+/* Custom animations and transitions */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Animation utility classes */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.6s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.6s ease-out forwards;
+}
+
+/* Stagger animation delays - smaller increments */
+.stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.stagger-2 {
+  animation-delay: 0.1s;
+}
+
+.stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.stagger-4 {
+  animation-delay: 0.2s;
+}
+
+/* Initial hidden state for animations */
+.animate-on-load {
+  opacity: 0;
+}
+
+/* Smooth reveal without jarring movements */
+.smooth-reveal {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Hover animations */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.1);
+}
+
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Smooth transitions for all interactive elements */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced button animations */
+.btn-animate {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-animate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading state animations */
+.loading-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Micro-interactions */
+.micro-bounce {
+  transition: transform 0.1s ease-in-out;
+}
+
+.micro-bounce:active {
+  transform: scale(0.98);
+}
+
+/* Floating animation for special elements */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Gradient animation for special effects */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background: linear-gradient(-45deg, #1b3a6d, #152f5a, #1b3a6d, #152f5a);
+  background-size: 400% 400%;
+  animation: gradient 3s ease infinite;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
