@@ -1,6 +1,6 @@
+import React, { useState, useEffect } from "react";
 import { IconType } from "react-icons";
 import { FiArrowUp, FiArrowDown } from "react-icons/fi";
-import { useEffect, useState } from "react";
 
 interface DashboardCardProps {
   title: string;
