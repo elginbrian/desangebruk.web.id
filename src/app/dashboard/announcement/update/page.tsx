@@ -1,3 +1,5 @@
+"use client";
+
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import AnnouncementForm from "@/component/dashboard/AnnouncementForm";
