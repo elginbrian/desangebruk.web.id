@@ -11,18 +11,20 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth = true, redirectTo = "/login" }) => {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, user, profile } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading) {
-      if (requireAuth && !isAuthenticated) {
+      if (requireAuth && (!isAuthenticated || !user || !profile)) {
+        console.log("Redirecting to login - Auth required but user not authenticated or profile not loaded");
         router.push(redirectTo);
-      } else if (!requireAuth && isAuthenticated) {
+      } else if (!requireAuth && isAuthenticated && user && profile) {
+        console.log("Redirecting to dashboard - User is authenticated");
         router.push("/dashboard");
       }
     }
-  }, [isAuthenticated, loading, router, requireAuth, redirectTo]);
+  }, [isAuthenticated, loading, router, requireAuth, redirectTo, user, profile]);
 
   // Show loading while checking auth state
   if (loading) {
@@ -37,12 +39,26 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth =
   }
 
   // Don't render children if auth check fails
-  if (requireAuth && !isAuthenticated) {
-    return null;
+  if (requireAuth && (!isAuthenticated || !user || !profile)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B3A6D] mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm">Mengalihkan...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!requireAuth && isAuthenticated) {
-    return null;
+  if (!requireAuth && isAuthenticated && user && profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B3A6D] mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm">Mengalihkan ke dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return <>{children}</>;

@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardPage = () => {
   const [mounted, setMounted] = useState(false);
-  const { profile } = useAuth();
+  const { profile, user, loading } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -16,6 +16,18 @@ const DashboardPage = () => {
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Show loading if profile is still being loaded
+  if (loading || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B3A6D] mx-auto mb-4"></div>
+          <p className="text-gray-600 text-sm">Memuat data profil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -25,7 +37,12 @@ const DashboardPage = () => {
         mounted={mounted}
         actions={
           <div className="text-left sm:text-right sm:min-w-0 sm:flex-shrink-0">
-            <p className="text-gray-600 text-xs truncate smooth-transition">Selamat datang, {profile?.name || "Admin"}</p>
+            <p className="text-gray-600 text-xs truncate smooth-transition">
+              Selamat datang, {profile.name || user?.displayName || "Admin"}
+            </p>
+            <p className="text-gray-400 text-xs truncate smooth-transition">
+              {profile.role === "admin" ? "Administrator" : "User"} • {profile.email}
+            </p>
             <p className="text-gray-400 text-xs truncate smooth-transition">
               {new Date().toLocaleDateString("id-ID", {
                 weekday: "long",
