@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import PageHeader from "@/component/common/PageHeader";
 import DashboardCard from "@/component/dashboard/DashboardCard";
 import RecentActivity from "@/component/dashboard/RecentActivity";
+import { useAuth } from "@/contexts/AuthContext";
 
 const DashboardPage = () => {
   const [mounted, setMounted] = useState(false);
+  const { profile } = useAuth();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -23,7 +25,7 @@ const DashboardPage = () => {
         mounted={mounted}
         actions={
           <div className="text-left sm:text-right sm:min-w-0 sm:flex-shrink-0">
-            <p className="text-gray-600 text-xs truncate smooth-transition">Selamat datang, Rifai</p>
+            <p className="text-gray-600 text-xs truncate smooth-transition">Selamat datang, {profile?.name || "Admin"}</p>
             <p className="text-gray-400 text-xs truncate smooth-transition">
               {new Date().toLocaleDateString("id-ID", {
                 weekday: "long",
