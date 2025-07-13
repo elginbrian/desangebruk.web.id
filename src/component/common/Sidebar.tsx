@@ -117,16 +117,28 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         {/* User Info & Logout */}
         <div className="px-4 py-4 border-t border-white/10 space-y-3">
-          {/* User Profile */}
-          <div className="flex items-center px-4 py-2 rounded-lg bg-white/5">
-            <div className="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-              <FiUser size={14} className="text-white" />
+          {/* User Profile Button */}
+          <Link
+            href="/dashboard/profile"
+            onClick={() => onClose()} // Close mobile menu when link is clicked
+            className={`
+              flex items-center px-4 py-2 rounded-lg smooth-transition text-xs group
+              hover:scale-105 active:scale-95
+              ${pathname === "/dashboard/profile" ? "bg-white text-[#1B3A6D] font-medium shadow-sm" : "bg-white/5 text-white/90 hover:bg-white/10 hover:text-white"}
+            `}
+          >
+            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center smooth-transition group-hover:scale-110 ${pathname === "/dashboard/profile" ? "bg-[#1B3A6D]/20 text-[#1B3A6D]" : "bg-white/20 text-white"}`}>
+              <FiUser size={14} />
             </div>
             <div className="ml-3 flex-1 min-w-0">
-              <p className="text-xs font-medium text-white truncate">{profile?.name || "Admin"}</p>
-              <p className="text-xs text-white/60 truncate">{profile?.email || "admin@example.com"}</p>
+              <p className={`text-xs font-medium truncate smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]" : "text-white"}`}>
+                {profile?.name || "Admin"}
+              </p>
+              <p className={`text-xs truncate capitalize smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]/60" : "text-white/60"}`}>
+                {profile?.role || "admin"}
+              </p>
             </div>
-          </div>
+          </Link>
 
           {/* Logout Button */}
           <button onClick={logout} className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-white/10 smooth-transition text-xs text-white/90 hover:text-white group hover:scale-105 active:scale-95">

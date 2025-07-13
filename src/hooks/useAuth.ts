@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOutUser, resetPassword, AuthError } from "@/lib/auth";
+import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOutUser, resetPassword, updateUserProfile, AuthError, UserProfile } from "@/lib/auth";
 
 export const useAuthActions = () => {
   const [loading, setLoading] = useState(false);
@@ -131,16 +131,42 @@ export const useAuthActions = () => {
     setError(null);
 
     try {
+      console.log('Requesting password reset for email:', email);
       const result = await resetPassword(email);
 
       if (result && "error" in result) {
+        console.error('Password reset failed:', result.error);
         setError(result.error.message);
         return { success: false, error: result.error.message };
       }
 
-      return { success: true, message: "Email reset password telah dikirim" };
+      console.log('Password reset email sent successfully');
+      return { success: true, message: "Email reset password telah dikirim. Silakan periksa kotak masuk email Anda (termasuk folder spam)." };
     } catch (error) {
-      const errorMessage = "Terjadi kesalahan saat mengirim email reset";
+      console.error('Unexpected error during password reset:', error);
+      const errorMessage = "Terjadi kesalahan saat mengirim email reset password";
+      setError(errorMessage);
+      return { success: false, error: errorMessage };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (uid: string, updateData: Partial<UserProfile>) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await updateUserProfile(uid, updateData);
+
+      if ("error" in result) {
+        setError(result.error.message);
+        return { success: false, error: result.error.message };
+      }
+
+      return { success: true, profile: result.profile };
+    } catch (error) {
+      const errorMessage = "Terjadi kesalahan saat memperbarui profil";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -158,6 +184,7 @@ export const useAuthActions = () => {
     loginWithGoogle,
     logout,
     forgotPassword,
+    updateProfile,
     loading,
     error,
     clearError,

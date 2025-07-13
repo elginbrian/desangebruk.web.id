@@ -9,6 +9,7 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   isAuthenticated: boolean;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -16,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   loading: true,
   isAuthenticated: false,
+  refreshProfile: async () => {},
 });
 
 export const useAuth = () => {
@@ -82,11 +84,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  const refreshProfile = async () => {
+    if (user) {
+      try {
+        const userProfile = await getUserProfile(user.uid);
+        if (userProfile) {
+          setProfile(userProfile);
+          console.log("Profile refreshed:", userProfile);
+        }
+      } catch (error) {
+        console.error("Error refreshing profile:", error);
+      }
+    }
+  };
+
   const value = {
     user,
     profile,
     loading,
     isAuthenticated: !!user && !!profile,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

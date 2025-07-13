@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
 // User profile interface
@@ -9,6 +9,7 @@ export interface UserProfile {
   name: string;
   role: "admin" | "user";
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 // Auth error interface
@@ -140,8 +141,17 @@ export const signOutUser = async (): Promise<void | { error: AuthError }> => {
 // Send password reset email
 export const resetPassword = async (email: string): Promise<void | { error: AuthError }> => {
   try {
-    await sendPasswordResetEmail(auth, email);
+    // Configure action code settings for password reset
+    const actionCodeSettings = {
+      url: `${window.location.origin}/login`, // URL to redirect after password reset
+      handleCodeInApp: false, // This will be handled by Firebase's default reset page
+    };
+
+    console.log("Attempting to send password reset email to:", email);
+    await sendPasswordResetEmail(auth, email, actionCodeSettings);
+    console.log("Password reset email sent successfully");
   } catch (error: any) {
+    console.error("Password reset error:", error);
     return {
       error: {
         code: error.code,
@@ -162,6 +172,48 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
   } catch (error) {
     console.error("Error getting user profile:", error);
     return null;
+  }
+};
+
+// Update user profile
+export const updateUserProfile = async (uid: string, updateData: Partial<UserProfile>): Promise<{ profile: UserProfile } | { error: AuthError }> => {
+  try {
+    const userDocRef = doc(db, "users", uid);
+
+    // Update document in Firestore
+    await updateDoc(userDocRef, {
+      ...updateData,
+      updatedAt: new Date(),
+    });
+
+    // Get updated profile
+    const updatedDoc = await getDoc(userDocRef);
+    if (updatedDoc.exists()) {
+      const profile = updatedDoc.data() as UserProfile;
+
+      // Also update Firebase Auth display name if name was changed
+      if (updateData.name && auth.currentUser) {
+        await updateProfile(auth.currentUser, {
+          displayName: updateData.name,
+        });
+      }
+
+      return { profile };
+    } else {
+      return {
+        error: {
+          code: "profile/not-found",
+          message: "Profil pengguna tidak ditemukan",
+        },
+      };
+    }
+  } catch (error: any) {
+    return {
+      error: {
+        code: error.code,
+        message: getAuthErrorMessage(error.code),
+      },
+    };
   }
 };
 
@@ -193,7 +245,17 @@ const getAuthErrorMessage = (errorCode: string): string => {
       return "Jendela masuk ditutup. Silakan coba lagi.";
     case "auth/cancelled-popup-request":
       return "Permintaan masuk dibatalkan.";
+    case "profile/not-found":
+      return "Profil pengguna tidak ditemukan.";
+    case "auth/user-not-found":
+      return "Email tidak ditemukan. Silakan periksa email Anda atau buat akun baru.";
+    case "auth/invalid-email":
+      return "Format email tidak valid. Silakan periksa kembali email Anda.";
+    case "auth/missing-email":
+      return "Email harus diisi.";
+    case "auth/too-many-requests":
+      return "Terlalu banyak percobaan reset password. Silakan tunggu beberapa menit sebelum mencoba lagi.";
     default:
-      return "Terjadi kesalahan. Silakan coba lagi.";
+      return "Terjadi kesalahan saat mengirim email reset password. Silakan coba lagi.";
   }
 };
