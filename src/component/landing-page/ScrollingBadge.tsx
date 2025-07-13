@@ -3,22 +3,18 @@
 import React from "react";
 
 const ScrollingBadge = () => {
-  const badges = ["🏛️ Transparan", "📋 Informatif", "🤝 Melayani", "🔄 Transparan", "📊 Informatif", "💫 Melayani"];
+  const badges = ["Transparan", "Informatif", "Melayani"];
+
+  // Create multiple repetitions for seamless scrolling
+  const repeatedBadges = Array(8).fill(badges).flat();
 
   return (
-    <div className="bg-yellow-400 text-black py-3 overflow-hidden">
+    <div className="bg-[#1B3A6D] text-white py-2 md:py-3 overflow-hidden">
       <div className="flex animate-scroll">
-        {badges.map((badge, index) => (
-          <div key={index} className="flex items-center whitespace-nowrap px-8 text-sm font-semibold">
-            <span>{badge}</span>
-            <span className="ml-8 text-yellow-600">•</span>
-          </div>
-        ))}
-        {/* Duplicate for seamless loop */}
-        {badges.map((badge, index) => (
-          <div key={`duplicate-${index}`} className="flex items-center whitespace-nowrap px-8 text-sm font-semibold">
-            <span>{badge}</span>
-            <span className="ml-8 text-yellow-600">•</span>
+        {repeatedBadges.map((badge, index) => (
+          <div key={index} className="flex items-center whitespace-nowrap text-xs md:text-sm font-semibold">
+            <span className="text-yellow-400 mx-4 md:mx-8">⭐</span>
+            <span className="mx-3 md:mx-4">{badge}</span>
           </div>
         ))}
       </div>

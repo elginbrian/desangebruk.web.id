@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Desa Ngebruk - Malang, Jawa Timur",
+  title: "Desa Ngebruk, Kecamatan Sumberpucung, Kabupaten Malang",
   description: "Website resmi Desa Ngebruk, Kecamatan Sumberpucung, Kabupaten Malang, Jawa Timur. Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal.",
 };
 

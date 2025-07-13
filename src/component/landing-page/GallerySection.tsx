@@ -1,8 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const GallerySection = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
   const galleryImages = [
     {
       id: 1,
@@ -42,24 +50,56 @@ const GallerySection = () => {
     },
   ];
 
+  // Create multiple repetitions of images for seamless scrolling
+  const repeatedImagesRow1 = Array(4).fill(galleryImages).flat();
+  const repeatedImagesRow2 = Array(4).fill(galleryImages).flat();
+
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8">
-          {galleryImages.map((image) => (
-            <div key={image.id} className="group relative aspect-square bg-gray-200 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
-              <img src={image.src} alt={image.alt} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-opacity duration-300">
-                <div className="absolute bottom-0 left-0 right-0 p-4 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h3 className="text-sm font-semibold">{image.title}</h3>
-                </div>
+    <section className={`py-8 md:py-12 bg-white smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+      <div className="space-y-4 md:space-y-6 mb-6 md:mb-8">
+        {/* First Row - Scrolling Left */}
+        <div className="overflow-hidden">
+          <div className="flex animate-scroll-left gap-3 md:gap-6">
+            {repeatedImagesRow1.map((image, index) => (
+              <div key={`row1-${index}`} className="flex-shrink-0 w-48 h-64 md:w-64 md:h-96 group cursor-pointer overflow-hidden rounded-lg bg-gray-100 hover-lift smooth-transition">
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 smooth-transition"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = "/kantor_desa.jpg";
+                  }}
+                />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
+        {/* Second Row - Scrolling Right */}
+        <div className="overflow-hidden">
+          <div className="flex animate-scroll-right gap-3 md:gap-6">
+            {repeatedImagesRow2.map((image, index) => (
+              <div key={`row2-${index}`} className="flex-shrink-0 w-48 h-64 md:w-64 md:h-96 group cursor-pointer overflow-hidden rounded-lg bg-gray-100 hover-lift smooth-transition">
+                <img
+                  src={image.src}
+                  alt={image.alt}
+                  className="w-full h-full object-cover group-hover:scale-105 smooth-transition"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = "/kantor_desa.jpg";
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Button Section with Container */}
+      <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="text-center">
-          <button className="bg-[#1B3A6D] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#152f5a] transition-colors">Lihat Galeri Lengkap</button>
+          <button className="bg-[#1B3A6D] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg font-semibold hover:bg-[#152f5a] smooth-transition text-sm md:text-base btn-animate">Lihat Galeri Lainnya</button>
         </div>
       </div>
     </section>

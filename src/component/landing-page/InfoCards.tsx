@@ -1,47 +1,62 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FiSun, FiUsers, FiHome } from "react-icons/fi";
 
 const InfoCards = () => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 200);
+    return () => clearTimeout(timer);
+  }, []);
+
   const cardData = [
     {
       icon: FiSun,
       title: "Cuaca Hari Ini",
       value: "28°C",
       subtitle: "Cerah Berawan",
-      color: "bg-yellow-500",
+      extraInfo: "Kelembaban: 65%",
     },
     {
       icon: FiUsers,
       title: "Jumlah Penduduk",
       value: "2,847",
       subtitle: "Jiwa",
-      color: "bg-blue-500",
     },
     {
       icon: FiHome,
       title: "Jumlah RT",
-      value: "36",
+      value: "39",
       subtitle: "Rukun Tetangga",
-      color: "bg-green-500",
     },
   ];
 
   return (
-    <section className="py-16 bg-yellow-400">
+    <section className={`py-8 md:py-10 bg-yellow-400 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           {cardData.map((card, index) => (
-            <div key={index} className="bg-white rounded-lg p-8 shadow-sm hover:shadow-md transition-shadow text-center">
-              <div className="flex justify-center mb-6">
-                <div className={`p-4 rounded-full ${card.color} text-white`}>
-                  <card.icon size={32} />
-                </div>
+            <div key={index} className={`text-center md:text-left smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`} style={{ animationDelay: `${index * 0.1}s` }}>
+              {/* Icon */}
+              <div className="mb-4 md:mb-6 flex justify-center md:justify-start animate-float">
+                <card.icon size={40} className="text-[#1B3A6D] md:w-12 md:h-12 smooth-transition hover:scale-110" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">{card.title}</h3>
-              <div className="text-4xl font-bold text-gray-900 mb-2">{card.value}</div>
-              <p className="text-sm text-gray-600">{card.subtitle}</p>
+
+              {/* Title */}
+              <h3 className="text-lg md:text-xl font-semibold text-[#1B3A6D] mb-3 md:mb-4 smooth-transition">{card.title}</h3>
+
+              {/* Value */}
+              <div className="text-3xl md:text-4xl font-bold text-[#1B3A6D] mb-2 smooth-transition hover:scale-105">{card.value}</div>
+
+              {/* Subtitle */}
+              <p className="text-sm text-[#1B3A6D] mb-1 smooth-transition">{card.subtitle}</p>
+
+              {/* Extra info for weather card */}
+              {card.extraInfo && <p className="text-sm text-[#1B3A6D] smooth-transition">{card.extraInfo}</p>}
             </div>
           ))}
         </div>
