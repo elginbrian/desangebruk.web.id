@@ -2,11 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogOut } from "react-icons/fi";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAuthActions } from "@/hooks/useAuth";
+import UserDropdown from "@/component/common/UserDropdown";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { isAuthenticated, profile, loading } = useAuth();
+  const { logout } = useAuthActions();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -54,11 +59,21 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Login Button */}
+          {/* Auth Buttons */}
           <div className={`hidden md:flex items-center space-x-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-            <Link href="/login" className="bg-[#1B3A6D] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate">
-              Login
-            </Link>
+            {!loading && (
+              <>
+                {isAuthenticated && profile ? (
+                  // User is logged in - show user dropdown
+                  <UserDropdown />
+                ) : (
+                  // User is not logged in - show login button
+                  <Link href="/login" className="bg-[#1B3A6D] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate">
+                    Login
+                  </Link>
+                )}
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -85,9 +100,52 @@ const Header = () => {
                   {item.name}
                 </Link>
               ))}
-              <Link href="/login" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition mt-4 btn-animate" onClick={() => setIsMenuOpen(false)}>
-                Login
-              </Link>
+
+              {/* Mobile Auth Section */}
+              {!loading && (
+                <>
+                  {isAuthenticated && profile ? (
+                    // User is logged in - show user info and navigation for mobile
+                    <div className="pt-4 border-t border-gray-200 space-y-3">
+                      {/* User Info */}
+                      <div className="px-3 py-2 bg-gray-50 rounded-md">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-[#1B3A6D] rounded-full flex items-center justify-center">
+                            <FiUser className="text-white" size={16} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{profile.name}</p>
+                            <p className="text-xs text-gray-500">{profile.email}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Dashboard Link */}
+                      <Link href="/dashboard" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate flex items-center" onClick={() => setIsMenuOpen(false)}>
+                        <FiUser className="mr-2" size={16} />
+                        Dashboard
+                      </Link>
+
+                      {/* Logout Button */}
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                        }}
+                        className="w-full text-red-600 hover:text-red-700 px-3 py-2 text-sm font-medium smooth-transition text-left flex items-center"
+                      >
+                        <FiLogOut className="mr-2" size={16} />
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    // User is not logged in - show login button for mobile
+                    <Link href="/login" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition mt-4 btn-animate" onClick={() => setIsMenuOpen(false)}>
+                      Login
+                    </Link>
+                  )}
+                </>
+              )}
             </nav>
           </div>
         )}

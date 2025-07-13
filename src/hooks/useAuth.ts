@@ -21,8 +21,13 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Redirect to dashboard on successful login
-      router.push("/dashboard");
+      console.log("Login successful, user:", result.user.email);
+
+      // Small delay to ensure auth state is properly set
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
+
       return { success: true };
     } catch (error) {
       const errorMessage = "Terjadi kesalahan saat masuk";
@@ -45,8 +50,13 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Redirect to dashboard on successful registration
-      router.push("/dashboard");
+      console.log("Registration successful, user:", result.user.email);
+
+      // Small delay to ensure auth state is properly set
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
+
       return { success: true };
     } catch (error) {
       const errorMessage = "Terjadi kesalahan saat mendaftar";
@@ -69,8 +79,13 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Redirect to dashboard on successful login
-      router.push("/dashboard");
+      console.log("Google login successful, user:", result.user.email);
+
+      // Small delay to ensure auth state is properly set
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 100);
+
       return { success: true };
     } catch (error) {
       const errorMessage = "Terjadi kesalahan saat masuk dengan Google";
@@ -93,8 +108,14 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Redirect to login page on successful logout
-      router.push("/login");
+      console.log("Logout successful");
+
+      // Clear any local state if needed
+      // Small delay to ensure auth state is properly cleared
+      setTimeout(() => {
+        router.push("/login");
+      }, 100);
+
       return { success: true };
     } catch (error) {
       const errorMessage = "Terjadi kesalahan saat keluar";
