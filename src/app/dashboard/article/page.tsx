@@ -3,15 +3,24 @@
 import { FiPlus } from "react-icons/fi";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import DataTable from "@/component/common/DataTable";
+import { useArticles, useArticleActions } from "@/hooks/useArticles";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 
 const ArticlePage = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [mounted, setMounted] = useState(false);
+
+  const { articles, loading, error, hasMore, fetchArticles, loadMore, searchArticlesList, clearSearch } = useArticles();
+
+  const { remove, loading: deleteLoading } = useArticleActions();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,33 +29,61 @@ const ArticlePage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Sample data - replace with actual data from your backend
-  const articles = [
-    {
-      id: 1,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-    {
-      id: 2,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-    {
-      id: 3,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-  ];
+  useEffect(() => {
+    // Initial fetch
+    fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
+  }, [statusFilter]);
 
-  const filteredArticles = articles.filter((article) => article.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim()) {
+        searchArticlesList(searchTerm);
+      } else {
+        clearSearch();
+      }
+    }, 500);
 
-  const handleDelete = (id: string | number) => {
-    console.log("Delete article:", id);
-    // Handle delete logic here
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  const handleDelete = async (id: string | number) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus artikel ini?")) {
+      const success = await remove(String(id));
+      if (success) {
+        // Refresh the list
+        fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
+      }
+    }
+  };
+
+  const handleEdit = (id: string | number) => {
+    router.push(`/dashboard/article/update?id=${id}`);
+  };
+
+  const handleLoadMore = () => {
+    loadMore(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "-";
+
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return format(date, "dd MMM yyyy", { locale: idLocale });
+    } catch (error) {
+      return "-";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      published: { bg: "bg-green-100", text: "text-green-800", label: "Published" },
+      draft: { bg: "bg-yellow-100", text: "text-yellow-800", label: "Draft" },
+    };
+
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
+
+    return <span className={`app-button-small ${config.bg} ${config.text} font-medium smooth-transition`}>{config.label}</span>;
   };
 
   const columns = [
@@ -56,22 +93,35 @@ const ArticlePage = () => {
       className: "text-xs font-medium text-black",
       render: (value: string, item: any) => (
         <div>
-          <div className="max-w-xs truncate">{value}</div>
-          <div className="sm:hidden text-gray-500 text-xs mt-1">{item.dateCreated}</div>
+          <div className="max-w-xs truncate font-medium">{value}</div>
+          <div className="text-gray-500 text-xs mt-1 max-w-xs truncate">{item.excerpt || "Tidak ada excerpt"}</div>
+          <div className="sm:hidden text-gray-500 text-xs mt-1">{formatDate(item.createdAt)}</div>
         </div>
       ),
     },
     {
-      key: "dateCreated",
+      key: "authorName",
+      label: "Author",
+      className: "whitespace-nowrap text-xs text-gray-600 hidden md:table-cell",
+    },
+    {
+      key: "createdAt",
       label: "Date Created",
       className: "whitespace-nowrap text-xs text-gray-600 hidden sm:table-cell",
+      render: (value: any) => formatDate(value),
     },
     {
       key: "status",
       label: "Status",
       className: "whitespace-nowrap hidden sm:table-cell",
-      render: (value: string) => <span className="app-button-small bg-orange-100 text-orange-800 font-medium smooth-transition hover:bg-orange-200">{value}</span>,
+      render: (value: string) => getStatusBadge(value),
     },
+  ];
+
+  const statusOptions = [
+    { value: "All Status", label: "All Status" },
+    { value: "published", label: "Published" },
+    { value: "draft", label: "Draft" },
   ];
 
   const headerActions = (
@@ -83,6 +133,17 @@ const ArticlePage = () => {
     </Link>
   );
 
+  if (error) {
+    return (
+      <>
+        <PageHeader title="Kelola Berita" subtitle="Kelola dan atur berita desa" actions={headerActions} mounted={mounted} />
+        <div className="app-content">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{error}</div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <PageHeader title="Kelola Berita" subtitle="Kelola dan atur berita desa" actions={headerActions} mounted={mounted} />
@@ -90,9 +151,36 @@ const ArticlePage = () => {
       {/* Content */}
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
-          <SearchAndFilterBar title="Berita" searchTerm={searchTerm} onSearchChange={setSearchTerm} searchPlaceholder="Cari berita..." statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} mounted={mounted} />
+          <SearchAndFilterBar
+            title="Berita"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Cari berita..."
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            statusOptions={statusOptions}
+            mounted={mounted}
+          />
 
-          <DataTable columns={columns} data={filteredArticles} editRoute="/dashboard/article/update" onDelete={handleDelete} mounted={mounted} />
+          {loading && articles.length === 0 ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-gray-600">Memuat data artikel...</div>
+            </div>
+          ) : (
+            <>
+              <DataTable columns={columns} data={articles} editRoute={handleEdit} onDelete={handleDelete} mounted={mounted} />
+
+              {articles.length === 0 && !loading && <div className="text-center py-8 text-gray-500">{searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}</div>}
+
+              {hasMore && !searchTerm && (
+                <div className="flex justify-center py-4 border-t border-gray-100">
+                  <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
+                    {loading ? "Memuat..." : "Muat Lebih Banyak"}
+                  </ActionButton>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </>

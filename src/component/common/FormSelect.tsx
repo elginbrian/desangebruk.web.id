@@ -13,11 +13,12 @@ interface FormSelectProps {
   defaultValue?: string;
   options: Option[];
   required?: boolean;
+  disabled?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   className?: string;
 }
 
-const FormSelect = ({ label, id, name, value, defaultValue, options, required = false, onChange, className = "" }: FormSelectProps) => {
+const FormSelect = ({ label, id, name, value, defaultValue, options, required = false, disabled = false, onChange, className = "" }: FormSelectProps) => {
   return (
     <div>
       <label className="block text-xs font-medium text-black mb-2" htmlFor={id}>
@@ -30,7 +31,10 @@ const FormSelect = ({ label, id, name, value, defaultValue, options, required = 
         defaultValue={defaultValue}
         onChange={onChange}
         required={required}
-        className={`form-input app-form-input app-select w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent ${className}`}
+        disabled={disabled}
+        className={`form-input app-form-input app-select w-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent ${
+          disabled ? "bg-gray-50 text-gray-500 cursor-not-allowed" : ""
+        } ${className}`}
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
