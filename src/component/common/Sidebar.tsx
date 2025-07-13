@@ -1,9 +1,11 @@
 "use client";
 
-import { FiHome, FiFileText, FiBell, FiLogOut, FiX } from "react-icons/fi";
+import { FiHome, FiFileText, FiBell, FiLogOut, FiX, FiUser } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAuthActions } from "@/hooks/useAuth";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -13,6 +15,8 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
   const sidebarRef = useRef<HTMLElement>(null);
+  const { profile } = useAuth();
+  const { logout } = useAuthActions();
 
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
@@ -111,12 +115,24 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </ul>
         </nav>
 
-        {/* Logout */}
-        <div className="px-4 py-2 border-t border-white/10">
-          <a href="#" className="flex items-center px-4 py-3 rounded-lg hover:bg-white/10 smooth-transition text-xs text-white/90 hover:text-white group hover:scale-105 active:scale-95">
+        {/* User Info & Logout */}
+        <div className="px-4 py-4 border-t border-white/10 space-y-3">
+          {/* User Profile */}
+          <div className="flex items-center px-4 py-2 rounded-lg bg-white/5">
+            <div className="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+              <FiUser size={14} className="text-white" />
+            </div>
+            <div className="ml-3 flex-1 min-w-0">
+              <p className="text-xs font-medium text-white truncate">{profile?.name || "Admin"}</p>
+              <p className="text-xs text-white/60 truncate">{profile?.email || "admin@example.com"}</p>
+            </div>
+          </div>
+
+          {/* Logout Button */}
+          <button onClick={logout} className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-white/10 smooth-transition text-xs text-white/90 hover:text-white group hover:scale-105 active:scale-95">
             <FiLogOut className="mr-2 smooth-transition group-hover:scale-110" size={14} />
             <span className="smooth-transition">Logout</span>
-          </a>
+          </button>
         </div>
       </aside>
     </>
