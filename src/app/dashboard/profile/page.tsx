@@ -5,11 +5,14 @@ import PageHeader from "@/component/common/PageHeader";
 import FormInput from "@/component/common/FormInput";
 import ActionButton from "@/component/common/ActionButton";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuthActions } from "@/hooks/useAuth";
 
 const ProfilePage = () => {
   const [mounted, setMounted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const { profile, user } = useAuth();
+  const [success, setSuccess] = useState<string | null>(null);
+  const { profile, user, refreshProfile } = useAuth();
+  const { updateProfile, loading, error, clearError } = useAuthActions();
 
   const [formData, setFormData] = useState({
     name: profile?.name || "",
@@ -34,18 +37,47 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
+  // Clear success and error messages after 5 seconds
+  useEffect(() => {
+    if (success || error) {
+      const timer = setTimeout(() => {
+        setSuccess(null);
+        clearError();
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, error, clearError]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
+
+    // Clear success and error messages when user starts typing
+    if (success || error) {
+      setSuccess(null);
+      clearError();
+    }
   };
 
-  const handleSave = () => {
-    // TODO: Implement save functionality
-    console.log("Save profile:", formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (!user || !profile) return;
+
+    // Only update name since email and role shouldn't be editable
+    const updateData = {
+      name: formData.name,
+    };
+
+    const result = await updateProfile(user.uid, updateData);
+
+    if (result.success) {
+      setSuccess("Profil berhasil diperbarui!");
+      setIsEditing(false);
+      // Refresh the profile data
+      await refreshProfile();
+    }
   };
 
   const handleCancel = () => {
@@ -57,6 +89,8 @@ const ProfilePage = () => {
       });
     }
     setIsEditing(false);
+    setSuccess(null);
+    clearError();
   };
 
   if (!profile) {
@@ -72,11 +106,11 @@ const ProfilePage = () => {
 
   const headerActions = isEditing ? (
     <>
-      <ActionButton variant="secondary" onClick={handleCancel}>
+      <ActionButton variant="secondary" onClick={handleCancel} disabled={loading}>
         Batal
       </ActionButton>
-      <ActionButton variant="primary" onClick={handleSave}>
-        Simpan
+      <ActionButton variant="primary" onClick={handleSave} disabled={loading}>
+        {loading ? "Menyimpan..." : "Simpan"}
       </ActionButton>
     </>
   ) : (
@@ -91,6 +125,20 @@ const ProfilePage = () => {
 
       {/* Content */}
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+        {/* Success Message */}
+        {success && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md smooth-transition">
+            <p className="text-green-600 text-sm">{success}</p>
+          </div>
+        )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
         <div className="bg-white app-card shadow-sm border border-gray-100">
           {/* Profile Header */}
           <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-gray-200">
@@ -100,7 +148,6 @@ const ProfilePage = () => {
             <div>
               <h2 className="text-xl font-bold text-gray-900">{profile.name}</h2>
               <p className="text-gray-600 capitalize">{profile.role}</p>
-              <p className="text-sm text-gray-500">Bergabung sejak {new Date(profile.createdAt).toLocaleDateString("id-ID")}</p>
             </div>
           </div>
 
