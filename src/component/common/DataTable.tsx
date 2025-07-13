@@ -12,7 +12,7 @@ interface Column {
 interface DataTableProps {
   columns: Column[];
   data: any[];
-  editRoute?: string;
+  editRoute?: string | ((id: string | number) => void);
   onDelete?: (id: string | number) => void;
   mounted?: boolean;
 }
@@ -42,13 +42,18 @@ const DataTable = ({ columns, data, editRoute, onDelete, mounted = true }: DataT
               {(editRoute || onDelete) && (
                 <td className="app-table-cell whitespace-nowrap text-xs text-gray-600">
                   <div className="flex gap-1">
-                    {editRoute && (
-                      <Link href={`${editRoute}?id=${item.id}`}>
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                    {editRoute &&
+                      (typeof editRoute === "string" ? (
+                        <Link href={`${editRoute}?id=${item.id}`}>
+                          <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                            <FiEdit size={14} />
+                          </button>
+                        </Link>
+                      ) : (
+                        <button onClick={() => editRoute(item.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
                           <FiEdit size={14} />
                         </button>
-                      </Link>
-                    )}
+                      ))}
                     {onDelete && (
                       <button onClick={() => onDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded smooth-transition hover-lift">
                         <FiTrash2 size={14} />

@@ -2,9 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePublishedArticles } from "@/hooks/useArticles";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 
 const NewsSection = () => {
   const [mounted, setMounted] = useState(false);
+  const { articles, loading, error } = usePublishedArticles(4); // Ambil 4 artikel terbaru
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -13,28 +17,40 @@ const NewsSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const newsData = [
-    {
-      id: 1,
-      title: "Siaran Pers: Kementerian Pariwisata Fasilitasi Geopark Kaldera Toba Raih...",
-      excerpt: "Jakarta, 8 Juli 2025 - Kementerian Pariwisata berkomitmen untuk mendukung upaya meraih kembali green card bagi Kaldera Toba melalui...",
-      date: "Rabu, 9 Juli 2025",
-      image: "/kantor_desa.jpg",
-      category: "Kegiatan",
-      views: "133",
-      author: "Desa Ngebruk",
-    },
-    {
-      id: 2,
-      title: "Siaran Pers: Kementerian Pariwisata Fasilitasi Geopark Kaldera Toba Raih...",
-      excerpt: "Jakarta, 8 Juli 2025 - Kementerian Pariwisata berkomitmen untuk mendukung upaya meraih kembali green card bagi Kaldera Toba melalui...",
-      date: "Rabu, 9 Juli 2025",
-      image: "/stasiun_ngebruk.JPG",
-      category: "Kegiatan",
-      views: "133",
-      author: "Desa Ngebruk",
-    },
-  ];
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return format(date, "EEEE, dd MMMM yyyy", { locale: idLocale });
+    } catch (error) {
+      return "";
+    }
+  };
+
+  // Tampilkan berita dummy jika tidak ada data dari Firebase atau ada error
+  const newsData =
+    articles.length > 0
+      ? articles.slice(0, 2)
+      : [
+          {
+            id: "1",
+            title: "Selamat Datang di Website Desa Ngebruk",
+            excerpt: "Website resmi Desa Ngebruk telah hadir untuk memberikan informasi terkini tentang kegiatan, pengumuman, dan perkembangan di desa kami.",
+            createdAt: new Date(),
+            imageUrl: "/kantor_desa.jpg",
+            authorName: "Desa Ngebruk",
+            slug: "selamat-datang-website-desa-ngebruk",
+          },
+          {
+            id: "2",
+            title: "Pembangunan Infrastruktur Desa Terus Berlanjut",
+            excerpt: "Pemerintah Desa Ngebruk terus berkomitmen dalam pembangunan infrastruktur untuk meningkatkan kesejahteraan masyarakat.",
+            createdAt: new Date(),
+            imageUrl: "/stasiun_ngebruk.JPG",
+            authorName: "Desa Ngebruk",
+            slug: "pembangunan-infrastruktur-desa",
+          },
+        ];
 
   const announcements = [
     {
@@ -61,50 +77,56 @@ const NewsSection = () => {
           {/* Left Content - News */}
           <div className={`lg:col-span-2 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
             <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 md:mb-8 smooth-transition">Berita</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
-              {newsData.map((news, index) => (
-                <div
-                  key={news.id}
-                  className={`bg-white rounded-2xl shadow-lg hover:shadow-xl smooth-transition overflow-hidden group cursor-pointer hover-lift ${mounted ? "smooth-reveal" : "animate-on-load"}`}
-                  style={{ animationDelay: `${(index + 2) * 0.1}s` }}
-                >
-                  {/* Image */}
-                  <div className="aspect-video overflow-hidden">
-                    <img src={news.image} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
-                  </div>
 
-                  {/* Content */}
-                  <div className="p-4 md:p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2 md:mb-3 line-clamp-2 text-sm leading-relaxed smooth-transition group-hover:text-[#1B3A6D]">{news.title}</h3>
-                    <p className="text-gray-600 text-xs mb-3 md:mb-4 line-clamp-3 leading-relaxed smooth-transition">{news.excerpt}</p>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B3A6D] mx-auto mb-2"></div>
+                <div className="text-gray-600">Memuat berita...</div>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 mb-6 md:mb-8">
+                  {newsData.map((news, index) => (
+                    <Link
+                      key={news.id}
+                      href={`/berita/${news.slug}`}
+                      className={`bg-white rounded-2xl shadow-lg hover:shadow-xl smooth-transition overflow-hidden group cursor-pointer hover-lift ${mounted ? "smooth-reveal" : "animate-on-load"}`}
+                      style={{ animationDelay: `${(index + 2) * 0.1}s` }}
+                    >
+                      {/* Image */}
+                      <div className="aspect-video overflow-hidden">
+                        <img src={news.imageUrl || "/kantor_desa.jpg"} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
+                      </div>
 
-                    {/* Footer */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-[#1B3A6D] rounded-full flex items-center justify-center hover-scale smooth-transition">
-                          <span className="text-white text-xs font-bold">DN</span>
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-gray-900 smooth-transition">{news.author}</p>
-                          <p className="text-xs text-gray-500 smooth-transition">{news.date}</p>
+                      {/* Content */}
+                      <div className="p-4 md:p-6">
+                        <h3 className="font-semibold text-gray-900 mb-2 md:mb-3 line-clamp-2 text-sm leading-relaxed smooth-transition group-hover:text-[#1B3A6D]">{news.title}</h3>
+                        <p className="text-gray-600 text-xs mb-3 md:mb-4 line-clamp-3 leading-relaxed smooth-transition">{news.excerpt || "Tidak ada excerpt"}</p>
+
+                        {/* Footer */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-[#1B3A6D] rounded-full flex items-center justify-center hover-scale smooth-transition">
+                              <span className="text-white text-xs font-bold">DN</span>
+                            </div>
+                            <div>
+                              <p className="text-xs font-medium text-gray-900 smooth-transition">{news.authorName}</p>
+                              <p className="text-xs text-gray-500 smooth-transition">{formatDate(news.createdAt)}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1 text-gray-400 smooth-transition hover:text-[#1B3A6D]">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-xs">{news.views}</span>
-                      </div>
-                    </div>
-                  </div>
+                    </Link>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className={`smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
-              <button className="bg-[#1B3A6D] text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium hover:bg-[#152f5a] smooth-transition text-sm btn-animate">Berita Lainnya</button>
-            </div>
+                <div className={`smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+                  <Link href="/berita" className="bg-[#1B3A6D] text-white px-4 md:px-6 py-2 md:py-3 rounded-lg font-medium hover:bg-[#152f5a] smooth-transition text-sm btn-animate inline-block">
+                    Berita Lainnya
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Right Sidebar - Announcements */}
