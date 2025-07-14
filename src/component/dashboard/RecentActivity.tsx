@@ -69,9 +69,9 @@ const RecentActivity = () => {
   }, []);
 
   return (
-    <div className={`bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 smooth-transition hover-lift ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2 sm:gap-0">
-        <h3 className="app-text-lg font-semibold text-black smooth-transition">Aktivitas Terbaru</h3>
+        <h3 className="text-lg font-semibold text-gray-900 smooth-transition">Aktivitas Terbaru</h3>
         <button className="text-[#1B3A6D] text-xs hover:underline self-start sm:self-auto smooth-transition hover:text-[#152f5a]">Lihat Semua</button>
       </div>
 
@@ -85,14 +85,14 @@ const RecentActivity = () => {
             <div
               key={activity.id}
               className={`
-                flex flex-col sm:flex-row sm:justify-between py-3 
-                border-b border-gray-100 last:border-b-0 gap-1 sm:gap-4
+                flex flex-col py-3 
+                border-b border-gray-100 last:border-b-0 gap-1
                 smooth-transition hover:bg-gray-50 px-2 -mx-2 rounded-md
                 ${mounted ? `smooth-reveal stagger-${index + 1}` : "animate-on-load"}
               `}
             >
-              <p className="text-black text-xs leading-relaxed flex-1 min-w-0 smooth-transition">{activity.description}</p>
-              <p className="text-gray-500 text-xs whitespace-nowrap flex-shrink-0 self-start sm:self-center smooth-transition">{activity.time}</p>
+              <p className="text-gray-900 text-sm leading-relaxed smooth-transition">{activity.description}</p>
+              <p className="text-gray-500 text-xs smooth-transition">{activity.time}</p>
             </div>
           ))}
         </div>

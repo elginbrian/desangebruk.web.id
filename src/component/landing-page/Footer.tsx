@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FiInstagram, FiYoutube, FiPhone, FiMail } from "react-icons/fi";
+import VisitorCounter from "@/component/common/VisitorCounter";
 
 const Footer = () => {
   const [mounted, setMounted] = useState(false);
@@ -83,8 +84,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-
-        {/* Copyright */}
       </div>
       <div className={`text-center pt-3 md:pt-2 pb-4 bg-[#152d55] smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
         <p className="text-white text-xs md:text-xs mb-1 mt-2 smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>

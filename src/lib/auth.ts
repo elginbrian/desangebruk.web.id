@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User, updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, User, updateProfile, sendPasswordResetEmail } from "firebase/auth";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
@@ -77,43 +77,6 @@ export const signInWithEmail = async (email: string, password: string): Promise<
       await setDoc(doc(db, "users", user.uid), userProfile);
       return { user, profile: userProfile };
     }
-  } catch (error: any) {
-    return {
-      error: {
-        code: error.code,
-        message: getAuthErrorMessage(error.code),
-      },
-    };
-  }
-};
-
-// Sign in with Google
-export const signInWithGoogle = async (): Promise<{ user: User; profile: UserProfile } | { error: AuthError }> => {
-  try {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
-
-    // Check if user profile exists
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-
-    let profile: UserProfile;
-    if (userDoc.exists()) {
-      profile = userDoc.data() as UserProfile;
-    } else {
-      // Create new profile for Google user
-      profile = {
-        uid: user.uid,
-        email: user.email || "",
-        name: user.displayName || "Admin",
-        role: "admin",
-        createdAt: new Date(),
-      };
-
-      await setDoc(doc(db, "users", user.uid), profile);
-    }
-
-    return { user, profile };
   } catch (error: any) {
     return {
       error: {
@@ -237,21 +200,11 @@ const getAuthErrorMessage = (errorCode: string): string => {
       return "Terlalu banyak percobaan. Silakan coba lagi nanti.";
     case "auth/network-request-failed":
       return "Koneksi internet bermasalah. Silakan periksa koneksi Anda.";
-    case "auth/popup-closed-by-user":
-      return "Jendela masuk ditutup. Silakan coba lagi.";
-    case "auth/cancelled-popup-request":
-      return "Permintaan masuk dibatalkan.";
     case "profile/not-found":
       return "Profil pengguna tidak ditemukan.";
-    case "auth/user-not-found":
-      return "Email tidak ditemukan. Silakan periksa email Anda atau buat akun baru.";
-    case "auth/invalid-email":
-      return "Format email tidak valid. Silakan periksa kembali email Anda.";
     case "auth/missing-email":
       return "Email harus diisi.";
-    case "auth/too-many-requests":
-      return "Terlalu banyak percobaan reset password. Silakan tunggu beberapa menit sebelum mencoba lagi.";
     default:
-      return "Terjadi kesalahan saat mengirim email reset password. Silakan coba lagi.";
+      return "Terjadi kesalahan. Silakan coba lagi.";
   }
 };

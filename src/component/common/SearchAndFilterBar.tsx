@@ -39,14 +39,14 @@ const SearchAndFilterBar = ({
               placeholder={searchPlaceholder}
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="form-input app-form-input search-input w-full sm:w-48 pr-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent smooth-transition"
+              className="form-input app-form-input search-input w-full sm:w-48 pr-3 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent text-black smooth-transition"
             />
           </div>
           {onStatusFilterChange && (
             <select
               value={statusFilter}
               onChange={(e) => onStatusFilterChange(e.target.value)}
-              className="form-input app-form-input app-select border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent bg-white smooth-transition"
+              className="form-input app-form-input app-select border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent bg-white text-black smooth-transition"
             >
               {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>

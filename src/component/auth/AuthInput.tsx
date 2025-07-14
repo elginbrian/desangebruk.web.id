@@ -30,7 +30,7 @@ const AuthInput = ({ label, type = "text", id, name, value, onChange, placeholde
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm smooth-transition hover:border-gray-400 hover-lift"
+          className="form-input w-full px-3 py-2.5 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm text-black smooth-transition hover:border-gray-400 hover-lift"
           placeholder={placeholder}
           required={required}
         />
