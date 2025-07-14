@@ -67,7 +67,7 @@ const HeroSection = () => {
   const weatherOverlayClass = weather ? getWeatherOverlayClass(weather.icon, weather.description) : "";
 
   return (
-    <section className="relative min-h-[85vh] flex items-center">
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
