@@ -32,6 +32,18 @@ body {
   color: var(--foreground);
   font-family: "Inter", sans-serif;
   font-weight: 400;
+  overflow-x: hidden; /* Prevent horizontal scroll on all screen sizes */
+}
+
+html {
+  overflow-x: hidden; /* Ensure html also prevents horizontal scroll */
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
 }
 
 /* Custom utility classes for consistent text colors */
@@ -376,6 +388,7 @@ select:focus {
 .animate-scroll {
   animation: scroll 20s linear infinite;
   width: max-content;
+  will-change: transform;
 }
 
 .animate-scroll-left {
@@ -570,11 +583,6 @@ select:focus {
     padding: 0.75rem; /* Reduce content padding on mobile */
   }
 
-  /* Prevent horizontal scroll */
-  body {
-    overflow-x: hidden;
-  }
-
   /* Ensure proper text wrapping */
   .truncate {
     white-space: nowrap;
@@ -735,10 +743,10 @@ select:focus {
   }
   97% {
     opacity: 1;
-    transform: translateY(95vh) translateX(35px) scaleY(1);
+    transform: translateY(95vh) translateX(min(35px, 5vw)) scaleY(1);
   }
   100% {
-    transform: translateY(100vh) translateX(40px) scaleY(0.8);
+    transform: translateY(100vh) translateX(min(40px, 6vw)) scaleY(0.8);
     opacity: 0;
   }
 }
@@ -773,10 +781,10 @@ select:focus {
   }
   98% {
     opacity: 1;
-    transform: translateY(96vh) translateX(50px) scaleY(1.2);
+    transform: translateY(96vh) translateX(min(50px, 8vw)) scaleY(1.2);
   }
   100% {
-    transform: translateY(100vh) translateX(55px) scaleY(1);
+    transform: translateY(100vh) translateX(min(55px, 9vw)) scaleY(1);
     opacity: 0;
   }
 }
@@ -810,6 +818,8 @@ select:focus {
   pointer-events: none;
   overflow: hidden;
   z-index: 5;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .rain-container.drizzle {
@@ -885,20 +895,20 @@ select:focus {
     transform: translateY(-90vh) translateX(5px) rotate(45deg) scale(1);
   }
   25% {
-    transform: translateY(-50vh) translateX(20px) rotate(180deg) scale(1.1);
+    transform: translateY(-50vh) translateX(min(20px, 3vw)) rotate(180deg) scale(1.1);
   }
   50% {
-    transform: translateY(0vh) translateX(40px) rotate(270deg) scale(1);
+    transform: translateY(0vh) translateX(min(40px, 6vw)) rotate(270deg) scale(1);
   }
   75% {
-    transform: translateY(50vh) translateX(60px) rotate(360deg) scale(0.9);
+    transform: translateY(50vh) translateX(min(60px, 9vw)) rotate(360deg) scale(0.9);
   }
   95% {
     opacity: 1;
-    transform: translateY(90vh) translateX(75px) rotate(450deg) scale(0.8);
+    transform: translateY(90vh) translateX(min(75px, 11vw)) rotate(450deg) scale(0.8);
   }
   100% {
-    transform: translateY(100vh) translateX(80px) rotate(480deg) scale(0.6);
+    transform: translateY(100vh) translateX(min(80px, 12vw)) rotate(480deg) scale(0.6);
     opacity: 0;
   }
 }
@@ -912,6 +922,8 @@ select:focus {
   pointer-events: none;
   overflow: hidden;
   z-index: 5;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .snow-flake {
@@ -937,7 +949,7 @@ select:focus {
     opacity: 1;
   }
   100% {
-    transform: translateX(calc(100vw + 120px));
+    transform: translateX(min(calc(100vw + 120px), calc(100% + 120px)));
     opacity: 0;
   }
 }
@@ -961,6 +973,8 @@ select:focus {
   pointer-events: none;
   overflow: hidden;
   z-index: 2;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .cloud {
@@ -1123,6 +1137,9 @@ select:focus {
   bottom: 0;
   pointer-events: none;
   z-index: 6;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .lightning-flash {
@@ -1289,11 +1306,14 @@ select:focus {
   pointer-events: none;
   overflow: hidden;
   z-index: 4;
+  width: 100%;
+  max-width: 100vw;
 }
 
 .fog-layer {
   position: absolute;
-  width: 250%;
+  width: 100%;
+  max-width: 100vw;
   height: 120px;
   background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 20%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.15) 80%, transparent 100%);
   animation: fog 20s ease-in-out infinite;

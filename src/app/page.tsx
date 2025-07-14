@@ -25,7 +25,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className={`min-h-screen smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+    <div className={`min-h-screen overflow-x-hidden smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <Header />
       <HeroSection />
       <ScrollingBadge />
