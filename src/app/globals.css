@@ -65,11 +65,32 @@ textarea:focus::placeholder {
 
 /* Custom styling for form elements */
 .form-input {
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
 }
 
 .form-input:focus {
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
+}
+
+/* Ensure all input and textarea elements have black text */
+input[type="text"],
+input[type="email"], 
+input[type="password"],
+input[type="date"],
+input[type="search"],
+textarea,
+select {
+  color: #000000 !important;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus, 
+input[type="password"]:focus,
+input[type="date"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  color: #000000 !important;
 }
 
 /* Search input specific styling */

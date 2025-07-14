@@ -74,6 +74,15 @@ const PengumumanPage = () => {
     <div className={`min-h-screen bg-gray-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <Header />
 
+      <section className="bg-[#1B3A6D] text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">Pengumuman Desa Ngebruk</h1>
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">Dapatkan pengumuman terkini seputar kegiatan, pembangunan, dan perkembangan di Desa Ngebruk</p>
+          </div>
+        </div>
+      </section>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tab Navigation */}
@@ -90,9 +99,6 @@ const PengumumanPage = () => {
 
         {/* Page Header */}
         <div className={`text-center mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">PENGUMUMAN</h1>
-          <p className="text-gray-600 mb-6">Semua Informasi Pengumuman Desa Ngebruk</p>
-
           {/* Search Bar */}
           <div className="max-w-md mx-auto relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -103,7 +109,7 @@ const PengumumanPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Cari"
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent smooth-transition"
+              className="form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent text-black smooth-transition"
             />
           </div>
         </div>

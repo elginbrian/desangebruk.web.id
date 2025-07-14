@@ -7,6 +7,7 @@ import Footer from "@/component/landing-page/Footer";
 import NewsCard from "@/component/common/NewsCard";
 import { LoadingSpinner, ErrorState, EmptyState, NewsCardSkeleton } from "@/component/common/LoadingStates";
 import { usePublishedArticles } from "@/hooks/useArticles";
+import Link from "next/link";
 
 const BeritaPage = () => {
   const [mounted, setMounted] = useState(false);
@@ -73,13 +74,24 @@ const BeritaPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Berita Desa Ngebruk</h1>
-            <p className="text-lg text-white/90 max-w-2xl mx-auto">Dapatkan informasi terkini seputar kegiatan, pembangunan, dan perkembangan di Desa Ngebruk</p>
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">Dapatkan berita terkini seputar kegiatan, pembangunan, dan perkembangan di Desa Ngebruk</p>
           </div>
         </div>
       </section>
 
       {/* Search Section */}
-      <section className="py-8 bg-gray-50">
+      <section className="py-8 bg-white">
+        <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+          <div className="flex justify-center">
+            <div className="bg-white rounded-lg p-1 shadow-sm">
+              <button className="px-8 py-3 rounded-md font-medium text-sm transition-all duration-200 bg-[#1B3A6D] text-white ">Berita</button>
+              <Link href="/pengumuman">
+                <button className="px-8 py-3 font-medium text-sm transition-all duration-20 text-gray-600 hover:text-gray-900">Pengumuman</button>
+              </Link>
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <form onSubmit={handleSearch} className="max-w-md mx-auto">
             <div className="relative">
@@ -88,8 +100,8 @@ const BeritaPage = () => {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Cari berita..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent"
+                placeholder="Cari"
+                className="form-input w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#1B3A6D] focus:border-transparent text-black"
               />
             </div>
           </form>
