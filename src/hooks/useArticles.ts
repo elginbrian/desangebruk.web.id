@@ -174,34 +174,58 @@ export const useArticleActions = () => {
 
 export const usePublishedArticles = (limit?: number) => {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const fetchPublishedArticles = async () => {
-    try {
+  const fetchPublishedArticles = async (isRetry: boolean = false) => {
+    if (!isRetry) {
       setLoading(true);
-      setError(null);
+    }
+    setError(null);
 
+    try {
       const publishedArticles = await getPublishedArticles(limit);
       setArticles(publishedArticles);
+      setRetryCount(0); // Reset retry count on success
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch published articles";
       setError(errorMessage);
+
       // Set empty array on error so UI can show fallback content
       setArticles([]);
+
+      // Auto retry up to 2 times with exponential backoff
+      if (retryCount < 2 && !isRetry) {
+        setTimeout(() => {
+          setRetryCount((prev) => prev + 1);
+          fetchPublishedArticles(true);
+        }, Math.pow(2, retryCount) * 1000);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPublishedArticles();
+    // Add small delay to prevent rapid requests
+    const timer = setTimeout(() => {
+      fetchPublishedArticles();
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, [limit]);
+
+  const refetch = () => {
+    setRetryCount(0);
+    fetchPublishedArticles();
+  };
 
   return {
     articles,
     loading,
     error,
-    refetch: fetchPublishedArticles,
+    refetch,
+    retryCount,
   };
 };

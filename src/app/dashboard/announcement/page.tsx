@@ -2,16 +2,24 @@
 
 import { FiPlus } from "react-icons/fi";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
-import DataTable from "@/component/common/DataTable";
+import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
+import { useAnnouncements, useAnnouncementActions } from "@/hooks/useAnnouncements";
 
 const AnnouncementPage = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [mounted, setMounted] = useState(false);
+
+  const { announcements, loading, error, hasMore, fetchAnnouncements, loadMore, searchAnnouncementsList, clearSearch } = useAnnouncements();
+  const { remove, loading: deleteLoading } = useAnnouncementActions();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -20,59 +28,128 @@ const AnnouncementPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Sample data - replace with actual data from your backend
-  const announcements = [
-    {
-      id: 1,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-    {
-      id: 2,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-    {
-      id: 3,
-      title: "Village Festival 2024 Announcement",
-      dateCreated: "Jan 15, 2024",
-      status: "Lorem Ipsum",
-    },
-  ];
+  useEffect(() => {
+    // Fetch announcements when component mounts or status filter changes
+    const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+    fetchAnnouncements(10, statusFilterValue, true);
+  }, [statusFilter]);
 
-  const filteredAnnouncements = announcements.filter((announcement) => announcement.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  useEffect(() => {
+    // Handle search
+    if (searchTerm.trim()) {
+      const timeoutId = setTimeout(() => {
+        searchAnnouncementsList(searchTerm);
+      }, 500); // Debounce search
+
+      return () => clearTimeout(timeoutId);
+    } else {
+      clearSearch();
+      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+      fetchAnnouncements(10, statusFilterValue, true);
+    }
+  }, [searchTerm]);
+
+  const handleDelete = async (id: string | number) => {
+    if (window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
+      const success = await remove(id.toString());
+      if (success) {
+        // Refresh the list
+        const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+        fetchAnnouncements(10, statusFilterValue, true);
+      }
+    }
+  };
+
+  const handleEdit = (id: string | number) => {
+    router.push(`/dashboard/announcement/update?id=${id}`);
+  };
+
+  const handleLoadMore = () => {
+    const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+    loadMore(10, statusFilterValue);
+  };
+
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
+
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return format(date, "dd MMM yyyy", { locale: idLocale });
+    } catch (error) {
+      return "";
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusClasses = {
+      active: "bg-green-100 text-green-800",
+      inactive: "bg-yellow-100 text-yellow-800",
+      expired: "bg-red-100 text-red-800",
+    };
+
+    const statusLabels = {
+      active: "Aktif",
+      inactive: "Belum Aktif",
+      expired: "Kedaluwarsa",
+    };
+
+    return <span className={`app-button-small font-medium smooth-transition ${statusClasses[status as keyof typeof statusClasses] || "bg-gray-100 text-gray-800"}`}>{statusLabels[status as keyof typeof statusLabels] || status}</span>;
+  };
+
+  const statusOptions = [
+    { value: "All Status", label: "Semua Status" },
+    { value: "active", label: "Aktif" },
+    { value: "inactive", label: "Belum Aktif" },
+    { value: "expired", label: "Kedaluwarsa" },
+  ];
 
   const columns = [
     {
       key: "title",
-      label: "Title",
+      label: "Judul",
       className: "text-xs font-medium text-black",
       render: (value: string, item: any) => (
         <div>
           <div className="max-w-xs truncate">{value}</div>
-          <div className="sm:hidden text-gray-500 text-xs mt-1">{item.dateCreated}</div>
+          <div className="sm:hidden text-gray-500 text-xs mt-1">{formatDate(item.createdAt)}</div>
         </div>
       ),
     },
     {
-      key: "dateCreated",
-      label: "Date Created",
+      key: "createdAt",
+      label: "Tanggal Dibuat",
       className: "whitespace-nowrap text-xs text-gray-600 hidden sm:table-cell",
+      render: (value: any) => formatDate(value),
+    },
+    {
+      key: "priority",
+      label: "Prioritas",
+      className: "whitespace-nowrap text-xs text-gray-600 hidden md:table-cell",
+      render: (value: string) => {
+        const priorityClasses = {
+          normal: "bg-blue-100 text-blue-800",
+          penting: "bg-orange-100 text-orange-800",
+          urgent: "bg-red-100 text-red-800",
+        };
+
+        const priorityLabels = {
+          normal: "Normal",
+          penting: "Penting",
+          urgent: "Urgent",
+        };
+
+        return (
+          <span className={`app-button-small font-medium smooth-transition ${priorityClasses[value as keyof typeof priorityClasses] || "bg-gray-100 text-gray-800"}`}>{priorityLabels[value as keyof typeof priorityLabels] || value}</span>
+        );
+      },
     },
     {
       key: "status",
       label: "Status",
       className: "whitespace-nowrap hidden sm:table-cell",
-      render: (value: string) => <span className="app-button-small bg-orange-100 text-orange-800 font-medium smooth-transition hover:bg-orange-200">{value}</span>,
+      render: (value: string) => getStatusBadge(value),
     },
   ];
-
-  const handleDelete = (id: string | number) => {
-    console.log("Delete announcement:", id);
-    // Handle delete logic here
-  };
 
   const headerActions = (
     <Link href="/dashboard/announcement/create">
@@ -90,9 +167,39 @@ const AnnouncementPage = () => {
       {/* Content */}
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
-          <SearchAndFilterBar title="Pengumuman" searchTerm={searchTerm} onSearchChange={setSearchTerm} searchPlaceholder="Cari pengumuman..." statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} mounted={mounted} />
+          <SearchAndFilterBar
+            title="Pengumuman"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Cari pengumuman..."
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            statusOptions={statusOptions}
+            mounted={mounted}
+          />
 
-          <DataTable columns={columns} data={filteredAnnouncements} editRoute="/dashboard/announcement/update" onDelete={handleDelete} mounted={mounted} />
+          <DataTableWithStates
+            columns={columns}
+            data={announcements}
+            editRoute={handleEdit}
+            onDelete={handleDelete}
+            mounted={mounted}
+            loading={loading && announcements.length === 0}
+            error={error}
+            onRetry={() => {
+              const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+              fetchAnnouncements(10, statusFilterValue, true);
+            }}
+            emptyMessage={searchTerm ? "Tidak ditemukan pengumuman yang sesuai" : "Belum ada pengumuman"}
+          />
+
+          {hasMore && !searchTerm && announcements.length > 0 && (
+            <div className="flex justify-center py-4">
+              <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
+                {loading ? "Memuat..." : "Muat Lebih Banyak"}
+              </ActionButton>
+            </div>
+          )}
         </div>
       </div>
     </>

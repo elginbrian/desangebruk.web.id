@@ -50,14 +50,11 @@ const ForgotPasswordPage = () => {
       return;
     }
 
-    console.log('Submitting forgot password form for:', email);
     const result = await forgotPassword(email);
 
     if (result.success) {
       setMessage(result.message || "Email reset password telah dikirim!");
       setEmail(""); // Clear email field after successful submission
-    } else {
-      console.error('Forgot password failed:', result.error);
     }
   };
 

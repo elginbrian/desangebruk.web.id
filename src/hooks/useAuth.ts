@@ -21,8 +21,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      console.log("Login successful, user:", result.user.email);
-
       // Small delay to ensure auth state is properly set
       setTimeout(() => {
         router.push("/dashboard");
@@ -49,8 +47,6 @@ export const useAuthActions = () => {
         setError(result.error.message);
         return { success: false, error: result.error.message };
       }
-
-      console.log("Registration successful, user:", result.user.email);
 
       // Small delay to ensure auth state is properly set
       setTimeout(() => {
@@ -79,8 +75,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      console.log("Google login successful, user:", result.user.email);
-
       // Small delay to ensure auth state is properly set
       setTimeout(() => {
         router.push("/dashboard");
@@ -108,8 +102,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      console.log("Logout successful");
-
       // Clear any local state if needed
       // Small delay to ensure auth state is properly cleared
       setTimeout(() => {
@@ -131,19 +123,15 @@ export const useAuthActions = () => {
     setError(null);
 
     try {
-      console.log('Requesting password reset for email:', email);
       const result = await resetPassword(email);
 
       if (result && "error" in result) {
-        console.error('Password reset failed:', result.error);
         setError(result.error.message);
         return { success: false, error: result.error.message };
       }
 
-      console.log('Password reset email sent successfully');
       return { success: true, message: "Email reset password telah dikirim. Silakan periksa kotak masuk email Anda (termasuk folder spam)." };
     } catch (error) {
-      console.error('Unexpected error during password reset:', error);
       const errorMessage = "Terjadi kesalahan saat mengirim email reset password";
       setError(errorMessage);
       return { success: false, error: errorMessage };

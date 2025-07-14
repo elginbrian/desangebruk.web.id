@@ -2,15 +2,22 @@
 
 import { useState, useEffect } from "react";
 import { FiSearch } from "react-icons/fi";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import Header from "@/component/landing-page/Header";
 import Footer from "@/component/landing-page/Footer";
 import Link from "next/link";
+import { useActiveAnnouncements } from "@/hooks/useAnnouncements";
+import { LoadingSpinner, ErrorState, EmptyState, CardSkeleton } from "@/component/common/LoadingStates";
 
 const PengumumanPage = () => {
   const [mounted, setMounted] = useState(false);
   const [activeTab, setActiveTab] = useState("pengumuman");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  const { announcements, loading, error, refetch } = useActiveAnnouncements();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,64 +26,21 @@ const PengumumanPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Sample announcement data
-  const announcementData = [
-    {
-      id: 1,
-      title: "Pengumuman tentang Aksi Bersih Pegawai Pemerintah dengan Pernyataan Komitmen",
-      content: "Dalam rangka meningkatkan integritas dan komitmen pegawai pemerintah desa...",
-      date: "Rabu, 3 Juli 2024",
-      priority: "Penting",
-      slug: "aksi-bersih-pegawai-pemerintah-1",
-    },
-    {
-      id: 2,
-      title: "Pengumuman tentang Hasil Akhir Seleksi Pegawai Pemerintah dengan Perjanjian Kerja",
-      content: "Berdasarkan hasil seleksi yang telah dilaksanakan, berikut adalah pengumuman hasil akhir...",
-      date: "Selasa, 2 Juli 2024",
-      priority: "Normal",
-      slug: "hasil-seleksi-pegawai-pemerintah",
-    },
-    {
-      id: 3,
-      title: "Pengumuman Jadwal Pelayanan Administrasi Desa Selama Bulan Ramadan",
-      content: "Sehubungan dengan bulan suci Ramadan, kami informasikan perubahan jadwal pelayanan...",
-      date: "Senin, 1 Juli 2024",
-      priority: "Urgent",
-      slug: "jadwal-pelayanan-ramadan",
-    },
-    // Duplicate for more content
-    {
-      id: 4,
-      title: "Pengumuman Penerimaan Bantuan Sosial untuk Keluarga Kurang Mampu",
-      content: "Dalam rangka membantu masyarakat kurang mampu, Pemerintah Desa Ngebruk mengumumkan...",
-      date: "Minggu, 30 Juni 2024",
-      priority: "Penting",
-      slug: "bantuan-sosial-keluarga-kurang-mampu",
-    },
-    {
-      id: 5,
-      title: "Pengumuman Pembukaan Pendaftaran Posyandu Balita dan Lansia",
-      content: "Pemerintah Desa Ngebruk mengundang seluruh masyarakat untuk berpartisipasi...",
-      date: "Sabtu, 29 Juni 2024",
-      priority: "Normal",
-      slug: "pendaftaran-posyandu-balita-lansia",
-    },
-    {
-      id: 6,
-      title: "Pengumuman Penutupan Sementara Jalan Desa untuk Perbaikan",
-      content: "Dalam rangka perbaikan infrastruktur jalan desa, dengan ini kami informasikan...",
-      date: "Jumat, 28 Juni 2024",
-      priority: "Urgent",
-      slug: "penutupan-jalan-desa-perbaikan",
-    },
-  ];
+  const formatDate = (timestamp: any) => {
+    if (!timestamp) return "";
 
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(announcementData.length / itemsPerPage);
+    try {
+      const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+      return format(date, "EEEE, dd MMMM yyyy", { locale: idLocale });
+    } catch (error) {
+      return "";
+    }
+  };
 
-  const filteredAnnouncements = announcementData.filter((announcement) => announcement.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filter announcements based on search term
+  const filteredAnnouncements = announcements.filter((announcement) => announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) || announcement.content.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  const totalPages = Math.ceil(filteredAnnouncements.length / itemsPerPage);
   const currentAnnouncements = filteredAnnouncements.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const handlePageChange = (page: number) => {
@@ -86,12 +50,23 @@ const PengumumanPage = () => {
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "Urgent":
+      case "urgent":
         return "bg-red-100 text-red-800";
-      case "Penting":
+      case "penting":
         return "bg-orange-100 text-orange-800";
       default:
         return "bg-blue-100 text-blue-800";
+    }
+  };
+
+  const getPriorityLabel = (priority: string) => {
+    switch (priority) {
+      case "urgent":
+        return "Urgent";
+      case "penting":
+        return "Penting";
+      default:
+        return "Normal";
     }
   };
 
@@ -135,40 +110,56 @@ const PengumumanPage = () => {
 
         {/* Announcements List */}
         <div className={`smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-12">
-            <div className="divide-y divide-gray-200">
-              {currentAnnouncements.map((announcement, index) => (
-                <Link key={announcement.id} href={`/pengumuman/${announcement.slug}`} className="block">
-                  <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group" style={{ animationDelay: `${index * 0.1}s` }}>
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        {/* Priority Badge */}
-                        <div className="mb-3">
-                          <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getPriorityColor(announcement.priority)}`}>{announcement.priority}</span>
-                        </div>
-
-                        {/* Title */}
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#1B3A6D] transition-colors">{announcement.title}</h3>
-
-                        {/* Content Preview */}
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-2">{announcement.content}</p>
-
-                        {/* Date */}
-                        <p className="text-sm text-gray-500">{announcement.date}</p>
-                      </div>
-
-                      {/* Arrow Icon */}
-                      <div className="ml-4 flex-shrink-0">
-                        <svg className="w-5 h-5 text-gray-400 group-hover:text-[#1B3A6D] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+          {loading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <CardSkeleton key={index} />
               ))}
             </div>
-          </div>
+          ) : error ? (
+            <ErrorState message={error} onRetry={refetch} className="py-12" />
+          ) : currentAnnouncements.length > 0 ? (
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-12">
+              <div className="divide-y divide-gray-200">
+                {currentAnnouncements.map((announcement, index) => (
+                  <Link key={announcement.id} href={`/pengumuman/${announcement.slug}`} className="block">
+                    <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group" style={{ animationDelay: `${index * 0.1}s` }}>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          {/* Priority Badge */}
+                          <div className="mb-3">
+                            <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getPriorityColor(announcement.priority)}`}>{getPriorityLabel(announcement.priority)}</span>
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#1B3A6D] transition-colors">{announcement.title}</h3>
+
+                          {/* Content Preview */}
+                          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{announcement.content.length > 150 ? `${announcement.content.substring(0, 150)}...` : announcement.content}</p>
+
+                          {/* Date */}
+                          <p className="text-sm text-gray-500">{formatDate(announcement.createdAt)}</p>
+                        </div>
+
+                        {/* Arrow Icon */}
+                        <div className="ml-4 flex-shrink-0">
+                          <svg className="w-5 h-5 text-gray-400 group-hover:text-[#1B3A6D] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <EmptyState
+              title={searchTerm ? "Tidak ada pengumuman yang sesuai dengan pencarian" : "Belum ada pengumuman"}
+              description={searchTerm ? "Coba gunakan kata kunci yang berbeda" : "Pengumuman akan muncul di sini setelah dipublikasikan"}
+              className="py-12"
+            />
+          )}
         </div>
 
         {/* Pagination */}

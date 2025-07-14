@@ -1,22 +1,65 @@
 import { useEffect, useState } from "react";
+import { useActiveAnnouncements } from "@/hooks/useAnnouncements";
+import { usePublishedArticles } from "@/hooks/useArticles";
+import { LoadingSpinner, EmptyState } from "@/component/common/LoadingStates";
+import { format } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 
 const RecentActivity = () => {
   const [mounted, setMounted] = useState(false);
+  const { announcements, loading: announcementsLoading } = useActiveAnnouncements(2);
+  const { articles, loading: articlesLoading } = usePublishedArticles(2);
 
-  const activities = [
-    {
-      description: 'Pengumuman baru "Jadwal Vaksinasi" Telah diupload',
-      time: "2 Jam yang lalu",
-    },
-    {
-      description: 'Artikel baru "Pembangunan Jalan Desa" telah dipublikasi',
-      time: "4 Jam yang lalu",
-    },
-    {
-      description: 'Pengumuman "Festival Desa 2024" telah diperbarui',
-      time: "1 Hari yang lalu",
-    },
-  ];
+  // Combine and sort recent activities
+  const getRecentActivities = () => {
+    const activities: Array<{
+      id: string;
+      description: string;
+      time: string;
+      type: "announcement" | "article";
+      createdAt: Date;
+    }> = [];
+
+    // Add announcements
+    announcements.forEach((announcement) => {
+      try {
+        const date = announcement.createdAt?.toDate ? announcement.createdAt.toDate() : new Date();
+        activities.push({
+          id: announcement.id,
+          description: `Pengumuman baru "${announcement.title}" telah diupload`,
+          time: format(date, "dd MMM yyyy", { locale: idLocale }),
+          type: "announcement",
+          createdAt: date,
+        });
+      } catch (error) {
+        // Skip if error processing date
+      }
+    });
+
+    // Add articles
+    articles.forEach((article) => {
+      if (!article.id) return; // Skip if no ID
+
+      try {
+        const date = article.createdAt?.toDate ? article.createdAt.toDate() : new Date();
+        activities.push({
+          id: article.id,
+          description: `Artikel baru "${article.title}" telah dipublikasi`,
+          time: format(date, "dd MMM yyyy", { locale: idLocale }),
+          type: "article",
+          createdAt: date,
+        });
+      } catch (error) {
+        // Skip if error processing date
+      }
+    });
+
+    // Sort by date (newest first) and take only 3 items
+    return activities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 3);
+  };
+
+  const activities = getRecentActivities();
+  const isLoading = announcementsLoading || articlesLoading;
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,26 +75,26 @@ const RecentActivity = () => {
         <button className="text-[#1B3A6D] text-xs hover:underline self-start sm:self-auto smooth-transition hover:text-[#152f5a]">Lihat Semua</button>
       </div>
 
-      <div className="space-y-0">
-        {activities.map((activity, index) => (
-          <div
-            key={index}
-            className={`
-              flex flex-col sm:flex-row sm:justify-between py-3 
-              border-b border-gray-100 last:border-b-0 gap-1 sm:gap-4
-              smooth-transition hover:bg-gray-50 px-2 -mx-2 rounded-md
-              ${mounted ? `smooth-reveal stagger-${index + 1}` : "animate-on-load"}
-            `}
-          >
-            <p className="text-black text-xs leading-relaxed flex-1 min-w-0 smooth-transition">{activity.description}</p>
-            <p className="text-gray-500 text-xs whitespace-nowrap flex-shrink-0 self-start sm:self-center smooth-transition">{activity.time}</p>
-          </div>
-        ))}
-      </div>
-
-      {activities.length === 0 && (
-        <div className="text-center py-8 smooth-reveal">
-          <p className="text-gray-500 text-sm">Belum ada aktivitas terbaru</p>
+      {isLoading ? (
+        <LoadingSpinner message="Memuat aktivitas..." />
+      ) : activities.length === 0 ? (
+        <EmptyState title="Belum ada aktivitas" description="Aktivitas terbaru akan muncul di sini" className="!py-8" />
+      ) : (
+        <div className="space-y-0">
+          {activities.map((activity, index) => (
+            <div
+              key={activity.id}
+              className={`
+                flex flex-col sm:flex-row sm:justify-between py-3 
+                border-b border-gray-100 last:border-b-0 gap-1 sm:gap-4
+                smooth-transition hover:bg-gray-50 px-2 -mx-2 rounded-md
+                ${mounted ? `smooth-reveal stagger-${index + 1}` : "animate-on-load"}
+              `}
+            >
+              <p className="text-black text-xs leading-relaxed flex-1 min-w-0 smooth-transition">{activity.description}</p>
+              <p className="text-gray-500 text-xs whitespace-nowrap flex-shrink-0 self-start sm:self-center smooth-transition">{activity.time}</p>
+            </div>
+          ))}
         </div>
       )}
     </div>
