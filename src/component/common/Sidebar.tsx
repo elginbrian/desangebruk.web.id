@@ -52,8 +52,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       <aside
         ref={sidebarRef}
         className={`
-        fixed lg:relative lg:translate-x-0 
-        w-64 min-h-screen flex flex-col text-white bg-[#1B3A6D] shadow-lg 
+        dashboard-sidebar fixed lg:relative lg:translate-x-0 
+        w-64 h-full flex flex-col text-white bg-[#1B3A6D] shadow-lg 
         z-50 transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
@@ -94,7 +94,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </div>
 
         {/* Navigation */}
-        <nav className="flex-grow px-4 py-4">
+        <nav className="flex-grow px-4 py-4 overflow-y-auto">
           <ul className="space-y-1">
             {menuItems.map((item, index) => (
               <li key={index} className={`animate-slide-in-left stagger-${index + 1}`}>
@@ -116,7 +116,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </nav>
 
         {/* User Info & Logout */}
-        <div className="px-4 py-4 border-t border-white/10 space-y-3">
+        <div className="px-4 py-4 border-t border-white/10 space-y-3 flex-shrink-0">
           {/* User Profile Button */}
           <Link
             href="/dashboard/profile"
@@ -131,12 +131,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <FiUser size={14} />
             </div>
             <div className="ml-3 flex-1 min-w-0">
-              <p className={`text-xs font-medium truncate smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]" : "text-white"}`}>
-                {profile?.name || "Admin"}
-              </p>
-              <p className={`text-xs truncate capitalize smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]/60" : "text-white/60"}`}>
-                {profile?.role || "admin"}
-              </p>
+              <p className={`text-xs font-medium truncate smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]" : "text-white"}`}>{profile?.name || "Admin"}</p>
+              <p className={`text-xs truncate capitalize smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]/60" : "text-white/60"}`}>{profile?.role || "admin"}</p>
             </div>
           </Link>
 
