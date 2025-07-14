@@ -33,7 +33,7 @@ const Header = () => {
     <header className={`bg-white shadow-sm sticky top-0 z-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
+
           <div className={`flex items-center hover-lift smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
             <img
               src="/logo.png"
@@ -50,7 +50,7 @@ const Header = () => {
             </div>
           </div>
 
-          {/* Desktop Navigation */}
+
           <nav className={`hidden md:flex space-x-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
             {navigationItems.map((item, index) => (
               <Link key={item.name} href={item.href} className="text-gray-700 hover:text-[#1B3A6D] px-3 py-2 text-sm font-medium smooth-transition hover-lift" style={{ animationDelay: `${(index + 2) * 0.05}s` }}>
@@ -59,15 +59,13 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Auth Buttons */}
+
           <div className={`hidden md:flex items-center space-x-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
             {!loading && (
               <>
                 {isAuthenticated && profile ? (
-                  // User is logged in - show user dropdown
                   <UserDropdown />
                 ) : (
-                  // User is not logged in - show login button
                   <Link href="/login" className="bg-[#1B3A6D] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate">
                     Login
                   </Link>
@@ -76,7 +74,7 @@ const Header = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
+
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-2 rounded-md text-gray-700 hover:text-[#1B3A6D] hover:bg-gray-100 smooth-transition hover-lift ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}
@@ -85,7 +83,7 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200 animate-slide-in-left">
             <nav className="flex flex-col space-y-2">
@@ -101,13 +99,12 @@ const Header = () => {
                 </Link>
               ))}
 
-              {/* Mobile Auth Section */}
+
               {!loading && (
                 <>
                   {isAuthenticated && profile ? (
-                    // User is logged in - show user info and navigation for mobile
                     <div className="pt-4 border-t border-gray-200 space-y-3">
-                      {/* User Info */}
+
                       <div className="px-3 py-2 bg-gray-50 rounded-md">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-[#1B3A6D] rounded-full flex items-center justify-center">
@@ -120,13 +117,13 @@ const Header = () => {
                         </div>
                       </div>
 
-                      {/* Dashboard Link */}
+
                       <Link href="/dashboard" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate flex items-center" onClick={() => setIsMenuOpen(false)}>
                         <FiUser className="mr-2" size={16} />
                         Dashboard
                       </Link>
 
-                      {/* Logout Button */}
+
                       <button
                         onClick={() => {
                           logout();
@@ -139,7 +136,6 @@ const Header = () => {
                       </button>
                     </div>
                   ) : (
-                    // User is not logged in - show login button for mobile
                     <Link href="/login" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition mt-4 btn-animate" onClick={() => setIsMenuOpen(false)}>
                       Login
                     </Link>
@@ -155,3 +151,4 @@ const Header = () => {
 };
 
 export default Header;
+

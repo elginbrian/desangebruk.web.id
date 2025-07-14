@@ -2,7 +2,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, on
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "./firebase";
 
-// User profile interface
 export interface UserProfile {
   uid: string;
   email: string;
@@ -12,30 +11,25 @@ export interface UserProfile {
   updatedAt?: Date;
 }
 
-// Auth error interface
 export interface AuthError {
   code: string;
   message: string;
 }
 
-// Sign up with email and password
 export const signUpWithEmail = async (email: string, password: string, name: string): Promise<{ user: User; profile: UserProfile } | { error: AuthError }> => {
   try {
-    // Create user with email and password
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Update user profile with name
     await updateProfile(user, {
       displayName: name,
     });
 
-    // Create user profile in Firestore
     const userProfile: UserProfile = {
       uid: user.uid,
       email: email,
       name: name,
-      role: "admin", // Default role
+      role: "admin",
       createdAt: new Date(),
     };
 
@@ -52,20 +46,17 @@ export const signUpWithEmail = async (email: string, password: string, name: str
   }
 };
 
-// Sign in with email and password
 export const signInWithEmail = async (email: string, password: string): Promise<{ user: User; profile: UserProfile } | { error: AuthError }> => {
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    // Get user profile from Firestore
     const userDoc = await getDoc(doc(db, "users", user.uid));
 
     if (userDoc.exists()) {
       const profile = userDoc.data() as UserProfile;
       return { user, profile };
     } else {
-      // Create profile if doesn't exist (for existing users)
       const userProfile: UserProfile = {
         uid: user.uid,
         email: user.email || email,
@@ -87,7 +78,6 @@ export const signInWithEmail = async (email: string, password: string): Promise<
   }
 };
 
-// Sign out
 export const signOutUser = async (): Promise<void | { error: AuthError }> => {
   try {
     await signOut(auth);
@@ -101,13 +91,11 @@ export const signOutUser = async (): Promise<void | { error: AuthError }> => {
   }
 };
 
-// Send password reset email
 export const resetPassword = async (email: string): Promise<void | { error: AuthError }> => {
   try {
-    // Configure action code settings for password reset
     const actionCodeSettings = {
-      url: `${window.location.origin}/login`, // URL to redirect after password reset
-      handleCodeInApp: false, // This will be handled by Firebase's default reset page
+      url: `${window.location.origin}/login`,
+      handleCodeInApp: false,
     };
 
     await sendPasswordResetEmail(auth, email, actionCodeSettings);
@@ -121,7 +109,6 @@ export const resetPassword = async (email: string): Promise<void | { error: Auth
   }
 };
 
-// Get user profile from Firestore
 export const getUserProfile = async (uid: string): Promise<UserProfile | null> => {
   try {
     const userDoc = await getDoc(doc(db, "users", uid));
@@ -134,23 +121,19 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
   }
 };
 
-// Update user profile
 export const updateUserProfile = async (uid: string, updateData: Partial<UserProfile>): Promise<{ profile: UserProfile } | { error: AuthError }> => {
   try {
     const userDocRef = doc(db, "users", uid);
 
-    // Update document in Firestore
     await updateDoc(userDocRef, {
       ...updateData,
       updatedAt: new Date(),
     });
 
-    // Get updated profile
     const updatedDoc = await getDoc(userDocRef);
     if (updatedDoc.exists()) {
       const profile = updatedDoc.data() as UserProfile;
 
-      // Also update Firebase Auth display name if name was changed
       if (updateData.name && auth.currentUser) {
         await updateProfile(auth.currentUser, {
           displayName: updateData.name,
@@ -176,12 +159,10 @@ export const updateUserProfile = async (uid: string, updateData: Partial<UserPro
   }
 };
 
-// Auth state observer
 export const onAuthStateChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
-// Helper function to get user-friendly error messages
 const getAuthErrorMessage = (errorCode: string): string => {
   switch (errorCode) {
     case "auth/user-not-found":
@@ -208,3 +189,4 @@ const getAuthErrorMessage = (errorCode: string): string => {
       return "Terjadi kesalahan. Silakan coba lagi.";
   }
 };
+

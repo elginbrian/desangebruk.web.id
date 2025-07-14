@@ -12,7 +12,6 @@ const HeroSection = () => {
   const images = ["/kantor_desa.jpg", "/stasiun_ngebruk.JPG", "/pasar_ngebruk.png", "/kampung_gatot.png", "/koka_caffee.png"];
 
   useEffect(() => {
-    // Set initial random image
     const randomIndex = Math.floor(Math.random() * images.length);
     setCurrentImageIndex(randomIndex);
 
@@ -22,9 +21,8 @@ const HeroSection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto slide images every 8 seconds
   useEffect(() => {
-    if (isManualControl) return; // Skip auto slide if user is manually controlling
+    if (isManualControl) return;
 
     const slideInterval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -33,7 +31,6 @@ const HeroSection = () => {
     return () => clearInterval(slideInterval);
   }, [images.length, isManualControl]);
 
-  // Reset manual control after 16 seconds of inactivity
   useEffect(() => {
     if (!isManualControl) return;
 
@@ -64,11 +61,9 @@ const HeroSection = () => {
     const codeNum = parseInt(weatherCode);
     const descLower = description.toLowerCase();
 
-    // Thunderstorm conditions
     if (codeNum >= 200 && codeNum <= 299) return "weather-overlay-stormy";
     if (descLower.includes("thunderstorm") || descLower.includes("lightning")) return "weather-overlay-stormy";
 
-    // Rain conditions - more specific
     if (codeNum >= 500 && codeNum <= 504) return "weather-overlay-heavy-rain";
     if (codeNum >= 300 && codeNum <= 399) return "weather-overlay-drizzle";
     if (codeNum >= 520 && codeNum <= 531) return "weather-overlay-rainy";
@@ -76,19 +71,15 @@ const HeroSection = () => {
     if (descLower.includes("light rain") || descLower.includes("drizzle")) return "weather-overlay-drizzle";
     if (descLower.includes("moderate rain") || descLower.includes("rain")) return "weather-overlay-rainy";
 
-    // Snow conditions
     if (codeNum >= 600 && codeNum <= 699) return "weather-overlay-snowy";
     if (descLower.includes("snow") || descLower.includes("blizzard")) return "weather-overlay-snowy";
 
-    // Atmospheric conditions
     if (codeNum >= 700 && codeNum <= 799) return "weather-overlay-foggy";
     if (descLower.includes("fog") || descLower.includes("mist") || descLower.includes("haze")) return "weather-overlay-foggy";
 
-    // Clear conditions
     if (codeNum === 800) return "weather-overlay-sunny";
     if (descLower.includes("clear") || descLower.includes("sunny")) return "weather-overlay-sunny";
 
-    // Cloudy conditions - more specific
     if (codeNum === 801) return "weather-overlay-few-clouds";
     if (codeNum === 802) return "weather-overlay-scattered-clouds";
     if (codeNum === 803) return "weather-overlay-broken-clouds";
@@ -103,7 +94,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      {/* Background Images with sliding effect */}
+
       <div className="absolute inset-0">
         {images.map((image, index) => (
           <div
@@ -116,29 +107,29 @@ const HeroSection = () => {
         ))}
       </div>
 
-      {/* Base dark overlay */}
+
       <div className="absolute inset-0 bg-black/70"></div>
 
-      {/* Weather overlay with smooth transition */}
+
       {weather && <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${weatherOverlayClass} ${weatherVisible ? "opacity-100" : "opacity-0"}`}></div>}
 
-      {/* Weather Effects with smooth appearance */}
+
       {weather && weatherVisible && (
         <div className="absolute inset-0 transition-opacity duration-1000 ease-in-out">
           <WeatherEffects weatherCode={weather.icon} description={weather.description} intensity="medium" />
         </div>
       )}
 
-      {/* Content */}
+
       <div className={`relative z-10 w-full px-4 sm:px-6 lg:px-8 text-left text-white smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
         <div className="max-w-7xl mx-auto">
           <h1 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>Selamat Datang di Desa Ngebruk</h1>
           <p className={`text-sm sm:text-base md:text-lg mb-8 text-gray-200 max-w-2xl smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal</p>
 
-          {/* Horizontal line separator */}
+
           <div className={`w-full h-px bg-white mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}></div>
 
-          {/* Info sections without cards */}
+
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 max-w-4xl smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
             <div className="space-y-4 hover-lift smooth-transition">
               <div className="text-xl md:text-2xl font-bold text-white">01</div>
@@ -155,7 +146,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* Image Indicators */}
+
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-2">
           {images.map((_, index) => (
@@ -173,3 +164,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+

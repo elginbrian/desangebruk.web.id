@@ -43,12 +43,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (user) {
         try {
-          // Get user profile when user is authenticated
           const userProfile = await getUserProfile(user.uid);
           if (userProfile) {
             setProfile(userProfile);
           } else {
-            // Create profile if doesn't exist
             const newProfile: UserProfile = {
               uid: user.uid,
               email: user.email || "",
@@ -59,7 +57,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             setProfile(newProfile);
           }
         } catch (error) {
-          // Set basic profile from auth user if profile loading fails
           const fallbackProfile: UserProfile = {
             uid: user.uid,
             email: user.email || "",
@@ -87,7 +84,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setProfile(userProfile);
         }
       } catch (error) {
-        // Silent error handling
       }
     }
   };
@@ -102,3 +98,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+

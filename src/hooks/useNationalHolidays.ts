@@ -47,7 +47,7 @@ export const useNationalHolidays = () => {
 
   const isUpcoming = (holidayDate: string): boolean => {
     const daysFromToday = calculateDaysFromToday(holidayDate);
-    return daysFromToday >= 0; // Upcoming tanpa batas waktu
+    return daysFromToday >= 0;
   };
 
   const formatHolidayData = (apiData: HolidayAPIResponse[]): NationalHoliday[] => {
@@ -74,7 +74,6 @@ export const useNationalHolidays = () => {
 
         const currentYear = getCurrentYear();
 
-        // Ambil hari besar tahun ini
         const currentYearResponse = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentYear}/ID`);
 
         if (!currentYearResponse.ok) {
@@ -84,7 +83,6 @@ export const useNationalHolidays = () => {
         const currentYearData: HolidayAPIResponse[] = await currentYearResponse.json();
         let formattedHolidays = formatHolidayData(currentYearData);
 
-        // Jika tahun ini kurang dari 3, ambil dari tahun berikutnya
         if (formattedHolidays.length < 3) {
           try {
             const nextYear = currentYear + 1;
@@ -94,7 +92,6 @@ export const useNationalHolidays = () => {
               const nextYearData: HolidayAPIResponse[] = await nextYearResponse.json();
               const nextYearHolidays = formatHolidayData(nextYearData);
 
-              // Gabungkan dan urutkan ulang
               const combinedHolidays = [...formattedHolidays, ...nextYearHolidays].sort((a, b) => a.daysFromToday - b.daysFromToday);
 
               formattedHolidays = combinedHolidays;
@@ -104,13 +101,11 @@ export const useNationalHolidays = () => {
           }
         }
 
-        // Ambil hanya 3 terdekat
         setHolidays(formattedHolidays.slice(0, 3));
       } catch (err) {
         console.error("Error fetching national holidays:", err);
         setError("Gagal mengambil data hari besar nasional");
 
-        // Set holidays kosong jika API gagal
         setHolidays([]);
       } finally {
         setLoading(false);
@@ -131,8 +126,8 @@ export const useNationalHolidays = () => {
     getUpcomingHolidays,
     refetch: () => {
       setLoading(true);
-      // Re-trigger useEffect
       setHolidays([]);
     },
   };
 };
+

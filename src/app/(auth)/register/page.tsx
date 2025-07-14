@@ -28,7 +28,6 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    // Clear error when component unmounts or form data changes
     if (error) {
       const timer = setTimeout(() => {
         clearError();
@@ -44,7 +43,6 @@ const Page = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Clear error when user starts typing
     if (error) {
       clearError();
     }
@@ -61,13 +59,13 @@ const Page = () => {
   return (
     <ProtectedRoute requireAuth={false}>
       <AuthLayout imageSrc="/stasiun_ngebruk.JPG" title="Mulai kelola dan kembangkan website Desa Ngebruk dengan mudah melalui panel admin" subtitle="Panel Admin" mounted={mounted}>
-        {/* Header */}
+
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
           <h2 className="text-2xl font-bold text-gray-900 mb-2 smooth-transition">Daftar</h2>
           <p className="text-gray-500 text-sm smooth-transition">Daftarkan akun untuk mengakses website</p>
         </div>
 
-        {/* Error Message */}
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
             <p className="text-red-600 text-sm">{error}</p>
@@ -75,13 +73,13 @@ const Page = () => {
         )}
 
         <form onSubmit={handleSubmit} className={`space-y-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-          {/* Email Field */}
+
           <AuthInput label="Alamat Email" type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Masukkan email..." required mounted={mounted} />
 
-          {/* Name Field */}
+
           <AuthInput label="Nama" type="text" id="name" name="name" value={formData.name} onChange={handleInputChange} placeholder="Masukkan nama..." required mounted={mounted} />
 
-          {/* Password Field */}
+
           <AuthInput
             label="Kata Sandi"
             type="password"
@@ -96,7 +94,7 @@ const Page = () => {
             mounted={mounted}
           />
 
-          {/* Terms Agreement */}
+
           <div className={`flex items-start space-x-3 py-2 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
             <input
               type="checkbox"
@@ -119,13 +117,13 @@ const Page = () => {
             </label>
           </div>
 
-          {/* Register Button */}
+
           <AuthButton type="submit" variant="primary" disabled={!formData.agreeToTerms || loading} mounted={mounted}>
             {loading ? "Mendaftar..." : "Daftar"}
           </AuthButton>
         </form>
 
-        {/* Already have account */}
+
         <div className={`mt-6 text-center smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
           <p className="text-sm text-gray-600 smooth-transition">
             Sudah punya akun?{" "}
@@ -140,3 +138,4 @@ const Page = () => {
 };
 
 export default Page;
+

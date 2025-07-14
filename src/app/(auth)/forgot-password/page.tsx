@@ -23,7 +23,6 @@ const ForgotPasswordPage = () => {
   }, []);
 
   useEffect(() => {
-    // Clear error/message when component unmounts or email changes
     if (error || message) {
       const timer = setTimeout(() => {
         clearError();
@@ -36,7 +35,6 @@ const ForgotPasswordPage = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
 
-    // Clear error/message when user starts typing
     if (error || message) {
       clearError();
       setMessage("");
@@ -54,20 +52,20 @@ const ForgotPasswordPage = () => {
 
     if (result.success) {
       setMessage(result.message || "Email reset password telah dikirim!");
-      setEmail(""); // Clear email field after successful submission
+      setEmail("");
     }
   };
 
   return (
     <ProtectedRoute requireAuth={false}>
       <AuthLayout imageSrc="/kantor_desa.jpg" title="Pulihkan akses ke panel admin Desa Ngebruk dengan mudah" subtitle="Reset Password" mounted={mounted}>
-        {/* Header */}
+
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
           <h2 className="text-2xl font-bold text-gray-900 mb-2 smooth-transition">Lupa Kata Sandi</h2>
           <p className="text-gray-500 text-sm smooth-transition">Masukkan email Anda untuk menerima tautan reset kata sandi</p>
         </div>
 
-        {/* Success Message */}
+
         {message && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md smooth-transition">
             <p className="text-green-600 text-sm font-medium mb-2">✅ Email Berhasil Dikirim!</p>
@@ -84,7 +82,7 @@ const ForgotPasswordPage = () => {
           </div>
         )}
 
-        {/* Error Message */}
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
             <p className="text-red-600 text-sm">{error}</p>
@@ -92,16 +90,16 @@ const ForgotPasswordPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className={`space-y-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-          {/* Email Field */}
+
           <AuthInput label="Alamat Email" type="email" id="email" name="email" value={email} onChange={handleInputChange} placeholder="Masukkan email..." required mounted={mounted} />
 
-          {/* Submit Button */}
+
           <AuthButton type="submit" variant="primary" mounted={mounted} disabled={loading}>
             {loading ? "Mengirim..." : "Kirim Link Reset"}
           </AuthButton>
         </form>
 
-        {/* Back to Login */}
+
         <div className={`mt-6 text-center smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
           <p className="text-sm text-gray-600 smooth-transition">
             Ingat kata sandi Anda?{" "}
@@ -116,3 +114,4 @@ const ForgotPasswordPage = () => {
 };
 
 export default ForgotPasswordPage;
+

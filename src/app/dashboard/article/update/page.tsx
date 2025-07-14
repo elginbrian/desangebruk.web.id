@@ -121,7 +121,7 @@ const UpdateArticlePage = () => {
     <>
       <PageHeader title="Edit Berita" subtitle="Edit artikel berita yang sudah ada" actions={headerActions} />
 
-      {/* Content */}
+
       <div className="app-content">
         {updateError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{updateError}</div>}
 
@@ -136,3 +136,4 @@ const UpdateArticlePage = () => {
 };
 
 export default UpdateArticlePage;
+

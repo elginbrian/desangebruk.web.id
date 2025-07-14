@@ -27,7 +27,6 @@ const UpdateAnnouncementPage = () => {
 
   const [success, setSuccess] = useState<string | null>(null);
 
-  // Populate form when announcement data is loaded
   useEffect(() => {
     if (announcement) {
       setFormData({
@@ -40,7 +39,6 @@ const UpdateAnnouncementPage = () => {
     }
   }, [announcement]);
 
-  // Redirect if no ID is provided
   useEffect(() => {
     if (!announcementId) {
       router.push("/dashboard/announcement");
@@ -53,7 +51,6 @@ const UpdateAnnouncementPage = () => {
       [field]: value,
     }));
 
-    // Clear success message when form changes
     if (success) {
       setSuccess(null);
     }
@@ -97,7 +94,6 @@ const UpdateAnnouncementPage = () => {
 
     if (result) {
       setSuccess("Pengumuman berhasil diperbarui!");
-      // Redirect to announcements list after short delay
       setTimeout(() => {
         router.push("/dashboard/announcement");
       }, 1500);
@@ -108,7 +104,6 @@ const UpdateAnnouncementPage = () => {
     router.push("/dashboard/announcement");
   };
 
-  // Show loading while fetching announcement data
   if (fetchLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -117,7 +112,6 @@ const UpdateAnnouncementPage = () => {
     );
   }
 
-  // Show error if announcement not found
   if (fetchError || !announcement) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -146,13 +140,13 @@ const UpdateAnnouncementPage = () => {
     <>
       <PageHeader title="Edit Pengumuman" subtitle="Edit pengumuman yang sudah ada" actions={headerActions} />
 
-      {/* Content */}
+
       <div className="app-content">
         <div className="bg-white app-card shadow-sm border border-gray-100">
-          {/* Error Message */}
+
           {updateError && <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md">{updateError}</div>}
 
-          {/* Success Message */}
+
           {success && <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded-md">{success}</div>}
 
           <AnnouncementForm formData={formData} onChange={handleFormChange} isEditing={true} />
@@ -163,3 +157,4 @@ const UpdateAnnouncementPage = () => {
 };
 
 export default UpdateAnnouncementPage;
+

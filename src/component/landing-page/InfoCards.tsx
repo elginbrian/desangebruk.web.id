@@ -21,11 +21,8 @@ const InfoCards = () => {
     const code = parseInt(weatherCode);
 
     if (code === 113) return FiSun;
-    // Partly cloudy
     if ([116, 119, 122].includes(code)) return FiCloud;
-    // Cloudy/Overcast
     if ([119, 122, 143, 248, 260].includes(code)) return FiCloud;
-    // Rainy
     if ([176, 179, 182, 185, 200, 227, 230, 263, 266, 281, 284, 293, 296, 299, 302, 305, 308, 311, 314, 317, 320, 323, 326, 356, 359, 362, 365, 368, 371, 374, 377, 386, 389, 392, 395].includes(code)) return FiCloudRain;
 
     return FiSun;
@@ -58,18 +55,18 @@ const InfoCards = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8 md:gap-6">
           {cardData.map((card, index) => (
             <div key={index} className={`text-center md:text-left smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`} style={{ animationDelay: `${index * 0.1}s` }}>
-              {/* Icon */}
+
               <div className="mb-4 md:mb-6 flex justify-center md:justify-start animate-float">
                 <card.icon size={40} className="text-[#1B3A6D] md:w-12 md:h-12 smooth-transition hover:scale-110" />
               </div>
 
-              {/* Title */}
+
               <h3 className="text-lg md:text-xl font-semibold text-[#1B3A6D] mb-3 md:mb-4 smooth-transition">{card.title}</h3>
 
-              {/* Value */}
+
               <div className="text-3xl md:text-4xl font-bold text-[#1B3A6D] mb-2 smooth-transition hover:scale-105">{card.value}</div>
 
-              {/* Subtitle */}
+
               <p className="text-sm text-[#1B3A6D] mb-1 smooth-transition">{card.subtitle}</p>
             </div>
           ))}
@@ -80,3 +77,4 @@ const InfoCards = () => {
 };
 
 export default InfoCards;
+

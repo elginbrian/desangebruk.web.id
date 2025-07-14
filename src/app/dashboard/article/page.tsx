@@ -31,7 +31,6 @@ const ArticlePage = () => {
   }, []);
 
   useEffect(() => {
-    // Initial fetch
     fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
   }, [statusFilter]);
 
@@ -51,7 +50,6 @@ const ArticlePage = () => {
     if (window.confirm("Apakah Anda yakin ingin menghapus artikel ini?")) {
       const success = await remove(String(id));
       if (success) {
-        // Refresh the list
         fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
       }
     }
@@ -149,7 +147,7 @@ const ArticlePage = () => {
     <>
       <PageHeader title="Kelola Berita" subtitle="Kelola dan atur berita desa" actions={headerActions} mounted={mounted} />
 
-      {/* Content */}
+
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
           <SearchAndFilterBar
@@ -188,3 +186,4 @@ const ArticlePage = () => {
   );
 };
 export default ArticlePage;
+

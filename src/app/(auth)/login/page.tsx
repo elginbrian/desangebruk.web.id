@@ -27,7 +27,6 @@ const Page = () => {
   }, []);
 
   useEffect(() => {
-    // Clear error when component unmounts or form data changes
     if (error) {
       const timer = setTimeout(() => {
         clearError();
@@ -43,7 +42,6 @@ const Page = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Clear error when user starts typing
     if (error) {
       clearError();
     }
@@ -57,13 +55,13 @@ const Page = () => {
   return (
     <ProtectedRoute requireAuth={false}>
       <AuthLayout imageSrc="/kantor_desa.jpg" title="Mulai kelola dan kembangkan website Desa Ngebruk dengan mudah melalui panel admin" subtitle="Panel Admin" mounted={mounted}>
-        {/* Header */}
+
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
           <h2 className="text-2xl font-bold text-gray-900 mb-2 smooth-transition">Masuk</h2>
           <p className="text-gray-500 text-sm smooth-transition">Masuk ke akun Anda untuk mengakses panel admin</p>
         </div>
 
-        {/* Error Message */}
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
             <p className="text-red-600 text-sm">{error}</p>
@@ -71,10 +69,10 @@ const Page = () => {
         )}
 
         <form onSubmit={handleSubmit} className={`space-y-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-          {/* Email Field */}
+
           <AuthInput label="Alamat Email" type="email" id="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="Masukkan email..." required mounted={mounted} />
 
-          {/* Password Field */}
+
           <AuthInput
             label="Kata Sandi"
             type="password"
@@ -89,7 +87,7 @@ const Page = () => {
             mounted={mounted}
           />
 
-          {/* Remember Me and Forgot Password */}
+
           <div className={`flex items-center justify-between py-2 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
             <div className="flex items-center">
               <input type="checkbox" id="rememberMe" name="rememberMe" checked={formData.rememberMe} onChange={handleInputChange} className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded smooth-transition" />
@@ -102,13 +100,13 @@ const Page = () => {
             </Link>
           </div>
 
-          {/* Login Button */}
+
           <AuthButton type="submit" variant="primary" mounted={mounted} disabled={loading}>
             {loading ? "Masuk..." : "Masuk"}
           </AuthButton>
         </form>
 
-        {/* Don't have account */}
+
         <div className={`mt-6 text-center smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
           <p className="text-sm text-gray-600 smooth-transition">
             Belum punya akun?{" "}
@@ -123,3 +121,4 @@ const Page = () => {
 };
 
 export default Page;
+

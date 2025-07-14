@@ -20,7 +20,6 @@ const PengumumanPage = () => {
 
   const { announcements, loading, error, refetch } = useActiveAnnouncements();
 
-  // Track visitor
   usePageVisitor("Pengumuman");
 
   useEffect(() => {
@@ -41,7 +40,6 @@ const PengumumanPage = () => {
     }
   };
 
-  // Filter announcements based on search term
   const filteredAnnouncements = announcements.filter((announcement) => announcement.title.toLowerCase().includes(searchTerm.toLowerCase()) || announcement.content.toLowerCase().includes(searchTerm.toLowerCase()));
 
   const totalPages = Math.ceil(filteredAnnouncements.length / itemsPerPage);
@@ -87,9 +85,9 @@ const PengumumanPage = () => {
         </div>
       </section>
 
-      {/* Main Content */}
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab Navigation */}
+
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
           <div className="flex justify-center">
             <div className="bg-white rounded-lg p-1 shadow-sm">
@@ -101,9 +99,9 @@ const PengumumanPage = () => {
           </div>
         </div>
 
-        {/* Page Header */}
+
         <div className={`text-center mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
-          {/* Search Bar */}
+
           <div className="max-w-md mx-auto relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FiSearch className="h-5 w-5 text-gray-400" />
@@ -118,7 +116,7 @@ const PengumumanPage = () => {
           </div>
         </div>
 
-        {/* Announcements List */}
+
         <div className={`smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
           {loading ? (
             <div className="space-y-4">
@@ -136,22 +134,22 @@ const PengumumanPage = () => {
                     <div className="p-6 hover:bg-gray-50 transition-colors cursor-pointer group" style={{ animationDelay: `${index * 0.1}s` }}>
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
-                          {/* Priority Badge */}
+
                           <div className="mb-3">
                             <span className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${getPriorityColor(announcement.priority)}`}>{getPriorityLabel(announcement.priority)}</span>
                           </div>
 
-                          {/* Title */}
+
                           <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-[#1B3A6D] transition-colors">{announcement.title}</h3>
 
-                          {/* Content Preview */}
+
                           <p className="text-gray-600 text-sm mb-3 line-clamp-2">{announcement.content.length > 150 ? `${announcement.content.substring(0, 150)}...` : announcement.content}</p>
 
-                          {/* Date */}
+
                           <p className="text-sm text-gray-500">{formatDate(announcement.createdAt)}</p>
                         </div>
 
-                        {/* Arrow Icon */}
+
                         <div className="ml-4 flex-shrink-0">
                           <svg className="w-5 h-5 text-gray-400 group-hover:text-[#1B3A6D] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -172,9 +170,9 @@ const PengumumanPage = () => {
           )}
         </div>
 
-        {/* Pagination */}
+
         <div className={`flex items-center justify-center gap-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
-          {/* Previous Button */}
+
           <button
             onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
@@ -183,7 +181,7 @@ const PengumumanPage = () => {
             «
           </button>
 
-          {/* First Page */}
+
           <button
             onClick={() => handlePageChange(1)}
             disabled={currentPage === 1}
@@ -192,7 +190,7 @@ const PengumumanPage = () => {
             ‹
           </button>
 
-          {/* Page Numbers */}
+
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
             const page = i + 1;
             return (
@@ -206,7 +204,7 @@ const PengumumanPage = () => {
             );
           })}
 
-          {/* Next Page */}
+
           <button
             onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
@@ -215,7 +213,7 @@ const PengumumanPage = () => {
             ›
           </button>
 
-          {/* Last Page */}
+
           <button
             onClick={() => handlePageChange(totalPages)}
             disabled={currentPage === totalPages}
@@ -224,7 +222,7 @@ const PengumumanPage = () => {
             »
           </button>
 
-          {/* Page Info */}
+
           <div className="flex items-center gap-2 ml-4">
             <span className="text-sm text-gray-600">Page</span>
             <input
@@ -251,3 +249,4 @@ const PengumumanPage = () => {
 };
 
 export default PengumumanPage;
+

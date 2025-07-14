@@ -82,7 +82,7 @@ const CreateArticlePage = () => {
     <>
       <PageHeader title="Tambah Berita" subtitle="Buat artikel berita baru untuk desa" actions={headerActions} />
 
-      {/* Content */}
+
       <div className="app-content">
         {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{error}</div>}
 
@@ -97,3 +97,4 @@ const CreateArticlePage = () => {
 };
 
 export default CreateArticlePage;
+

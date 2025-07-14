@@ -50,7 +50,7 @@ export const useArticles = () => {
 
       const searchResults = await searchArticles(searchTerm);
       setArticles(searchResults);
-      setHasMore(false); // Search results don't support pagination
+      setHasMore(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to search articles");
     } finally {
@@ -174,7 +174,7 @@ export const useArticleActions = () => {
 
 export const usePublishedArticles = (limit?: number) => {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [loading, setLoading] = useState(true); // Start with loading true
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -187,15 +187,13 @@ export const usePublishedArticles = (limit?: number) => {
     try {
       const publishedArticles = await getPublishedArticles(limit);
       setArticles(publishedArticles);
-      setRetryCount(0); // Reset retry count on success
+      setRetryCount(0);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch published articles";
       setError(errorMessage);
 
-      // Set empty array on error so UI can show fallback content
       setArticles([]);
 
-      // Auto retry up to 2 times with exponential backoff
       if (retryCount < 2 && !isRetry) {
         setTimeout(() => {
           setRetryCount((prev) => prev + 1);
@@ -208,7 +206,6 @@ export const usePublishedArticles = (limit?: number) => {
   };
 
   useEffect(() => {
-    // Add small delay to prevent rapid requests
     const timer = setTimeout(() => {
       fetchPublishedArticles();
     }, 100);
@@ -229,3 +226,4 @@ export const usePublishedArticles = (limit?: number) => {
     retryCount,
   };
 };
+

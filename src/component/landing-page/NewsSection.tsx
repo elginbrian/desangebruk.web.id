@@ -30,7 +30,6 @@ const NewsSection = () => {
     }
   };
 
-  // Tampilkan berita dengan loading states yang proper
   const getNewsContent = () => {
     if (articlesLoading) {
       return (
@@ -46,7 +45,6 @@ const NewsSection = () => {
       return <ErrorState message={articlesError} onRetry={refetchArticles} className="mb-6 md:mb-8" />;
     }
 
-    // Use real data if available, otherwise show empty state
     if (articles.length === 0) {
       return <EmptyState title="Belum ada berita" description="Berita akan muncul di sini setelah dipublikasikan" className="mb-6 md:mb-8" />;
     }
@@ -63,17 +61,17 @@ const NewsSection = () => {
               className={`bg-white rounded-2xl shadow-lg hover:shadow-xl smooth-transition overflow-hidden group cursor-pointer hover-lift ${mounted ? "smooth-reveal" : "animate-on-load"}`}
               style={{ animationDelay: `${(index + 2) * 0.1}s` }}
             >
-              {/* Image */}
+
               <div className="aspect-video overflow-hidden">
                 <img src={news.imageUrl || "/kantor_desa.jpg"} alt={news.title} className="w-full h-full object-cover group-hover:scale-105 smooth-transition" />
               </div>
 
-              {/* Content */}
+
               <div className="p-4 md:p-6">
                 <h3 className="font-semibold text-gray-900 mb-2 md:mb-3 line-clamp-2 text-sm leading-relaxed smooth-transition group-hover:text-[#1B3A6D]">{news.title}</h3>
                 <p className="text-gray-600 text-xs mb-3 md:mb-4 line-clamp-3 leading-relaxed smooth-transition">{news.excerpt || "Tidak ada excerpt"}</p>
 
-                {/* Footer */}
+
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-[#1B3A6D] rounded-full flex items-center justify-center hover-scale smooth-transition">
@@ -99,7 +97,6 @@ const NewsSection = () => {
     );
   };
 
-  // Tampilkan pengumuman dengan loading states yang proper
   const getAnnouncementsContent = () => {
     if (announcementsLoading) {
       return (
@@ -115,7 +112,6 @@ const NewsSection = () => {
       return <ErrorState message={announcementsError} onRetry={refetchAnnouncements} />;
     }
 
-    // Use Firebase data if available, otherwise show empty state
     if (activeAnnouncements.length === 0) {
       return <EmptyState title="Belum ada pengumuman" description="Pengumuman akan muncul di sini ketika tersedia" />;
     }
@@ -154,13 +150,13 @@ const NewsSection = () => {
     <section className={`py-12 md:py-16 bg-gray-100 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Left Content - News */}
+
           <div className={`lg:col-span-2 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
             <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 md:mb-8 smooth-transition">Berita</h2>
             {getNewsContent()}
           </div>
 
-          {/* Right Sidebar - Announcements */}
+
           <div className={`lg:col-span-1 mt-8 lg:mt-0 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
             <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-6 md:mb-8 smooth-transition">Pengumuman</h3>
             {getAnnouncementsContent()}
@@ -172,3 +168,4 @@ const NewsSection = () => {
 };
 
 export default NewsSection;
+

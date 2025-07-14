@@ -57,7 +57,6 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
           const labels: string[] = [];
           const visitors: number[] = [];
           
-          // Generate data for the last N days
           for (let i = days - 1; i >= 0; i--) {
             const date = new Date();
             date.setDate(date.getDate() - i);
@@ -73,7 +72,6 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
           }
 
           if (type === "doughnut") {
-            // Data untuk chart pie/doughnut
             const todayVisitors = getTodayVisitorCount(stats);
             const weeklyVisitors = getWeeklyVisitorCount(stats);
             const totalVisitors = stats.totalVisitors;
@@ -99,7 +97,6 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
               ],
             });
           } else {
-            // Data untuk line atau bar chart
             setChartData({
               labels,
               datasets: [
@@ -123,7 +120,6 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
         }
       } catch (error) {
         console.error("Error fetching chart data:", error);
-        // Fallback data
         const labels = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
         const data = [45, 52, 38, 67, 73, 89, 42];
         
@@ -276,3 +272,4 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
 };
 
 export default VisitorChart;
+

@@ -10,7 +10,6 @@ const RecentActivity = () => {
   const { announcements, loading: announcementsLoading } = useActiveAnnouncements(2);
   const { articles, loading: articlesLoading } = usePublishedArticles(2);
 
-  // Combine and sort recent activities
   const getRecentActivities = () => {
     const activities: Array<{
       id: string;
@@ -20,7 +19,6 @@ const RecentActivity = () => {
       createdAt: Date;
     }> = [];
 
-    // Add announcements
     announcements.forEach((announcement) => {
       try {
         const date = announcement.createdAt?.toDate ? announcement.createdAt.toDate() : new Date();
@@ -32,13 +30,11 @@ const RecentActivity = () => {
           createdAt: date,
         });
       } catch (error) {
-        // Skip if error processing date
       }
     });
 
-    // Add articles
     articles.forEach((article) => {
-      if (!article.id) return; // Skip if no ID
+      if (!article.id) return;
 
       try {
         const date = article.createdAt?.toDate ? article.createdAt.toDate() : new Date();
@@ -50,11 +46,9 @@ const RecentActivity = () => {
           createdAt: date,
         });
       } catch (error) {
-        // Skip if error processing date
       }
     });
 
-    // Sort by date (newest first) and take only 3 items
     return activities.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 3);
   };
 
@@ -102,3 +96,4 @@ const RecentActivity = () => {
 };
 
 export default RecentActivity;
+
