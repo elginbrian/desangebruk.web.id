@@ -5,14 +5,49 @@ import { useEffect, useState } from "react";
 const HeroSection = () => {
   const [mounted, setMounted] = useState(false);
   const [weatherVisible, setWeatherVisible] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isManualControl, setIsManualControl] = useState(false);
   const { weather, loading: weatherLoading } = useWeather();
 
+  const images = ["/kantor_desa.jpg", "/stasiun_ngebruk.JPG", "/pasar_ngebruk.png", "/kampung_gatot.png", "/koka_caffee.png"];
+
   useEffect(() => {
+    // Set initial random image
+    const randomIndex = Math.floor(Math.random() * images.length);
+    setCurrentImageIndex(randomIndex);
+
     const timer = setTimeout(() => {
       setMounted(true);
     }, 100);
     return () => clearTimeout(timer);
   }, []);
+
+  // Auto slide images every 8 seconds
+  useEffect(() => {
+    if (isManualControl) return; // Skip auto slide if user is manually controlling
+
+    const slideInterval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 8000);
+
+    return () => clearInterval(slideInterval);
+  }, [images.length, isManualControl]);
+
+  // Reset manual control after 16 seconds of inactivity
+  useEffect(() => {
+    if (!isManualControl) return;
+
+    const resetTimer = setTimeout(() => {
+      setIsManualControl(false);
+    }, 16000);
+
+    return () => clearTimeout(resetTimer);
+  }, [isManualControl, currentImageIndex]);
+
+  const handleManualSlide = (index: number) => {
+    setCurrentImageIndex(index);
+    setIsManualControl(true);
+  };
 
   useEffect(() => {
     if (weather && mounted && !weatherLoading) {
@@ -68,13 +103,18 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-      {/* Background Image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: "url('/kantor_desa.jpg')",
-        }}
-      ></div>
+      {/* Background Images with sliding effect */}
+      <div className="absolute inset-0">
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-1000 ease-in-out ${index === currentImageIndex ? "opacity-100" : "opacity-0"}`}
+            style={{
+              backgroundImage: `url('${image}')`,
+            }}
+          />
+        ))}
+      </div>
 
       {/* Base dark overlay */}
       <div className="absolute inset-0 bg-black/70"></div>
@@ -112,6 +152,20 @@ const HeroSection = () => {
               <p className="text-sm text-white leading-relaxed">Unduh formulir administrasi, cek persyaratan, dan datang dengan lebih siap.</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Image Indicators */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="flex space-x-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              className={`w-1 h-1 rounded-full transition-all duration-300 ${index === currentImageIndex ? "bg-white shadow-lg" : "bg-white/50 hover:bg-white/70"}`}
+              onClick={() => handleManualSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
       </div>
     </section>

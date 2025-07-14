@@ -26,27 +26,21 @@ const GallerySection = () => {
     },
     {
       id: 3,
-      src: "/kantor_desa.jpg",
-      alt: "Kegiatan Desa",
-      title: "Kegiatan Desa",
+      src: "/pasar_ngebruk.png",
+      alt: "Pasar Ngebruk",
+      title: "Pasar Ngebruk",
     },
     {
       id: 4,
-      src: "/stasiun_ngebruk.JPG",
-      alt: "Budaya Lokal",
-      title: "Budaya Lokal",
+      src: "/kampung_gatot.png",
+      alt: "Kampung Gatot",
+      title: "Kampung Gatot",
     },
     {
       id: 5,
-      src: "/kantor_desa.jpg",
-      alt: "Alam Desa",
-      title: "Alam Desa",
-    },
-    {
-      id: 6,
-      src: "/stasiun_ngebruk.JPG",
-      alt: "Aktivitas Masyarakat",
-      title: "Aktivitas Masyarakat",
+      src: "/koka_caffee.png",
+      alt: "Koka Caffee",
+      title: "Koka Caffee",
     },
   ];
 
