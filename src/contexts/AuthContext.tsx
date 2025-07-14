@@ -39,8 +39,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChange(async (user) => {
-      console.log("Auth state changed:", user ? "User logged in" : "User logged out");
-      
       setUser(user);
 
       if (user) {
@@ -49,7 +47,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           const userProfile = await getUserProfile(user.uid);
           if (userProfile) {
             setProfile(userProfile);
-            console.log("User profile loaded:", userProfile);
           } else {
             // Create profile if doesn't exist
             const newProfile: UserProfile = {
@@ -60,10 +57,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               createdAt: new Date(),
             };
             setProfile(newProfile);
-            console.log("Created new profile for user:", newProfile);
           }
         } catch (error) {
-          console.error("Error loading user profile:", error);
           // Set basic profile from auth user if profile loading fails
           const fallbackProfile: UserProfile = {
             uid: user.uid,
@@ -90,10 +85,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userProfile = await getUserProfile(user.uid);
         if (userProfile) {
           setProfile(userProfile);
-          console.log("Profile refreshed:", userProfile);
         }
       } catch (error) {
-        console.error("Error refreshing profile:", error);
+        // Silent error handling
       }
     }
   };

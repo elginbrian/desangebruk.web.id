@@ -17,10 +17,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth =
   useEffect(() => {
     if (!loading) {
       if (requireAuth && (!isAuthenticated || !user || !profile)) {
-        console.log("Redirecting to login - Auth required but user not authenticated or profile not loaded");
         router.push(redirectTo);
       } else if (!requireAuth && isAuthenticated && user && profile) {
-        console.log("Redirecting to dashboard - User is authenticated");
         router.push("/dashboard");
       }
     }

@@ -8,6 +8,7 @@ import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import DataTable from "@/component/common/DataTable";
+import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
 import { useArticles, useArticleActions } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
@@ -162,24 +163,24 @@ const ArticlePage = () => {
             mounted={mounted}
           />
 
-          {loading && articles.length === 0 ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="text-gray-600">Memuat data artikel...</div>
+          <DataTableWithStates 
+            columns={columns} 
+            data={articles} 
+            editRoute={handleEdit} 
+            onDelete={handleDelete} 
+            mounted={mounted}
+            loading={loading && articles.length === 0}
+            error={error}
+            onRetry={() => fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"))}
+            emptyMessage={searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}
+          />
+
+          {hasMore && !searchTerm && articles.length > 0 && (
+            <div className="flex justify-center py-4 border-t border-gray-100">
+              <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
+                {loading ? "Memuat..." : "Muat Lebih Banyak"}
+              </ActionButton>
             </div>
-          ) : (
-            <>
-              <DataTable columns={columns} data={articles} editRoute={handleEdit} onDelete={handleDelete} mounted={mounted} />
-
-              {articles.length === 0 && !loading && <div className="text-center py-8 text-gray-500">{searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}</div>}
-
-              {hasMore && !searchTerm && (
-                <div className="flex justify-center py-4 border-t border-gray-100">
-                  <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
-                    {loading ? "Memuat..." : "Muat Lebih Banyak"}
-                  </ActionButton>
-                </div>
-              )}
-            </>
           )}
         </div>
       </div>

@@ -147,11 +147,8 @@ export const resetPassword = async (email: string): Promise<void | { error: Auth
       handleCodeInApp: false, // This will be handled by Firebase's default reset page
     };
 
-    console.log("Attempting to send password reset email to:", email);
     await sendPasswordResetEmail(auth, email, actionCodeSettings);
-    console.log("Password reset email sent successfully");
   } catch (error: any) {
-    console.error("Password reset error:", error);
     return {
       error: {
         code: error.code,
@@ -170,7 +167,6 @@ export const getUserProfile = async (uid: string): Promise<UserProfile | null> =
     }
     return null;
   } catch (error) {
-    console.error("Error getting user profile:", error);
     return null;
   }
 };
