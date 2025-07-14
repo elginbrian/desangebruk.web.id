@@ -29,7 +29,6 @@ const CreateAnnouncementPage = () => {
       [field]: value,
     }));
 
-    // Clear success message when form changes
     if (success) {
       setSuccess(null);
     }
@@ -70,7 +69,6 @@ const CreateAnnouncementPage = () => {
 
     if (result) {
       setSuccess("Pengumuman berhasil dibuat!");
-      // Redirect to announcements list after short delay
       setTimeout(() => {
         router.push("/dashboard/announcement");
       }, 1500);
@@ -96,13 +94,13 @@ const CreateAnnouncementPage = () => {
     <>
       <PageHeader title="Tambah Pengumuman" subtitle="Buat pengumuman baru untuk desa" actions={headerActions} />
 
-      {/* Content */}
+
       <div className="app-content">
         <div className="bg-white app-card shadow-sm border border-gray-100">
-          {/* Error Message */}
+
           {error && <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md">{error}</div>}
 
-          {/* Success Message */}
+
           {success && <div className="mb-4 p-3 bg-green-100 border border-green-300 text-green-700 rounded-md">{success}</div>}
 
           <AnnouncementForm formData={formData} onChange={handleFormChange} isEditing={false} />
@@ -113,3 +111,4 @@ const CreateAnnouncementPage = () => {
 };
 
 export default CreateAnnouncementPage;
+

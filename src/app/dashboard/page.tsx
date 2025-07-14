@@ -22,7 +22,6 @@ const DashboardPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Show loading if profile is still being loaded
   if (loading || !profile) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
@@ -58,19 +57,19 @@ const DashboardPage = () => {
         }
       />
 
-      {/* Content */}
+
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-        {/* Main Analytics Dashboard */}
+
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-          {/* Visitor Analytics - Takes up 2/3 of the width */}
+
           <div className="xl:col-span-2 space-y-6">
             <VisitorStatsCard />
             <VisitorChart type="line" timeRange="7days" />
           </div>
 
-          {/* Side Panel - Takes up 1/3 of the width */}
+
           <div className="xl:col-span-1 space-y-6">
-            {/* Quick Actions */}
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Tambahkan Informasi Baru</h3>
               <div className="space-y-3">
@@ -91,10 +90,10 @@ const DashboardPage = () => {
               </div>
             </div>
 
-            {/* Recent Activity */}
+
             <RecentActivity />
 
-            {/* Quick Stats */}
+
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Ringkasan</h3>
               <div className="space-y-3">
@@ -124,3 +123,4 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+

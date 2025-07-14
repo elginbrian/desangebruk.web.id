@@ -35,7 +35,6 @@ export interface UpdateAnnouncementData {
   status?: "active" | "inactive" | "expired";
 }
 
-// Generate slug from title
 const generateSlug = (title: string): string => {
   return title
     .toLowerCase()
@@ -44,18 +43,17 @@ const generateSlug = (title: string): string => {
     .substring(0, 100);
 };
 
-// Determine status based on dates
 const determineStatus = (startDate: string, endDate: string): "active" | "inactive" | "expired" => {
   const now = new Date();
   const start = new Date(startDate);
   const end = new Date(endDate);
 
   if (now < start) {
-    return "inactive"; // Not started yet
+    return "inactive";
   } else if (now > end) {
-    return "expired"; // Already ended
+    return "expired";
   } else {
-    return "active"; // Currently active
+    return "active";
   }
 };
 
@@ -74,7 +72,6 @@ export const createAnnouncement = async (data: CreateAnnouncementData): Promise<
 
     const docRef = await addDoc(collection(db, "announcements"), announcementData);
 
-    // Get the created document
     const docSnap = await getDoc(docRef);
     if (!docSnap.exists()) {
       throw new Error("Failed to create announcement");
@@ -98,12 +95,10 @@ export const getAnnouncements = async (
   try {
     let q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(pageSize));
 
-    // Add status filter if specified
     if (statusFilter && statusFilter !== "all") {
       q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), limit(pageSize));
     }
 
-    // Add pagination if lastDoc is provided
     if (lastDoc) {
       q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(pageSize));
 
@@ -177,7 +172,6 @@ export const updateAnnouncement = async (id: string, data: UpdateAnnouncementDat
   try {
     const docRef = doc(db, "announcements", id);
 
-    // Generate new slug if title is being updated
     let updateData: any = {
       ...data,
       updatedAt: serverTimestamp(),
@@ -187,11 +181,9 @@ export const updateAnnouncement = async (id: string, data: UpdateAnnouncementDat
       updateData.slug = generateSlug(data.title);
     }
 
-    // Update status if dates are being updated
     if (data.startDate && data.endDate) {
       updateData.status = determineStatus(data.startDate, data.endDate);
     } else if (data.startDate || data.endDate) {
-      // Get current announcement to check existing dates
       const currentDoc = await getDoc(docRef);
       if (currentDoc.exists()) {
         const currentData = currentDoc.data();
@@ -203,7 +195,6 @@ export const updateAnnouncement = async (id: string, data: UpdateAnnouncementDat
 
     await updateDoc(docRef, updateData);
 
-    // Get the updated document
     const updatedDoc = await getDoc(docRef);
     if (!updatedDoc.exists()) {
       throw new Error("Failed to update announcement");
@@ -229,13 +220,11 @@ export const deleteAnnouncement = async (id: string): Promise<void> => {
   }
 };
 
-// Get active announcements for public display
 export const getActiveAnnouncements = async (limitCount: number = 10): Promise<Announcement[]> => {
   try {
-    // Use the simplest possible query to avoid any index issues
     const q = query(
       collection(db, "announcements"),
-      limit(100) // Get more documents to filter locally
+      limit(100)
     );
 
     const querySnapshot = await getDocs(q);
@@ -249,66 +238,54 @@ export const getActiveAnnouncements = async (limitCount: number = 10): Promise<A
       } as Announcement);
     });
 
-    // Filter for active announcements in memory
     const now = new Date();
     const activeAnnouncements = allAnnouncements.filter((announcement) => {
-      // Check if the announcement is active based on dates
       try {
         const startDate = new Date(announcement.startDate);
         const endDate = new Date(announcement.endDate);
 
-        // Check if current time is within the announcement period
         const isWithinPeriod = now >= startDate && now <= endDate;
 
-        // Also check the status field
         const hasActiveStatus = announcement.status === "active";
 
         return isWithinPeriod || hasActiveStatus;
       } catch (dateError) {
-        // If there's an error with dates, check status only
         return announcement.status === "active";
       }
     });
 
-    // Sort by priority in memory (urgent > penting > normal)
     const priorityOrder = { urgent: 3, penting: 2, normal: 1 };
     activeAnnouncements.sort((a, b) => {
       const priorityA = priorityOrder[a.priority] || 1;
       const priorityB = priorityOrder[b.priority] || 1;
 
       if (priorityA !== priorityB) {
-        return priorityB - priorityA; // Higher priority first
+        return priorityB - priorityA;
       }
 
-      // If same priority, sort by creation date (newer first)
       try {
         const dateA = a.createdAt instanceof Timestamp ? a.createdAt.toDate() : new Date(a.createdAt as any);
         const dateB = b.createdAt instanceof Timestamp ? b.createdAt.toDate() : new Date(b.createdAt as any);
         return dateB.getTime() - dateA.getTime();
       } catch (dateError) {
-        return 0; // Keep original order if date comparison fails
+        return 0;
       }
     });
 
     return activeAnnouncements.slice(0, limitCount);
   } catch (error) {
-    // Return empty array instead of throwing to prevent UI crashes
     return [];
   }
 };
 
-// Search announcements
 export const searchAnnouncements = async (searchTerm: string): Promise<Announcement[]> => {
   try {
-    // For better search functionality, you might want to implement full-text search
-    // with external services like Algolia or use Firestore's limited text search
     const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
     const querySnapshot = await getDocs(q);
     const announcements: Announcement[] = [];
 
     querySnapshot.forEach((doc) => {
       const data = doc.data();
-      // Simple text search - case insensitive
       if (data.title.toLowerCase().includes(searchTerm.toLowerCase()) || data.content.toLowerCase().includes(searchTerm.toLowerCase())) {
         announcements.push({
           id: doc.id,
@@ -323,3 +300,4 @@ export const searchAnnouncements = async (searchTerm: string): Promise<Announcem
     throw error;
   }
 };
+

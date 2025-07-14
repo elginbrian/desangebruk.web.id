@@ -17,9 +17,9 @@ const Footer = () => {
   return (
     <footer className={`bg-[#1B3A6D] text-white pt-6 md:pt-4 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 mb-6 sm:px-6 lg:px-8">
-        {/* Top section with logo and social media */}
+
         <div className={`flex flex-col md:flex-row justify-between items-center md:items-center mb-6 md:mb-4 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-          {/* Logo on the left */}
+
           <div className="mb-4 md:mb-0">
             <img
               src="/logo.png"
@@ -32,7 +32,7 @@ const Footer = () => {
             />
           </div>
 
-          {/* Social Media on the right */}
+
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full md:w-auto">
             <a href="#" className="flex items-center justify-center px-3 py-2 md:px-4 border border-white/30 rounded-lg hover:bg-white/10 smooth-transition text-xs md:text-sm hover-lift">
               <FiInstagram size={14} className="mr-2" />
@@ -51,14 +51,14 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Divider with star */}
+
         <div className={`relative mb-6 md:mb-3 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
           <div className="border-t border-white/30"></div>
         </div>
 
-        {/* Main content */}
+
         <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 mb-6 md:mb-3 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-          {/* Left - Desa Info */}
+
           <div className="text-center md:text-left">
             <h3 className="text-lg md:text-xl font-bold mb-2 md:mb-1 smooth-transition">Desa Ngebruk</h3>
             <p className="text-white/90 mb-3 md:mb-2 text-sm md:text-sm smooth-transition">Kecamatan Sumberpucung</p>
@@ -69,7 +69,7 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Right - Contact Info */}
+
           <div className="text-center md:text-left">
             <h4 className="text-lg md:text-xl font-bold mb-3 md:mb-2 smooth-transition">Hubungi Kami</h4>
             <div className="space-y-2 md:space-y-1">
@@ -94,3 +94,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

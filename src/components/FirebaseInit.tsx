@@ -5,11 +5,10 @@ import { app, analytics } from "@/lib/firebase";
 
 const FirebaseInit = () => {
   useEffect(() => {
-    // Firebase is automatically initialized when imported
-    // Analytics is initialized in the firebase.ts file for browser environment
   }, []);
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 export default FirebaseInit;
+

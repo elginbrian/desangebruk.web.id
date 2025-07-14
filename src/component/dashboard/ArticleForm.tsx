@@ -90,7 +90,7 @@ const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = fal
       <div>
         <label className="block text-xs font-medium text-black mb-2">Gambar Berita {!isEditing && <span className="text-red-500">*</span>}</label>
 
-        {/* Tampilkan gambar sebelumnya jika sedang edit dan ada gambar */}
+
         {isEditing && formData.imageUrl && !previewUrl && (
           <div className="mb-4">
             <p className="text-xs text-gray-600 mb-2">Gambar saat ini:</p>
@@ -143,3 +143,4 @@ const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = fal
 };
 
 export default ArticleForm;
+

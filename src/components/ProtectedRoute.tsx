@@ -24,7 +24,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth =
     }
   }, [isAuthenticated, loading, router, requireAuth, redirectTo, user, profile]);
 
-  // Show loading while checking auth state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -36,7 +35,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth =
     );
   }
 
-  // Don't render children if auth check fails
   if (requireAuth && (!isAuthenticated || !user || !profile)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -63,3 +61,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth =
 };
 
 export default ProtectedRoute;
+

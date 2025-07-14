@@ -87,7 +87,7 @@ const AgendaSection = () => {
     <section className={`py-12 md:py-16 bg-gray-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
-          {/* Content */}
+
           <div className={`lg:col-span-2 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
             <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-4 md:mb-6 smooth-transition">Agenda Desa Ngebruk</h2>
             <p className="text-gray-600 mb-6 md:mb-8 text-base md:text-lg leading-relaxed smooth-transition">
@@ -95,7 +95,7 @@ const AgendaSection = () => {
             </p>
           </div>
 
-          {/* Agenda Cards */}
+
           <div className={`lg:col-span-1 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
             <div className="space-y-4">
               <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 md:mb-6 smooth-transition">Agenda & Hari Besar</h3>
@@ -142,3 +142,4 @@ const AgendaSection = () => {
 };
 
 export default AgendaSection;
+

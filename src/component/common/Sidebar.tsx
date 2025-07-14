@@ -18,14 +18,13 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const { profile } = useAuth();
   const { logout } = useAuthActions();
 
-  // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
         isOpen &&
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target as Node) &&
-        window.innerWidth < 1024 // Only on mobile/tablet
+        window.innerWidth < 1024
       ) {
         onClose();
       }
@@ -48,7 +47,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   return (
     <>
-      {/* Sidebar */}
+
       <aside
         ref={sidebarRef}
         className={`
@@ -58,14 +57,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
-        {/* Mobile close button */}
+
         <div className="lg:hidden absolute top-4 right-4 z-10">
           <button onClick={onClose} className="text-white hover:bg-white/10 p-2 rounded-lg smooth-transition hover:scale-110 active:scale-95">
             <FiX size={20} />
           </button>
         </div>
 
-        {/* Header */}
+
         <div className="p-4 border-b border-white/10 smooth-transition">
           <div className="flex items-center gap-3">
             <div className="flex-shrink-0 smooth-transition hover:scale-105">
@@ -93,14 +92,14 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </div>
         </div>
 
-        {/* Navigation */}
+
         <nav className="flex-grow px-4 py-4 overflow-y-auto">
           <ul className="space-y-1">
             {menuItems.map((item, index) => (
               <li key={index} className={`animate-slide-in-left stagger-${index + 1}`}>
                 <Link
                   href={item.href}
-                  onClick={() => onClose()} // Close mobile menu when link is clicked
+                  onClick={() => onClose()}
                   className={`
                     flex items-center px-4 py-3 rounded-lg smooth-transition text-xs group
                     hover:scale-105 active:scale-95
@@ -115,12 +114,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </ul>
         </nav>
 
-        {/* User Info & Logout */}
+
         <div className="px-4 py-4 border-t border-white/10 space-y-3 flex-shrink-0">
-          {/* User Profile Button */}
+
           <Link
             href="/dashboard/profile"
-            onClick={() => onClose()} // Close mobile menu when link is clicked
+            onClick={() => onClose()}
             className={`
               flex items-center px-4 py-2 rounded-lg smooth-transition text-xs group
               hover:scale-105 active:scale-95
@@ -136,7 +135,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </div>
           </Link>
 
-          {/* Logout Button */}
+
           <button onClick={logout} className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-white/10 smooth-transition text-xs text-white/90 hover:text-white group hover:scale-105 active:scale-95">
             <FiLogOut className="mr-2 smooth-transition group-hover:scale-110" size={14} />
             <span className="smooth-transition">Logout</span>
@@ -148,3 +147,4 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 };
 
 export default Sidebar;
+

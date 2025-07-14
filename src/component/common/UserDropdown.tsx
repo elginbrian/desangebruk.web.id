@@ -12,7 +12,6 @@ const UserDropdown = () => {
   const { profile, user } = useAuth();
   const { logout } = useAuthActions();
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -35,7 +34,7 @@ const UserDropdown = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Trigger Button */}
+
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center space-x-2 text-gray-700 hover:text-[#1B3A6D] px-3 py-2 text-sm font-medium smooth-transition hover-lift"
@@ -50,18 +49,18 @@ const UserDropdown = () => {
         />
       </button>
 
-      {/* Dropdown Menu */}
+
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 z-50 animate-slide-in-left">
           <div className="py-1">
-            {/* User Info */}
+
             <div className="px-4 py-2 border-b border-gray-200">
               <p className="text-sm font-medium text-gray-900">{profile.name}</p>
               <p className="text-xs text-gray-500">{profile.email}</p>
               <p className="text-xs text-gray-400 capitalize">{profile.role}</p>
             </div>
 
-            {/* Menu Items */}
+
             <Link
               href="/dashboard"
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 smooth-transition"
@@ -97,3 +96,4 @@ const UserDropdown = () => {
 };
 
 export default UserDropdown;
+

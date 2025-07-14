@@ -29,17 +29,15 @@ const AnnouncementPage = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch announcements when component mounts or status filter changes
     const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
     fetchAnnouncements(10, statusFilterValue, true);
   }, [statusFilter]);
 
   useEffect(() => {
-    // Handle search
     if (searchTerm.trim()) {
       const timeoutId = setTimeout(() => {
         searchAnnouncementsList(searchTerm);
-      }, 500); // Debounce search
+      }, 500);
 
       return () => clearTimeout(timeoutId);
     } else {
@@ -53,7 +51,6 @@ const AnnouncementPage = () => {
     if (window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
       const success = await remove(id.toString());
       if (success) {
-        // Refresh the list
         const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
         fetchAnnouncements(10, statusFilterValue, true);
       }
@@ -164,7 +161,7 @@ const AnnouncementPage = () => {
     <>
       <PageHeader title="Kelola Pengumuman" subtitle="Kelola dan atur pengumuman desa" actions={headerActions} mounted={mounted} />
 
-      {/* Content */}
+
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
           <SearchAndFilterBar
@@ -207,3 +204,4 @@ const AnnouncementPage = () => {
 };
 
 export default AnnouncementPage;
+

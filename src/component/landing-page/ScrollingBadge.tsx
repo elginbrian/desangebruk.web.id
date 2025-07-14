@@ -5,7 +5,6 @@ import React from "react";
 const ScrollingBadge = () => {
   const badges = ["Transparan", "Informatif", "Melayani"];
 
-  // Create multiple repetitions for seamless scrolling
   const repeatedBadges = Array(8).fill(badges).flat();
 
   return (
@@ -23,3 +22,4 @@ const ScrollingBadge = () => {
 };
 
 export default ScrollingBadge;
+

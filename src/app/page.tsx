@@ -14,7 +14,6 @@ import usePageVisitor from "@/hooks/usePageVisitor";
 export default function Home() {
   const [mounted, setMounted] = useState(false);
 
-  // Track visitor when page loads
   usePageVisitor("Home");
 
   useEffect(() => {
@@ -37,3 +36,4 @@ export default function Home() {
     </div>
   );
 }
+

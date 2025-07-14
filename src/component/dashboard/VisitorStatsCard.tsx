@@ -72,13 +72,11 @@ const VisitorStatsCard = ({ className = "" }: VisitorStatsCardProps) => {
           const weeklyCount = getWeeklyVisitorCount(stats);
           const dailyData = stats.dailyVisits;
 
-          // Calculate average daily visitors (last 7 days)
           const last7Days = Object.entries(dailyData)
             .slice(-7)
             .map(([_, count]) => count);
           const average = last7Days.length > 0 ? Math.round(last7Days.reduce((sum, count) => sum + count, 0) / last7Days.length) : 0;
 
-          // Find peak day
           let peakDay = "";
           let peakCount = 0;
           Object.entries(dailyData).forEach(([date, count]) => {
@@ -155,7 +153,7 @@ const VisitorStatsCard = ({ className = "" }: VisitorStatsCardProps) => {
         <StatCard icon={FiTrendingUp} title="Minggu Ini" value={formatNumber(extendedStats.weeklyVisitors)} change={`${calculateGrowthPercentage()}%`} isPositive={parseFloat(calculateGrowthPercentage()) >= 0} loading={loading} />
       </div>
 
-      {/* Additional Insights */}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-gray-100">
         <div className="space-y-2">
           <p className="text-sm font-medium text-gray-700">Rata-rata Harian</p>
@@ -178,3 +176,4 @@ const VisitorStatsCard = ({ className = "" }: VisitorStatsCardProps) => {
 };
 
 export default VisitorStatsCard;
+

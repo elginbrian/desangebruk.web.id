@@ -18,7 +18,6 @@ const BeritaPage = () => {
 
   const { articles, loading, error, refetch } = usePublishedArticles();
 
-  // Track visitor
   usePageVisitor("Berita");
 
   useEffect(() => {
@@ -28,7 +27,6 @@ const BeritaPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Filter articles based on search term
   const filteredArticles = articles.filter(
     (article) =>
       article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,7 +34,6 @@ const BeritaPage = () => {
       (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
   const startIndex = (currentPage - 1) * articlesPerPage;
   const currentArticles = filteredArticles.slice(startIndex, startIndex + articlesPerPage);
@@ -48,7 +45,7 @@ const BeritaPage = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setCurrentPage(1); // Reset to first page when searching
+    setCurrentPage(1);
   };
 
   if (error) {
@@ -73,7 +70,7 @@ const BeritaPage = () => {
     <div className={`min-h-screen flex flex-col smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <Header />
 
-      {/* Hero Section */}
+
       <section className="bg-[#1B3A6D] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -83,7 +80,7 @@ const BeritaPage = () => {
         </div>
       </section>
 
-      {/* Search Section */}
+
       <section className="py-8 bg-white">
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
           <div className="flex justify-center">
@@ -112,7 +109,7 @@ const BeritaPage = () => {
         </div>
       </section>
 
-      {/* Content */}
+
       <main className="flex-grow bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
@@ -131,7 +128,7 @@ const BeritaPage = () => {
                 ))}
               </div>
 
-              {/* Pagination */}
+
               {totalPages > 1 && (
                 <div className="flex justify-center items-center space-x-2">
                   <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed">
@@ -162,3 +159,4 @@ const BeritaPage = () => {
 };
 
 export default BeritaPage;
+

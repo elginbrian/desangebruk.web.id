@@ -21,7 +21,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Small delay to ensure auth state is properly set
       setTimeout(() => {
         router.push("/dashboard");
       }, 100);
@@ -48,7 +47,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Small delay to ensure auth state is properly set
       setTimeout(() => {
         router.push("/dashboard");
       }, 100);
@@ -75,8 +73,6 @@ export const useAuthActions = () => {
         return { success: false, error: result.error.message };
       }
 
-      // Clear any local state if needed
-      // Small delay to ensure auth state is properly cleared
       setTimeout(() => {
         router.push("/login");
       }, 100);
@@ -150,3 +146,4 @@ export const useAuthActions = () => {
     clearError,
   };
 };
+

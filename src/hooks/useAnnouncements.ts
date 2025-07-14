@@ -16,7 +16,6 @@ import {
   searchAnnouncements,
 } from "@/lib/announcementService";
 
-// Hook for managing announcements list
 export const useAnnouncements = () => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,7 +58,7 @@ export const useAnnouncements = () => {
       const results = await searchAnnouncements(searchTerm);
       setAnnouncements(results);
       setLastVisible(null);
-      setHasMore(false); // Search doesn't support pagination
+      setHasMore(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to search announcements");
     } finally {
@@ -86,7 +85,6 @@ export const useAnnouncements = () => {
   };
 };
 
-// Hook for managing single announcement
 export const useAnnouncement = (id?: string) => {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -115,7 +113,6 @@ export const useAnnouncement = (id?: string) => {
   return { announcement, loading, error };
 };
 
-// Hook for announcement by slug
 export const useAnnouncementBySlug = (slug?: string) => {
   const [announcement, setAnnouncement] = useState<Announcement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -144,7 +141,6 @@ export const useAnnouncementBySlug = (slug?: string) => {
   return { announcement, loading, error };
 };
 
-// Hook for announcement CRUD actions
 export const useAnnouncementActions = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -208,10 +204,9 @@ export const useAnnouncementActions = () => {
   };
 };
 
-// Hook for public announcements (for frontend display)
 export const useActiveAnnouncements = (limit?: number) => {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [loading, setLoading] = useState(true); // Start with loading true
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
@@ -224,14 +219,11 @@ export const useActiveAnnouncements = (limit?: number) => {
     try {
       const results = await getActiveAnnouncements(limit);
       setAnnouncements(results);
-      setRetryCount(0); // Reset retry count on success
+      setRetryCount(0);
 
-      // If we get empty results, don't treat it as an error
       if (results.length === 0) {
-        // No announcements found, but this is not an error
       }
     } catch (err) {
-      // Check if it's a Firestore index error
       const errorMessage = err instanceof Error ? err.message : "Failed to fetch announcements";
       if (errorMessage.includes("index") || errorMessage.includes("Index")) {
         setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
@@ -239,12 +231,10 @@ export const useActiveAnnouncements = (limit?: number) => {
         setError("Gagal memuat pengumuman. Silakan coba lagi.");
       }
 
-      // Keep previous data if available, otherwise set empty array
       if (announcements.length === 0) {
         setAnnouncements([]);
       }
 
-      // Auto retry up to 2 times with exponential backoff (only for non-manual retries)
       if (retryCount < 2 && !isRetry) {
         setTimeout(() => {
           setRetryCount((prev) => prev + 1);
@@ -257,7 +247,6 @@ export const useActiveAnnouncements = (limit?: number) => {
   };
 
   useEffect(() => {
-    // Add delay to prevent rapid-fire requests
     const timer = setTimeout(() => {
       fetchAnnouncements();
     }, 100);
@@ -278,3 +267,4 @@ export const useActiveAnnouncements = (limit?: number) => {
     retryCount,
   };
 };
+

@@ -37,7 +37,6 @@ const ProfilePage = () => {
     }
   }, [profile]);
 
-  // Clear success and error messages after 5 seconds
   useEffect(() => {
     if (success || error) {
       const timer = setTimeout(() => {
@@ -55,7 +54,6 @@ const ProfilePage = () => {
       [name]: value,
     }));
 
-    // Clear success and error messages when user starts typing
     if (success || error) {
       setSuccess(null);
       clearError();
@@ -65,7 +63,6 @@ const ProfilePage = () => {
   const handleSave = async () => {
     if (!user || !profile) return;
 
-    // Only update name since email and role shouldn't be editable
     const updateData = {
       name: formData.name,
     };
@@ -75,7 +72,6 @@ const ProfilePage = () => {
     if (result.success) {
       setSuccess("Profil berhasil diperbarui!");
       setIsEditing(false);
-      // Refresh the profile data
       await refreshProfile();
     }
   };
@@ -123,16 +119,16 @@ const ProfilePage = () => {
     <>
       <PageHeader title="Profil Pengguna" subtitle="Kelola informasi profil Anda" actions={headerActions} mounted={mounted} />
 
-      {/* Content */}
+
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-        {/* Success Message */}
+
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md smooth-transition">
             <p className="text-green-600 text-sm">{success}</p>
           </div>
         )}
 
-        {/* Error Message */}
+
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
             <p className="text-red-600 text-sm">{error}</p>
@@ -140,7 +136,7 @@ const ProfilePage = () => {
         )}
 
         <div className="bg-white app-card shadow-sm border border-gray-100">
-          {/* Profile Header */}
+
           <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-gray-200">
             <div className="w-16 h-16 bg-[#1B3A6D] rounded-full flex items-center justify-center">
               <span className="text-white text-xl font-bold">{profile.name?.charAt(0).toUpperCase() || "A"}</span>
@@ -151,7 +147,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* Profile Form */}
+
           <form className="space-y-4">
             <FormInput label="Nama Lengkap" name="name" value={formData.name} onChange={handleInputChange} placeholder="Masukkan nama lengkap..." disabled={!isEditing} />
 
@@ -162,7 +158,7 @@ const ProfilePage = () => {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Masukkan email..."
-              disabled={true} // Email shouldn't be editable
+              disabled={true}
             />
 
             <FormInput
@@ -171,7 +167,7 @@ const ProfilePage = () => {
               value={formData.role}
               onChange={handleInputChange}
               placeholder="Role pengguna..."
-              disabled={true} // Role shouldn't be editable
+              disabled={true}
             />
 
             <div className="pt-4">
@@ -188,3 +184,4 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
+
