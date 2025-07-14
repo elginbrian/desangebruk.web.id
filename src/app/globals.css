@@ -666,6 +666,46 @@ select:focus {
   }
 }
 
+/* Dashboard Layout Styles */
+.dashboard-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-sidebar {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-sidebar nav {
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.dashboard-main {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Ensure proper mobile behavior */
+@media (max-width: 1023px) {
+  .dashboard-sidebar {
+    height: 100vh;
+    position: fixed;
+    z-index: 50;
+  }
+}
+
 /* Custom utility classes for dashboard */
 .dashboard-grid {
   display: grid;

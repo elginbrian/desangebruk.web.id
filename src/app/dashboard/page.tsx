@@ -25,7 +25,7 @@ const DashboardPage = () => {
   // Show loading if profile is still being loaded
   if (loading || !profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1B3A6D] mx-auto mb-4"></div>
           <p className="text-gray-600 text-sm">Memuat data profil...</p>

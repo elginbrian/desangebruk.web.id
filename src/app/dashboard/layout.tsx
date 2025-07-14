@@ -10,12 +10,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <ProtectedRoute requireAuth={true}>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="dashboard-layout flex h-screen bg-gray-50 overflow-hidden">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <main className="flex-grow lg:ml-0 w-full min-w-0">
+        <main className="dashboard-main flex-grow lg:ml-0 w-full min-w-0 flex flex-col overflow-hidden">
           {/* Mobile header with hamburger menu */}
-          <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-2.5 animate-slide-in-left">
+          <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-2.5 animate-slide-in-left flex-shrink-0">
             <div className="flex items-center justify-between max-w-full">
               <button onClick={() => setSidebarOpen(true)} className="text-gray-600 hover:text-gray-900 smooth-transition p-1 -ml-1 hover:scale-110 active:scale-95 hover:bg-gray-100 rounded-lg" aria-label="Open menu">
                 <FiMenu size={20} />
@@ -25,7 +25,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
           </div>
 
-          {children}
+          {/* Scrollable content area */}
+          <div className="dashboard-content flex-1 overflow-y-auto">{children}</div>
         </main>
       </div>
     </ProtectedRoute>
