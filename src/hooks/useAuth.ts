@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithEmail, signUpWithEmail, signInWithGoogle, signOutUser, resetPassword, updateUserProfile, AuthError, UserProfile } from "@/lib/auth";
+import { signInWithEmail, signUpWithEmail, signOutUser, resetPassword, updateUserProfile, AuthError, UserProfile } from "@/lib/auth";
 
 export const useAuthActions = () => {
   const [loading, setLoading] = useState(false);
@@ -56,33 +56,6 @@ export const useAuthActions = () => {
       return { success: true };
     } catch (error) {
       const errorMessage = "Terjadi kesalahan saat mendaftar";
-      setError(errorMessage);
-      return { success: false, error: errorMessage };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loginWithGoogle = async () => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const result = await signInWithGoogle();
-
-      if ("error" in result) {
-        setError(result.error.message);
-        return { success: false, error: result.error.message };
-      }
-
-      // Small delay to ensure auth state is properly set
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 100);
-
-      return { success: true };
-    } catch (error) {
-      const errorMessage = "Terjadi kesalahan saat masuk dengan Google";
       setError(errorMessage);
       return { success: false, error: errorMessage };
     } finally {
@@ -169,7 +142,6 @@ export const useAuthActions = () => {
   return {
     login,
     register,
-    loginWithGoogle,
     logout,
     forgotPassword,
     updateProfile,

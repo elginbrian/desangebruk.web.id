@@ -9,6 +9,7 @@ import Footer from "@/component/landing-page/Footer";
 import Link from "next/link";
 import { useActiveAnnouncements } from "@/hooks/useAnnouncements";
 import { LoadingSpinner, ErrorState, EmptyState, CardSkeleton } from "@/component/common/LoadingStates";
+import usePageVisitor from "@/hooks/usePageVisitor";
 
 const PengumumanPage = () => {
   const [mounted, setMounted] = useState(false);
@@ -18,6 +19,9 @@ const PengumumanPage = () => {
   const itemsPerPage = 6;
 
   const { announcements, loading, error, refetch } = useActiveAnnouncements();
+
+  // Track visitor
+  usePageVisitor("Pengumuman");
 
   useEffect(() => {
     const timer = setTimeout(() => {

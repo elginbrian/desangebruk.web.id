@@ -1,4 +1,6 @@
 import React from "react";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import Link from "next/link";
 
 interface LoadingSpinnerProps {
   size?: "sm" | "md" | "lg";
@@ -166,17 +168,26 @@ export const DataTableWithStates = ({ columns, data, editRoute, onDelete, mounte
                   {column.render ? column.render(item[column.key], item) : item[column.key]}
                 </td>
               ))}
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                {editRoute && (
-                  <button onClick={() => (typeof editRoute === "function" ? editRoute(item.id) : (window.location.href = `${editRoute}?id=${item.id}`))} className="text-indigo-600 hover:text-indigo-900">
-                    Edit
-                  </button>
-                )}
-                {onDelete && (
-                  <button onClick={() => onDelete(item.id)} className="text-red-600 hover:text-red-900">
-                    Delete
-                  </button>
-                )}
+              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div className="flex gap-1">
+                  {editRoute &&
+                    (typeof editRoute === "function" ? (
+                      <button onClick={() => editRoute(item.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                        <FiEdit size={14} />
+                      </button>
+                    ) : (
+                      <Link href={`${editRoute}?id=${item.id}`}>
+                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                          <FiEdit size={14} />
+                        </button>
+                      </Link>
+                    ))}
+                  {onDelete && (
+                    <button onClick={() => onDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded smooth-transition hover-lift">
+                      <FiTrash2 size={14} />
+                    </button>
+                  )}
+                </div>
               </td>
             </tr>
           ))}

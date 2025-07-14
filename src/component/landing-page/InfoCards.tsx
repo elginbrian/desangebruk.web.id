@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FiSun, FiUsers, FiHome } from "react-icons/fi";
+import { FiSun, FiUsers, FiHome, FiFileText, FiBell } from "react-icons/fi";
+import { usePublicStats } from "@/hooks/usePublicStats";
 
 const InfoCards = () => {
   const [mounted, setMounted] = useState(false);
+  const { totalArticles, activeAnnouncements, loading } = usePublicStats();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -15,23 +17,22 @@ const InfoCards = () => {
 
   const cardData = [
     {
-      icon: FiSun,
-      title: "Cuaca Hari Ini",
-      value: "28°C",
-      subtitle: "Cerah Berawan",
-      extraInfo: "Kelembaban: 65%",
+      icon: FiFileText,
+      title: "Total Berita",
+      value: loading ? "..." : totalArticles.toString(),
+      subtitle: "Artikel Dipublikasi",
+    },
+    {
+      icon: FiBell,
+      title: "Pengumuman Aktif",
+      value: loading ? "..." : activeAnnouncements.toString(),
+      subtitle: "Pengumuman Berlaku",
     },
     {
       icon: FiUsers,
       title: "Jumlah Penduduk",
       value: "2,847",
       subtitle: "Jiwa",
-    },
-    {
-      icon: FiHome,
-      title: "Jumlah RT",
-      value: "39",
-      subtitle: "Rukun Tetangga",
     },
   ];
 
@@ -54,9 +55,6 @@ const InfoCards = () => {
 
               {/* Subtitle */}
               <p className="text-sm text-[#1B3A6D] mb-1 smooth-transition">{card.subtitle}</p>
-
-              {/* Extra info for weather card */}
-              {card.extraInfo && <p className="text-sm text-[#1B3A6D] smooth-transition">{card.extraInfo}</p>}
             </div>
           ))}
         </div>

@@ -9,9 +9,13 @@ import NewsSection from "@/component/landing-page/NewsSection";
 import AgendaSection from "@/component/landing-page/AgendaSection";
 import GallerySection from "@/component/landing-page/GallerySection";
 import Footer from "@/component/landing-page/Footer";
+import usePageVisitor from "@/hooks/usePageVisitor";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
+
+  // Track visitor when page loads
+  usePageVisitor("Home");
 
   useEffect(() => {
     const timer = setTimeout(() => {

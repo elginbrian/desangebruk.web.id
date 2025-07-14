@@ -7,6 +7,7 @@ import Footer from "@/component/landing-page/Footer";
 import NewsCard from "@/component/common/NewsCard";
 import { LoadingSpinner, ErrorState, EmptyState, NewsCardSkeleton } from "@/component/common/LoadingStates";
 import { usePublishedArticles } from "@/hooks/useArticles";
+import usePageVisitor from "@/hooks/usePageVisitor";
 import Link from "next/link";
 
 const BeritaPage = () => {
@@ -16,6 +17,9 @@ const BeritaPage = () => {
   const articlesPerPage = 9;
 
   const { articles, loading, error, refetch } = usePublishedArticles();
+
+  // Track visitor
+  usePageVisitor("Berita");
 
   useEffect(() => {
     const timer = setTimeout(() => {

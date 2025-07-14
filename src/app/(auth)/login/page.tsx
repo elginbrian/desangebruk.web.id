@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import AuthLayout from "@/component/auth/AuthLayout";
 import AuthInput from "@/component/auth/AuthInput";
@@ -18,7 +17,7 @@ const Page = () => {
     rememberMe: false,
   });
 
-  const { login, loginWithGoogle, loading, error, clearError } = useAuthActions();
+  const { login, loading, error, clearError } = useAuthActions();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -53,10 +52,6 @@ const Page = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(formData.email, formData.password, formData.rememberMe);
-  };
-
-  const handleGoogleSignIn = async () => {
-    await loginWithGoogle();
   };
 
   return (
@@ -122,24 +117,6 @@ const Page = () => {
             </Link>
           </p>
         </div>
-
-        {/* Divider */}
-        <div className={`mt-6 mb-6 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500 smooth-transition">atau</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Google Sign In */}
-        <AuthButton type="button" variant="google" mounted={mounted} onClick={handleGoogleSignIn} disabled={loading}>
-          <FcGoogle className="mr-3 smooth-transition" size={18} />
-          <span className="smooth-transition">{loading ? "Memproses..." : "Masuk dengan Google"}</span>
-        </AuthButton>
       </AuthLayout>
     </ProtectedRoute>
   );

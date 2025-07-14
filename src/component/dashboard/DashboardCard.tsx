@@ -8,9 +8,10 @@ interface DashboardCardProps {
   percentage: string;
   change: string;
   isPositive: boolean;
+  loading?: boolean;
 }
 
-const DashboardCard = ({ title, value, percentage, change, isPositive }: DashboardCardProps) => {
+const DashboardCard = ({ title, value, percentage, change, isPositive, loading = false }: DashboardCardProps) => {
   const [mounted, setMounted] = useState(false);
   const textColor = isPositive ? "text-green-600" : "text-red-500";
   const Icon = isPositive ? FiArrowUp : FiArrowDown;
@@ -21,6 +22,25 @@ const DashboardCard = ({ title, value, percentage, change, isPositive }: Dashboa
     }, 50);
     return () => clearTimeout(timer);
   }, []);
+
+  if (loading) {
+    return (
+      <div className={`bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+        <div className="flex flex-col justify-between h-full min-h-[100px] sm:min-h-[120px] animate-pulse">
+          <div className="mb-2">
+            <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+          </div>
+          <div className="mb-3 flex-grow flex items-center">
+            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+          </div>
+          <div className="flex items-center justify-start gap-1">
+            <div className="h-3 bg-gray-200 rounded w-16"></div>
+            <div className="h-3 bg-gray-200 rounded w-20 ml-1"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition cursor-pointer ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
