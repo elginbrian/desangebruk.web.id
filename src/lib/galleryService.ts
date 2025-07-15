@@ -1,20 +1,4 @@
-import {
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  limit,
-  startAfter,
-  where,
-  getDoc,
-  Timestamp,
-  QueryDocumentSnapshot,
-  DocumentData,
-} from "firebase/firestore";
+import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, limit, startAfter, where, getDoc, Timestamp, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
 
@@ -85,7 +69,7 @@ export const deleteGalleryImage = async (imagePath: string): Promise<void> => {
 export const createGalleryImage = async (data: CreateGalleryImageData): Promise<GalleryImage> => {
   try {
     const now = Timestamp.now();
-    
+
     const docRef = await addDoc(collection(db, "gallery"), {
       title: data.title,
       description: data.description || "",
@@ -138,36 +122,17 @@ export const getGalleryImages = async (
     let q;
 
     if (statusFilter && statusFilter !== "all") {
-      q = query(
-        collection(db, "gallery"),
-        where("isActive", "==", statusFilter === "active"),
-        orderBy("updatedAt", "desc"),
-        limit(pageSize)
-      );
-    } else {
-      q = query(
-        collection(db, "gallery"),
-        orderBy("updatedAt", "desc"),
-        limit(pageSize)
-      );
-    }
-
-    if (lastDoc) {
-      if (statusFilter && statusFilter !== "all") {
-        q = query(
-          collection(db, "gallery"),
-          where("isActive", "==", statusFilter === "active"),
-          orderBy("updatedAt", "desc"),
-          startAfter(lastDoc),
-          limit(pageSize)
-        );
+      const isActive = statusFilter === "active";
+      if (lastDoc) {
+        q = query(collection(db, "gallery"), where("isActive", "==", isActive), orderBy("updatedAt", "desc"), startAfter(lastDoc), limit(pageSize));
       } else {
-        q = query(
-          collection(db, "gallery"),
-          orderBy("updatedAt", "desc"),
-          startAfter(lastDoc),
-          limit(pageSize)
-        );
+        q = query(collection(db, "gallery"), where("isActive", "==", isActive), orderBy("updatedAt", "desc"), limit(pageSize));
+      }
+    } else {
+      if (lastDoc) {
+        q = query(collection(db, "gallery"), orderBy("updatedAt", "desc"), startAfter(lastDoc), limit(pageSize));
+      } else {
+        q = query(collection(db, "gallery"), orderBy("updatedAt", "desc"), limit(pageSize));
       }
     }
 
@@ -200,7 +165,44 @@ export const getGalleryImages = async (
     return { images, lastVisible };
   } catch (error) {
     console.error("Error fetching gallery images:", error);
-    return { images: [], lastVisible: null };
+
+    try {
+      const fallbackQuery = query(collection(db, "gallery"), orderBy("updatedAt", "desc"), limit(pageSize));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const images: GalleryImage[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data();
+        const image = {
+          id: doc.id,
+          title: data.title,
+          description: data.description || "",
+          imageUrl: data.imageUrl,
+          imagePath: data.imagePath,
+          category: data.category || "umum",
+          isActive: data.isActive,
+          order: data.order || 0,
+          createdAt: data.createdAt || data.updatedAt,
+          updatedAt: data.updatedAt,
+          createdBy: data.createdBy || data.updatedBy,
+          updatedBy: data.updatedBy,
+        };
+
+        if (!statusFilter || statusFilter === "all" || (statusFilter === "active" && image.isActive) || (statusFilter === "inactive" && !image.isActive)) {
+          images.push(image);
+        }
+      });
+
+      const filteredImages = statusFilter && statusFilter !== "all" ? images.filter((image) => (statusFilter === "active" && image.isActive) || (statusFilter === "inactive" && !image.isActive)) : images;
+
+      return {
+        images: filteredImages.slice(0, pageSize),
+        lastVisible: fallbackSnapshot.docs[fallbackSnapshot.docs.length - 1] || null,
+      };
+    } catch (fallbackError) {
+      console.error("Fallback query also failed:", fallbackError);
+      throw new Error("Gagal memuat galeri. Silakan coba lagi.");
+    }
   }
 };
 
@@ -237,12 +239,12 @@ export const getGalleryImageById = async (id: string): Promise<GalleryImage | nu
 export const updateGalleryImage = async (id: string, data: UpdateGalleryImageData): Promise<GalleryImage> => {
   try {
     const docRef = doc(db, "gallery", id);
-    
+
     const currentDoc = await getDoc(docRef);
     if (!currentDoc.exists()) {
       throw new Error("Gallery image not found");
     }
-    
+
     const currentData = currentDoc.data();
     let updateData: any = {
       updatedAt: Timestamp.now(),
@@ -293,7 +295,7 @@ export const updateGalleryImage = async (id: string, data: UpdateGalleryImageDat
 export const deleteGalleryImageById = async (id: string): Promise<void> => {
   try {
     const docRef = doc(db, "gallery", id);
-    
+
     const currentDoc = await getDoc(docRef);
     if (currentDoc.exists()) {
       const currentData = currentDoc.data();
@@ -314,22 +316,13 @@ export const getActiveGalleryImages = async (limitCount?: number): Promise<Galle
     console.log("Starting to fetch active gallery images...");
     console.log("Database instance:", db);
     console.log("Collection name: gallery");
-    
-    const testQuery = query(collection(db, "gallery"));
-    const testSnapshot = await getDocs(testQuery);
-    console.log("Total documents in gallery collection:", testSnapshot.size);
-    
-    let q = query(
-      collection(db, "gallery"),
-      where("isActive", "==", true)
-    );
+
+    let q;
 
     if (limitCount) {
-      q = query(
-        collection(db, "gallery"),
-        where("isActive", "==", true),
-        limit(limitCount)
-      );
+      q = query(collection(db, "gallery"), where("isActive", "==", true), limit(limitCount));
+    } else {
+      q = query(collection(db, "gallery"), where("isActive", "==", true));
     }
 
     const querySnapshot = await getDocs(q);
@@ -343,9 +336,9 @@ export const getActiveGalleryImages = async (limitCount?: number): Promise<Galle
         title: data.title,
         isActive: data.isActive,
         category: data.category,
-        imageUrl: data.imageUrl
+        imageUrl: data.imageUrl,
       });
-      
+
       images.push({
         id: doc.id,
         title: data.title || "Untitled",
@@ -374,7 +367,149 @@ export const getActiveGalleryImages = async (limitCount?: number): Promise<Galle
     return images;
   } catch (error) {
     console.error("Error fetching active gallery images:", error);
-    return [];
+
+    try {
+      const fallbackQuery = query(collection(db, "gallery"));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const images: GalleryImage[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.isActive === true) {
+          images.push({
+            id: doc.id,
+            title: data.title || "Untitled",
+            description: data.description || "",
+            imageUrl: data.imageUrl || "",
+            imagePath: data.imagePath || "",
+            category: data.category || "umum",
+            isActive: data.isActive ?? true,
+            order: data.order || 0,
+            createdAt: data.createdAt || data.updatedAt,
+            updatedAt: data.updatedAt,
+            createdBy: data.createdBy || data.updatedBy || "",
+            updatedBy: data.updatedBy || "",
+          });
+        }
+      });
+
+      images.sort((a, b) => {
+        if (b.updatedAt && a.updatedAt) {
+          return b.updatedAt.toDate().getTime() - a.updatedAt.toDate().getTime();
+        }
+        return 0;
+      });
+
+      return limitCount ? images.slice(0, limitCount) : images;
+    } catch (fallbackError) {
+      console.error("Fallback query also failed:", fallbackError);
+      return [];
+    }
+  }
+};
+
+export const searchGalleryImages = async (searchTerm: string): Promise<GalleryImage[]> => {
+  try {
+    const q = query(collection(db, "gallery"), orderBy("updatedAt", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    const images: GalleryImage[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const image: GalleryImage = {
+        id: doc.id,
+        title: data.title || "Untitled",
+        description: data.description || "",
+        imageUrl: data.imageUrl || "",
+        imagePath: data.imagePath || "",
+        category: data.category || "umum",
+        isActive: data.isActive ?? true,
+        order: data.order || 0,
+        createdAt: data.createdAt || data.updatedAt,
+        updatedAt: data.updatedAt,
+        createdBy: data.createdBy || data.updatedBy || "",
+        updatedBy: data.updatedBy || "",
+      };
+
+      if (
+        image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (image.description && image.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (image.category && image.category.toLowerCase().includes(searchTerm.toLowerCase()))
+      ) {
+        images.push(image);
+      }
+    });
+
+    return images;
+  } catch (error) {
+    console.error("Error searching gallery images:", error);
+    throw new Error("Gagal mencari gambar galeri");
+  }
+};
+
+export const getGalleryImagesWithPagination = async (page: number = 1, pageSize: number = 10, statusFilter: "all" | "active" | "inactive" = "all"): Promise<{ images: GalleryImage[]; totalPages: number; totalItems: number }> => {
+  try {
+    const offset = (page - 1) * pageSize;
+
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "gallery"), orderBy("updatedAt", "desc"));
+    } else {
+      const isActive = statusFilter === "active";
+      q = query(collection(db, "gallery"), where("isActive", "==", isActive), orderBy("updatedAt", "desc"));
+    }
+
+    const totalSnapshot = await getDocs(q);
+    const totalItems = totalSnapshot.size;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    const images: GalleryImage[] = [];
+    totalSnapshot.forEach((doc) => {
+      const data = doc.data();
+      images.push({
+        id: doc.id,
+        title: data.title || "Untitled",
+        description: data.description || "",
+        imageUrl: data.imageUrl || "",
+        imagePath: data.imagePath || "",
+        category: data.category || "umum",
+        isActive: data.isActive ?? true,
+        order: data.order || 0,
+        createdAt: data.createdAt || data.updatedAt,
+        updatedAt: data.updatedAt,
+        createdBy: data.createdBy || data.updatedBy || "",
+        updatedBy: data.updatedBy || "",
+      });
+    });
+
+    const paginatedImages = images.slice(offset, offset + pageSize);
+
+    return {
+      images: paginatedImages,
+      totalPages,
+      totalItems,
+    };
+  } catch (error) {
+    console.error("Error fetching gallery images with pagination:", error);
+    throw new Error("Gagal memuat gambar galeri");
+  }
+};
+
+export const getGalleryImageCountByStatus = async (statusFilter: "all" | "active" | "inactive" = "all"): Promise<number> => {
+  try {
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "gallery"));
+    } else {
+      const isActive = statusFilter === "active";
+      q = query(collection(db, "gallery"), where("isActive", "==", isActive));
+    }
+
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error counting gallery images:", error);
+    return 0;
   }
 };
 

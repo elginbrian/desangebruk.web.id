@@ -15,7 +15,6 @@ const GallerySection = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fallback images if Firebase is empty or loading
   const fallbackImages = [
     {
       id: "fallback-1",
@@ -49,7 +48,6 @@ const GallerySection = () => {
     },
   ];
 
-  // Use Firebase images if available, otherwise use fallback images
   const displayImages = galleryImages.length > 0 ? galleryImages : fallbackImages;
 
   const repeatedImagesRow1 = Array(4).fill(displayImages).flat();
@@ -107,3 +105,4 @@ const GallerySection = () => {
 };
 
 export default GallerySection;
+

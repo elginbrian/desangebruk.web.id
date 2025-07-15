@@ -127,14 +127,40 @@ export const getArticles = async (
   statusFilter?: "all" | "published" | "draft"
 ): Promise<{ articles: Article[]; lastVisible: QueryDocumentSnapshot<DocumentData> | null }> => {
   try {
-    let q = query(collection(db, "articles"), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
+    let q;
 
     if (statusFilter && statusFilter !== "all") {
-      q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
-    }
-
-    if (lastDoc) {
-      q = query(collection(db, "articles"), orderBy("createdAt", "desc"), startAfter(lastDoc), firestoreLimit(pageSize));
+      if (lastDoc) {
+        q = query(
+          collection(db, "articles"), 
+          where("status", "==", statusFilter), 
+          orderBy("createdAt", "desc"), 
+          startAfter(lastDoc),
+          firestoreLimit(pageSize)
+        );
+      } else {
+        q = query(
+          collection(db, "articles"), 
+          where("status", "==", statusFilter), 
+          orderBy("createdAt", "desc"), 
+          firestoreLimit(pageSize)
+        );
+      }
+    } else {
+      if (lastDoc) {
+        q = query(
+          collection(db, "articles"), 
+          orderBy("createdAt", "desc"), 
+          startAfter(lastDoc), 
+          firestoreLimit(pageSize)
+        );
+      } else {
+        q = query(
+          collection(db, "articles"), 
+          orderBy("createdAt", "desc"), 
+          firestoreLimit(pageSize)
+        );
+      }
     }
 
     const querySnapshot = await getDocs(q);
@@ -152,7 +178,34 @@ export const getArticles = async (
     return { articles, lastVisible };
   } catch (error) {
     console.error("Error getting articles:", error);
-    throw new Error("Failed to get articles");
+    
+    try {
+      const fallbackQuery = query(collection(db, "articles"), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const articles: Article[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data() as Article;
+        if (!statusFilter || statusFilter === "all" || data.status === statusFilter) {
+          articles.push({
+            id: doc.id,
+            ...data,
+          });
+        }
+      });
+
+      const filteredArticles = statusFilter && statusFilter !== "all" 
+        ? articles.filter(article => article.status === statusFilter)
+        : articles;
+
+      return { 
+        articles: filteredArticles.slice(0, pageSize), 
+        lastVisible: fallbackSnapshot.docs[fallbackSnapshot.docs.length - 1] || null 
+      };
+    } catch (fallbackError) {
+      console.error("Fallback query also failed:", fallbackError);
+      throw new Error("Gagal memuat artikel. Silakan coba lagi.");
+    }
   }
 };
 
@@ -272,8 +325,7 @@ export const deleteArticle = async (id: string): Promise<void> => {
 export const searchArticles = async (searchTerm: string): Promise<Article[]> => {
   try {
     // Note: Firestore doesn't support full-text search natively
-
-    const q = query(collection(db, "articles"), where("status", "==", "published"), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
 
     const querySnapshot = await getDocs(q);
     const articles: Article[] = [];
@@ -285,7 +337,9 @@ export const searchArticles = async (searchTerm: string): Promise<Article[]> => 
         ...articleData,
       };
 
-      if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || article.content.toLowerCase().includes(searchTerm.toLowerCase())) {
+      if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+          article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
         articles.push(article);
       }
     });
@@ -293,7 +347,37 @@ export const searchArticles = async (searchTerm: string): Promise<Article[]> => 
     return articles;
   } catch (error) {
     console.error("Error searching articles:", error);
-    throw new Error("Failed to search articles");
+    
+    try {
+      const fallbackQuery = query(collection(db, "articles"));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const articles: Article[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const articleData = doc.data() as Article;
+        const article = {
+          id: doc.id,
+          ...articleData,
+        };
+
+        if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
+          articles.push(article);
+        }
+      });
+
+      articles.sort((a, b) => {
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date();
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date();
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      return articles;
+    } catch (fallbackError) {
+      console.error("Fallback search failed:", fallbackError);
+      throw new Error("Gagal mencari artikel. Silakan coba lagi.");
+    }
   }
 };
 
@@ -355,4 +439,64 @@ export const getPublishedArticles = async (limit?: number): Promise<Article[]> =
     }
   }
 };
+
+export const getArticlesWithPagination = async (
+  page: number = 1,
+  pageSize: number = 10,
+  statusFilter: "all" | "published" | "draft" = "all"
+): Promise<{ articles: Article[]; totalPages: number; totalItems: number }> => {
+  try {
+    const offset = (page - 1) * pageSize;
+    
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
+    } else {
+      q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"));
+    }
+    
+    const totalSnapshot = await getDocs(q);
+    const totalItems = totalSnapshot.size;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    
+    const articles: Article[] = [];
+    totalSnapshot.forEach((doc) => {
+      const data = doc.data();
+      articles.push({
+        id: doc.id,
+        ...data,
+      } as Article);
+    });
+    
+    const paginatedArticles = articles.slice(offset, offset + pageSize);
+    
+    return {
+      articles: paginatedArticles,
+      totalPages,
+      totalItems,
+    };
+  } catch (error) {
+    console.error("Error fetching articles with pagination:", error);
+    throw new Error("Gagal memuat artikel");
+  }
+};
+
+export const getArticleCountByStatus = async (statusFilter: "all" | "published" | "draft" = "all"): Promise<number> => {
+  try {
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "articles"));
+    } else {
+      q = query(collection(db, "articles"), where("status", "==", statusFilter));
+    }
+    
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error counting articles:", error);
+    return 0;
+  }
+};
+
+
 

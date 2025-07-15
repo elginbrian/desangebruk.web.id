@@ -1,4 +1,5 @@
 import { useWeather } from "@/hooks/useWeather";
+import { useActiveGalleryImages } from "@/hooks/useGallery";
 import WeatherEffects from "@/component/common/WeatherEffects";
 import { useEffect, useState } from "react";
 
@@ -8,21 +9,26 @@ const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isManualControl, setIsManualControl] = useState(false);
   const { weather, loading: weatherLoading } = useWeather();
+  const { images: galleryImages, loading: galleryLoading } = useActiveGalleryImages(5);
 
-  const images = ["/kantor_desa.jpg", "/stasiun_ngebruk.JPG", "/pasar_ngebruk.png", "/kampung_gatot.png", "/koka_caffee.png"];
+  const fallbackImages = ["/kantor_desa.jpg", "/stasiun_ngebruk.JPG", "/pasar_ngebruk.png", "/kampung_gatot.png", "/koka_caffee.png"];
+
+  const images = galleryImages.length > 0 ? galleryImages.map((img) => img.imageUrl) : fallbackImages;
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * images.length);
-    setCurrentImageIndex(randomIndex);
+    if (!galleryLoading && images.length > 0) {
+      const randomIndex = Math.floor(Math.random() * images.length);
+      setCurrentImageIndex(randomIndex);
+    }
 
     const timer = setTimeout(() => {
       setMounted(true);
     }, 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [galleryLoading, images.length]);
 
   useEffect(() => {
-    if (isManualControl) return;
+    if (isManualControl || images.length === 0) return;
 
     const slideInterval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -94,7 +100,6 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-
       <div className="absolute inset-0">
         {images.map((image, index) => (
           <div
@@ -103,16 +108,17 @@ const HeroSection = () => {
             style={{
               backgroundImage: `url('${image}')`,
             }}
+            onError={(e) => {
+              const target = e.currentTarget as HTMLDivElement;
+              target.style.backgroundImage = `url('${fallbackImages[index % fallbackImages.length]}')`;
+            }}
           />
         ))}
       </div>
 
-
       <div className="absolute inset-0 bg-black/70"></div>
 
-
       {weather && <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${weatherOverlayClass} ${weatherVisible ? "opacity-100" : "opacity-0"}`}></div>}
-
 
       {weather && weatherVisible && (
         <div className="absolute inset-0 transition-opacity duration-1000 ease-in-out">
@@ -120,15 +126,12 @@ const HeroSection = () => {
         </div>
       )}
 
-
       <div className={`relative z-10 w-full px-4 sm:px-6 lg:px-8 text-left text-white smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
         <div className="max-w-7xl mx-auto">
           <h1 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>Selamat Datang di Desa Ngebruk</h1>
           <p className={`text-sm sm:text-base md:text-lg mb-8 text-gray-200 max-w-2xl smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal</p>
 
-
           <div className={`w-full h-px bg-white mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}></div>
-
 
           <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 max-w-4xl smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
             <div className="space-y-4 hover-lift smooth-transition">
@@ -145,7 +148,6 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-
 
       <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20">
         <div className="flex space-x-2">

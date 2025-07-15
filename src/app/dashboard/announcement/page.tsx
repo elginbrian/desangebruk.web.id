@@ -9,16 +9,19 @@ import { id as idLocale } from "date-fns/locale";
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
+import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
-import { useAnnouncements, useAnnouncementActions } from "@/hooks/useAnnouncements";
+import { useAnnouncementsPagination, useAnnouncementActions } from "@/hooks/useAnnouncements";
 
 const AnnouncementPage = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [mounted, setMounted] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const { announcements, loading, error, hasMore, fetchAnnouncements, loadMore, searchAnnouncementsList, clearSearch } = useAnnouncements();
+  const { announcements, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchAnnouncementsPaginated, searchAnnouncementsPaginated, goToPage } = useAnnouncementsPagination();
+
   const { remove, loading: deleteLoading } = useAnnouncementActions();
 
   useEffect(() => {
@@ -29,30 +32,39 @@ const AnnouncementPage = () => {
   }, []);
 
   useEffect(() => {
-    const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-    fetchAnnouncements(10, statusFilterValue, true);
-  }, [statusFilter]);
+    if (mounted) {
+      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+      fetchAnnouncementsPaginated(1, 10, statusFilterValue);
+    }
+  }, [statusFilter, mounted]);
 
   useEffect(() => {
-    if (searchTerm.trim()) {
-      const timeoutId = setTimeout(() => {
-        searchAnnouncementsList(searchTerm);
-      }, 500);
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim()) {
+        setIsSearching(true);
+        searchAnnouncementsPaginated(searchTerm);
+      } else {
+        setIsSearching(false);
+        if (mounted) {
+          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+          fetchAnnouncementsPaginated(1, 10, statusFilterValue);
+        }
+      }
+    }, 500);
 
-      return () => clearTimeout(timeoutId);
-    } else {
-      clearSearch();
-      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-      fetchAnnouncements(10, statusFilterValue, true);
-    }
-  }, [searchTerm]);
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, mounted]);
 
   const handleDelete = async (id: string | number) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
       const success = await remove(id.toString());
       if (success) {
-        const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-        fetchAnnouncements(10, statusFilterValue, true);
+        if (isSearching) {
+          searchAnnouncementsPaginated(searchTerm);
+        } else {
+          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+          fetchAnnouncementsPaginated(currentPage, 10, statusFilterValue);
+        }
       }
     }
   };
@@ -61,9 +73,12 @@ const AnnouncementPage = () => {
     router.push(`/dashboard/announcement/update?id=${id}`);
   };
 
-  const handleLoadMore = () => {
-    const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-    loadMore(10, statusFilterValue);
+  const handlePageChange = (page: number) => {
+    if (!isSearching) {
+      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+      fetchAnnouncementsPaginated(page, 10, statusFilterValue);
+    }
+    goToPage(page);
   };
 
   const formatDate = (timestamp: any) => {
@@ -161,7 +176,6 @@ const AnnouncementPage = () => {
     <>
       <PageHeader title="Kelola Pengumuman" subtitle="Kelola dan atur pengumuman desa" actions={headerActions} mounted={mounted} />
 
-
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
           <SearchAndFilterBar
@@ -184,19 +198,17 @@ const AnnouncementPage = () => {
             loading={loading && announcements.length === 0}
             error={error}
             onRetry={() => {
-              const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-              fetchAnnouncements(10, statusFilterValue, true);
+              if (isSearching) {
+                searchAnnouncementsPaginated(searchTerm);
+              } else {
+                const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
+                fetchAnnouncementsPaginated(currentPage, 10, statusFilterValue);
+              }
             }}
             emptyMessage={searchTerm ? "Tidak ditemukan pengumuman yang sesuai" : "Belum ada pengumuman"}
           />
 
-          {hasMore && !searchTerm && announcements.length > 0 && (
-            <div className="flex justify-center py-4">
-              <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
-                {loading ? "Memuat..." : "Muat Lebih Banyak"}
-              </ActionButton>
-            </div>
-          )}
+          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
         </div>
       </div>
     </>
@@ -204,4 +216,3 @@ const AnnouncementPage = () => {
 };
 
 export default AnnouncementPage;
-

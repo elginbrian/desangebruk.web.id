@@ -1,7 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Article, CreateArticleData, UpdateArticleData, createArticle, getArticles, getArticleById, updateArticle, deleteArticle, searchArticles, getPublishedArticles } from "@/lib/articleService";
+import {
+  Article,
+  CreateArticleData,
+  UpdateArticleData,
+  createArticle,
+  getArticles,
+  getArticleById,
+  updateArticle,
+  deleteArticle,
+  searchArticles,
+  getPublishedArticles,
+  getArticlesWithPagination,
+  getArticleCountByStatus,
+} from "@/lib/articleService";
 import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 export const useArticles = () => {
@@ -27,7 +40,20 @@ export const useArticles = () => {
       setLastVisible(newLastVisible);
       setHasMore(newArticles.length === pageSize);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch articles");
+      console.error("Error fetching articles:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat artikel";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
+      }
+
+      if (reset) {
+        setArticles([]);
+        setLastVisible(null);
+        setHasMore(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -52,7 +78,17 @@ export const useArticles = () => {
       setArticles(searchResults);
       setHasMore(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to search articles");
+      console.error("Error searching articles:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari artikel";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
+      }
+
+      setArticles([]);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -189,8 +225,14 @@ export const usePublishedArticles = (limit?: number) => {
       setArticles(publishedArticles);
       setRetryCount(0);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch published articles";
-      setError(errorMessage);
+      console.error("Error fetching published articles:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat artikel";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
+      }
 
       setArticles([]);
 
@@ -227,3 +269,89 @@ export const usePublishedArticles = (limit?: number) => {
   };
 };
 
+export const useArticlesPagination = () => {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const fetchArticlesPaginated = async (page: number = 1, pageSize: number = 10, statusFilter: "all" | "published" | "draft" = "all") => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { articles: newArticles, totalPages: newTotalPages, totalItems: newTotalItems } = await getArticlesWithPagination(page, pageSize, statusFilter);
+
+      setArticles(newArticles);
+      setCurrentPage(page);
+      setTotalPages(newTotalPages);
+      setTotalItems(newTotalItems);
+      setItemsPerPage(pageSize);
+    } catch (err) {
+      console.error("Error fetching articles with pagination:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat artikel";
+      setError(errorMessage);
+
+      setArticles([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchArticlesPaginated = async (searchTerm: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!searchTerm.trim()) {
+        await fetchArticlesPaginated(1, itemsPerPage);
+        return;
+      }
+
+      const searchResults = await searchArticles(searchTerm);
+      setArticles(searchResults);
+      setCurrentPage(1);
+      setTotalPages(1);
+      setTotalItems(searchResults.length);
+    } catch (err) {
+      console.error("Error searching articles:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari artikel";
+      setError(errorMessage);
+
+      setArticles([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  return {
+    articles,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    fetchArticlesPaginated,
+    searchArticlesPaginated,
+    goToPage,
+    setError,
+  };
+};

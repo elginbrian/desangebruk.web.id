@@ -8,8 +8,9 @@ import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import DataTable from "@/component/common/DataTable";
+import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
-import { useArticles, useArticleActions } from "@/hooks/useArticles";
+import { useArticlesPagination, useArticleActions } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -18,8 +19,20 @@ const ArticlePage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [mounted, setMounted] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const { articles, loading, error, hasMore, fetchArticles, loadMore, searchArticlesList, clearSearch } = useArticles();
+  const { 
+    articles, 
+    loading, 
+    error, 
+    currentPage, 
+    totalPages, 
+    totalItems, 
+    itemsPerPage, 
+    fetchArticlesPaginated, 
+    searchArticlesPaginated,
+    goToPage
+  } = useArticlesPagination();
 
   const { remove, loading: deleteLoading } = useArticleActions();
 
@@ -31,26 +44,39 @@ const ArticlePage = () => {
   }, []);
 
   useEffect(() => {
-    fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
-  }, [statusFilter]);
+    if (mounted) {
+      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
+      fetchArticlesPaginated(1, 10, statusFilterValue);
+    }
+  }, [statusFilter, mounted]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchTerm.trim()) {
-        searchArticlesList(searchTerm);
+        setIsSearching(true);
+        searchArticlesPaginated(searchTerm);
       } else {
-        clearSearch();
+        setIsSearching(false);
+        if (mounted) {
+          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
+          fetchArticlesPaginated(1, 10, statusFilterValue);
+        }
       }
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, mounted]);
 
   const handleDelete = async (id: string | number) => {
     if (window.confirm("Apakah Anda yakin ingin menghapus artikel ini?")) {
       const success = await remove(String(id));
       if (success) {
-        fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
+        if (isSearching) {
+          searchArticlesPaginated(searchTerm);
+        } else {
+          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
+          fetchArticlesPaginated(currentPage, 10, statusFilterValue);
+        }
       }
     }
   };
@@ -59,8 +85,12 @@ const ArticlePage = () => {
     router.push(`/dashboard/article/update?id=${id}`);
   };
 
-  const handleLoadMore = () => {
-    loadMore(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"));
+  const handlePageChange = (page: number) => {
+    if (!isSearching) {
+      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
+      fetchArticlesPaginated(page, 10, statusFilterValue);
+    }
+    goToPage(page);
   };
 
   const formatDate = (timestamp: any) => {
@@ -169,16 +199,26 @@ const ArticlePage = () => {
             mounted={mounted}
             loading={loading && articles.length === 0}
             error={error}
-            onRetry={() => fetchArticles(10, statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft"))}
+            onRetry={() => {
+              if (isSearching) {
+                searchArticlesPaginated(searchTerm);
+              } else {
+                const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
+                fetchArticlesPaginated(currentPage, 10, statusFilterValue);
+              }
+            }}
             emptyMessage={searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}
           />
 
-          {hasMore && !searchTerm && articles.length > 0 && (
-            <div className="flex justify-center py-4 border-t border-gray-100">
-              <ActionButton variant="secondary" onClick={handleLoadMore} disabled={loading}>
-                {loading ? "Memuat..." : "Muat Lebih Banyak"}
-              </ActionButton>
-            </div>
+          {!isSearching && totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              loading={loading}
+            />
           )}
         </div>
       </div>
