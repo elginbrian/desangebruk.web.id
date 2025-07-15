@@ -1,6 +1,19 @@
 import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, orderBy, limit, startAfter, where, getDoc, Timestamp, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "@/lib/firebase";
+import { canUploadFile } from "./storageService";
+
+let storageRefreshCallback: (() => void) | null = null;
+
+export const setStorageRefreshCallback = (callback: () => void) => {
+  storageRefreshCallback = callback;
+};
+
+const refreshStorageStats = () => {
+  if (storageRefreshCallback) {
+    storageRefreshCallback();
+  }
+};
 
 export interface GalleryImage {
   id: string;
@@ -39,6 +52,11 @@ export interface UpdateGalleryImageData {
 
 export const uploadGalleryImage = async (file: File, imageId?: string): Promise<{ url: string; path: string }> => {
   try {
+    const storageCheck = await canUploadFile(file.size);
+    if (!storageCheck.canUpload) {
+      throw new Error(storageCheck.message || "Storage penuh!");
+    }
+
     const fileName = `${Date.now()}_${file.name}`;
     const imagePath = `gallery/${imageId || "temp"}_${fileName}`;
     const imageRef = ref(storage, imagePath);
@@ -46,13 +64,15 @@ export const uploadGalleryImage = async (file: File, imageId?: string): Promise<
     const snapshot = await uploadBytes(imageRef, file);
     const downloadURL = await getDownloadURL(snapshot.ref);
 
+    refreshStorageStats();
+
     return {
       url: downloadURL,
       path: imagePath,
     };
   } catch (error) {
     console.error("Error uploading gallery image:", error);
-    throw new Error("Failed to upload image");
+    throw error instanceof Error ? error : new Error("Failed to upload image");
   }
 };
 
@@ -60,6 +80,8 @@ export const deleteGalleryImage = async (imagePath: string): Promise<void> => {
   try {
     const imageRef = ref(storage, imagePath);
     await deleteObject(imageRef);
+    
+    refreshStorageStats();
   } catch (error) {
     console.error("Error deleting gallery image:", error);
     throw new Error("Failed to delete image");
@@ -512,4 +534,6 @@ export const getGalleryImageCountByStatus = async (statusFilter: "all" | "active
     return 0;
   }
 };
+
+
 

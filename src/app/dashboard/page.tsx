@@ -5,6 +5,7 @@ import PageHeader from "@/component/common/PageHeader";
 import DashboardCard from "@/component/dashboard/DashboardCard";
 import RecentActivity from "@/component/dashboard/RecentActivity";
 import VisitorChart from "@/component/dashboard/VisitorChart";
+import StorageIndicator from "@/component/dashboard/StorageIndicator";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardStats } from "@/hooks/useStatistics";
 import VisitorStatsCard from "@/component/dashboard/VisitorStatsCard";
@@ -59,6 +60,8 @@ const DashboardPage = () => {
 
 
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+
+        <StorageIndicator />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
 
@@ -123,4 +126,5 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
+
 

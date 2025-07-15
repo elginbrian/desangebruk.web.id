@@ -2,7 +2,8 @@ import React, { useState, useRef } from "react";
 import FormInput from "../common/FormInput";
 import FormTextarea from "../common/FormTextarea";
 import FormSelect from "../common/FormSelect";
-import { FiUpload, FiX, FiImage } from "react-icons/fi";
+import { FiUpload, FiX, FiImage, FiAlertTriangle } from "react-icons/fi";
+import { useStorageValidation } from "@/hooks/useStorage";
 
 interface ArticleFormProps {
   formData?: {
@@ -12,14 +13,17 @@ interface ArticleFormProps {
     status?: "draft" | "published";
   };
   onChange?: (field: string, value: string | File) => void;
+  onStorageError?: (message: string) => void;
   isEditing?: boolean;
   loading?: boolean;
 }
 
-const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = false }: ArticleFormProps) => {
+const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = false, loading = false }: ArticleFormProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(formData.imageUrl || null);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { validateUpload, checkStorageStatus } = useStorageValidation();
 
   const handleChange = (field: string, value: string | File) => {
     if (onChange) {
@@ -27,8 +31,20 @@ const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = fal
     }
   };
 
-  const handleImageChange = (file: File) => {
+  const handleImageChange = async (file: File) => {
     if (file && file.type.startsWith("image/")) {
+      const validation = await validateUpload(file);
+
+      if (!validation.canUpload) {
+        setStorageError(validation.message || "Storage penuh!");
+        if (onStorageError) {
+          onStorageError(validation.message || "Storage penuh!");
+        }
+        return;
+      }
+
+      setStorageError(null);
+
       const reader = new FileReader();
       reader.onload = (e) => {
         setPreviewUrl(e.target?.result as string);
@@ -68,6 +84,7 @@ const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = fal
 
   const removeImage = () => {
     setPreviewUrl(null);
+    setStorageError(null);
     handleChange("image", "");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -90,6 +107,16 @@ const ArticleForm = ({ formData = {}, onChange, isEditing = false, loading = fal
       <div>
         <label className="block text-xs font-medium text-black mb-2">Gambar Berita {!isEditing && <span className="text-red-500">*</span>}</label>
 
+
+        {storageError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
+            <FiAlertTriangle className="text-red-500 mt-0.5 flex-shrink-0" size={16} />
+            <div>
+              <p className="text-sm font-medium text-red-800 mb-1">Storage Penuh!</p>
+              <p className="text-xs text-red-700">{storageError}</p>
+            </div>
+          </div>
+        )}
 
         {isEditing && formData.imageUrl && !previewUrl && (
           <div className="mb-4">

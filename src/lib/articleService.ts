@@ -2,8 +2,21 @@ import { collection, doc, getDocs, getDoc, addDoc, updateDoc, deleteDoc, query, 
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { getStorage } from "firebase/storage";
 import { db } from "./firebase";
+import { canUploadFile } from "./storageService";
 
 const storage = getStorage();
+
+let storageRefreshCallback: (() => void) | null = null;
+
+export const setStorageRefreshCallback = (callback: () => void) => {
+  storageRefreshCallback = callback;
+};
+
+const refreshStorageStats = () => {
+  if (storageRefreshCallback) {
+    storageRefreshCallback();
+  }
+};
 
 export interface Article {
   id?: string;
@@ -52,6 +65,11 @@ const createExcerpt = (content: string, maxLength: number = 150): string => {
 
 export const uploadArticleImage = async (file: File, articleId?: string): Promise<{ url: string; path: string }> => {
   try {
+    const storageCheck = await canUploadFile(file.size);
+    if (!storageCheck.canUpload) {
+      throw new Error(storageCheck.message || "Storage penuh!");
+    }
+
     const fileName = `${Date.now()}_${file.name}`;
     const imagePath = `articles/${articleId || "temp"}/${fileName}`;
     const imageRef = ref(storage, imagePath);
@@ -59,10 +77,12 @@ export const uploadArticleImage = async (file: File, articleId?: string): Promis
     const snapshot = await uploadBytes(imageRef, file);
     const url = await getDownloadURL(snapshot.ref);
 
+    refreshStorageStats();
+
     return { url, path: imagePath };
   } catch (error) {
     console.error("Error uploading image:", error);
-    throw new Error("Failed to upload image");
+    throw error instanceof Error ? error : new Error("Failed to upload image");
   }
 };
 
@@ -70,6 +90,8 @@ export const deleteArticleImage = async (imagePath: string): Promise<void> => {
   try {
     const imageRef = ref(storage, imagePath);
     await deleteObject(imageRef);
+
+    refreshStorageStats();
   } catch (error) {
     console.error("Error deleting image:", error);
   }
@@ -131,35 +153,15 @@ export const getArticles = async (
 
     if (statusFilter && statusFilter !== "all") {
       if (lastDoc) {
-        q = query(
-          collection(db, "articles"), 
-          where("status", "==", statusFilter), 
-          orderBy("createdAt", "desc"), 
-          startAfter(lastDoc),
-          firestoreLimit(pageSize)
-        );
+        q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), startAfter(lastDoc), firestoreLimit(pageSize));
       } else {
-        q = query(
-          collection(db, "articles"), 
-          where("status", "==", statusFilter), 
-          orderBy("createdAt", "desc"), 
-          firestoreLimit(pageSize)
-        );
+        q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
       }
     } else {
       if (lastDoc) {
-        q = query(
-          collection(db, "articles"), 
-          orderBy("createdAt", "desc"), 
-          startAfter(lastDoc), 
-          firestoreLimit(pageSize)
-        );
+        q = query(collection(db, "articles"), orderBy("createdAt", "desc"), startAfter(lastDoc), firestoreLimit(pageSize));
       } else {
-        q = query(
-          collection(db, "articles"), 
-          orderBy("createdAt", "desc"), 
-          firestoreLimit(pageSize)
-        );
+        q = query(collection(db, "articles"), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
       }
     }
 
@@ -178,7 +180,7 @@ export const getArticles = async (
     return { articles, lastVisible };
   } catch (error) {
     console.error("Error getting articles:", error);
-    
+
     try {
       const fallbackQuery = query(collection(db, "articles"), orderBy("createdAt", "desc"), firestoreLimit(pageSize));
       const fallbackSnapshot = await getDocs(fallbackQuery);
@@ -194,13 +196,11 @@ export const getArticles = async (
         }
       });
 
-      const filteredArticles = statusFilter && statusFilter !== "all" 
-        ? articles.filter(article => article.status === statusFilter)
-        : articles;
+      const filteredArticles = statusFilter && statusFilter !== "all" ? articles.filter((article) => article.status === statusFilter) : articles;
 
-      return { 
-        articles: filteredArticles.slice(0, pageSize), 
-        lastVisible: fallbackSnapshot.docs[fallbackSnapshot.docs.length - 1] || null 
+      return {
+        articles: filteredArticles.slice(0, pageSize),
+        lastVisible: fallbackSnapshot.docs[fallbackSnapshot.docs.length - 1] || null,
       };
     } catch (fallbackError) {
       console.error("Fallback query also failed:", fallbackError);
@@ -337,9 +337,7 @@ export const searchArticles = async (searchTerm: string): Promise<Article[]> => 
         ...articleData,
       };
 
-      if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
+      if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || article.content.toLowerCase().includes(searchTerm.toLowerCase()) || (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
         articles.push(article);
       }
     });
@@ -347,7 +345,7 @@ export const searchArticles = async (searchTerm: string): Promise<Article[]> => 
     return articles;
   } catch (error) {
     console.error("Error searching articles:", error);
-    
+
     try {
       const fallbackQuery = query(collection(db, "articles"));
       const fallbackSnapshot = await getDocs(fallbackQuery);
@@ -360,9 +358,7 @@ export const searchArticles = async (searchTerm: string): Promise<Article[]> => 
           ...articleData,
         };
 
-        if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            article.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
+        if (article.title.toLowerCase().includes(searchTerm.toLowerCase()) || article.content.toLowerCase().includes(searchTerm.toLowerCase()) || (article.excerpt && article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()))) {
           articles.push(article);
         }
       });
@@ -385,18 +381,9 @@ export const getPublishedArticles = async (limit?: number): Promise<Article[]> =
   try {
     let q;
     if (limit) {
-      q = query(
-        collection(db, "articles"), 
-        where("status", "==", "published"), 
-        orderBy("createdAt", "desc"), 
-        firestoreLimit(limit)
-      );
+      q = query(collection(db, "articles"), where("status", "==", "published"), orderBy("createdAt", "desc"), firestoreLimit(limit));
     } else {
-      q = query(
-        collection(db, "articles"), 
-        where("status", "==", "published"), 
-        orderBy("createdAt", "desc")
-      );
+      q = query(collection(db, "articles"), where("status", "==", "published"), orderBy("createdAt", "desc"));
     }
 
     const querySnapshot = await getDocs(q);
@@ -432,7 +419,7 @@ export const getPublishedArticles = async (limit?: number): Promise<Article[]> =
       });
 
       const limitedArticles = limit ? articles.slice(0, limit) : articles;
-      
+
       return limitedArticles;
     } catch (fallbackError) {
       return [];
@@ -440,25 +427,21 @@ export const getPublishedArticles = async (limit?: number): Promise<Article[]> =
   }
 };
 
-export const getArticlesWithPagination = async (
-  page: number = 1,
-  pageSize: number = 10,
-  statusFilter: "all" | "published" | "draft" = "all"
-): Promise<{ articles: Article[]; totalPages: number; totalItems: number }> => {
+export const getArticlesWithPagination = async (page: number = 1, pageSize: number = 10, statusFilter: "all" | "published" | "draft" = "all"): Promise<{ articles: Article[]; totalPages: number; totalItems: number }> => {
   try {
     const offset = (page - 1) * pageSize;
-    
+
     let q;
     if (statusFilter === "all") {
       q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
     } else {
       q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"));
     }
-    
+
     const totalSnapshot = await getDocs(q);
     const totalItems = totalSnapshot.size;
     const totalPages = Math.ceil(totalItems / pageSize);
-    
+
     const articles: Article[] = [];
     totalSnapshot.forEach((doc) => {
       const data = doc.data();
@@ -467,9 +450,9 @@ export const getArticlesWithPagination = async (
         ...data,
       } as Article);
     });
-    
+
     const paginatedArticles = articles.slice(offset, offset + pageSize);
-    
+
     return {
       articles: paginatedArticles,
       totalPages,
@@ -489,7 +472,7 @@ export const getArticleCountByStatus = async (statusFilter: "all" | "published" 
     } else {
       q = query(collection(db, "articles"), where("status", "==", statusFilter));
     }
-    
+
     const snapshot = await getDocs(q);
     return snapshot.size;
   } catch (error) {
@@ -497,6 +480,4 @@ export const getArticleCountByStatus = async (statusFilter: "all" | "published" 
     return 0;
   }
 };
-
-
 

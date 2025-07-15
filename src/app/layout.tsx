@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import FirebaseInit from "@/components/FirebaseInit";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { StorageProvider } from "@/contexts/StorageContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +29,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}>
         <AuthProvider>
-          <FirebaseInit />
-          {children}
+          <StorageProvider>
+            <FirebaseInit />
+            {children}
+          </StorageProvider>
         </AuthProvider>
       </body>
     </html>
