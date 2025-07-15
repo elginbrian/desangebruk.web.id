@@ -63,6 +63,36 @@ html {
   color: var(--text-hint);
 }
 
+/* Storage progress bar animations */
+.storage-progress-bar {
+  background: linear-gradient(90deg, currentColor 0%, currentColor 100%);
+  background-size: 200% 100%;
+  animation: progress-shimmer 2s ease-in-out infinite;
+}
+
+@keyframes progress-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.storage-pulse {
+  animation: storage-pulse 2s ease-in-out infinite;
+}
+
+@keyframes storage-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* Custom placeholder styling */
 input::placeholder,
 textarea::placeholder {

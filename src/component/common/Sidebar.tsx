@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthActions } from "@/hooks/useAuth";
+import StorageProgress from "./StorageProgress";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -20,12 +21,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen &&
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node) &&
-        window.innerWidth < 1024
-      ) {
+      if (isOpen && sidebarRef.current && !sidebarRef.current.contains(event.target as Node) && window.innerWidth < 1024) {
         onClose();
       }
     };
@@ -48,7 +44,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
   return (
     <>
-
       <aside
         ref={sidebarRef}
         className={`
@@ -58,13 +53,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
       `}
       >
-
         <div className="lg:hidden absolute top-4 right-4 z-10">
           <button onClick={onClose} className="text-white hover:bg-white/10 p-2 rounded-lg smooth-transition hover:scale-110 active:scale-95">
             <FiX size={20} />
           </button>
         </div>
-
 
         <div className="p-4 border-b border-white/10 smooth-transition">
           <div className="flex items-center gap-3">
@@ -93,7 +86,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </div>
         </div>
 
-
         <nav className="flex-grow px-4 py-4 overflow-y-auto">
           <ul className="space-y-1">
             {menuItems.map((item, index) => (
@@ -116,27 +108,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </nav>
 
 
-        <div className="px-4 py-4 border-t border-white/10 space-y-3 flex-shrink-0">
+        <StorageProgress />
 
-          <Link
-            href="/dashboard/profile"
-            onClick={() => onClose()}
-            className={`
-              flex items-center px-4 py-2 rounded-lg smooth-transition text-xs group
-              hover:scale-105 active:scale-95
-              ${pathname === "/dashboard/profile" ? "bg-white text-[#1B3A6D] font-medium shadow-sm" : "bg-white/5 text-white/90 hover:bg-white/10 hover:text-white"}
-            `}
-          >
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center smooth-transition group-hover:scale-110 ${pathname === "/dashboard/profile" ? "bg-[#1B3A6D]/20 text-[#1B3A6D]" : "bg-white/20 text-white"}`}>
-              <FiUser size={14} />
-            </div>
-            <div className="ml-3 flex-1 min-w-0">
-              <p className={`text-xs font-medium truncate smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]" : "text-white"}`}>{profile?.name || "Admin"}</p>
-              <p className={`text-xs truncate capitalize smooth-transition ${pathname === "/dashboard/profile" ? "text-[#1B3A6D]/60" : "text-white/60"}`}>{profile?.role || "admin"}</p>
-            </div>
-          </Link>
-
-
+        <div className="px-4 py-3 border-t border-white/10 space-y-3 flex-shrink-0">
           <button onClick={logout} className="w-full flex items-center px-4 py-3 rounded-lg hover:bg-white/10 smooth-transition text-xs text-white/90 hover:text-white group hover:scale-105 active:scale-95">
             <FiLogOut className="mr-2 smooth-transition group-hover:scale-110" size={14} />
             <span className="smooth-transition">Logout</span>

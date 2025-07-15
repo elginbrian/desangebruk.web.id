@@ -23,6 +23,7 @@ const CreateGalleryPage = () => {
   });
 
   const [success, setSuccess] = useState<string | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   const handleFormChange = (field: string, value: string | File | boolean | number) => {
     setFormData((prev) => ({
@@ -33,6 +34,14 @@ const CreateGalleryPage = () => {
     if (success) {
       setSuccess(null);
     }
+
+    if (storageError) {
+      setStorageError(null);
+    }
+  };
+
+  const handleStorageError = (message: string) => {
+    setStorageError(message);
   };
 
   const handleSave = async () => {
@@ -48,6 +57,11 @@ const CreateGalleryPage = () => {
 
     if (!formData.image) {
       alert("Gambar harus dipilih.");
+      return;
+    }
+
+    if (storageError) {
+      alert("Tidak dapat menyimpan gambar karena storage penuh. Silakan kosongkan storage terlebih dahulu.");
       return;
     }
 
@@ -91,10 +105,12 @@ const CreateGalleryPage = () => {
       <div className="app-content">
         {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{error}</div>}
 
+        {storageError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{storageError}</div>}
+
         {success && <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">{success}</div>}
 
         <div className="bg-white app-card shadow-sm border border-gray-100">
-          <GalleryForm formData={formData} onChange={handleFormChange} loading={loading} />
+          <GalleryForm formData={formData} onChange={handleFormChange} onStorageError={handleStorageError} loading={loading} />
         </div>
       </div>
     </>
@@ -102,3 +118,4 @@ const CreateGalleryPage = () => {
 };
 
 export default CreateGalleryPage;
+

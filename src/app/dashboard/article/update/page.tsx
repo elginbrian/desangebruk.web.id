@@ -24,6 +24,7 @@ const UpdateArticlePage = () => {
   });
 
   const [success, setSuccess] = useState<string | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
 
   useEffect(() => {
     if (article) {
@@ -43,6 +44,14 @@ const UpdateArticlePage = () => {
     } else if (typeof value === "string") {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
+    
+    if (storageError) {
+      setStorageError(null);
+    }
+  };
+
+  const handleStorageError = (message: string) => {
+    setStorageError(message);
   };
 
   const handleUpdate = async () => {
@@ -53,6 +62,11 @@ const UpdateArticlePage = () => {
 
     if (!formData.title.trim() || !formData.content.trim()) {
       alert("Judul dan konten berita harus diisi");
+      return;
+    }
+
+    if (formData.image && storageError) {
+      alert("Tidak dapat memperbarui artikel karena storage penuh. Silakan kosongkan storage terlebih dahulu.");
       return;
     }
 
@@ -125,10 +139,12 @@ const UpdateArticlePage = () => {
       <div className="app-content">
         {updateError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{updateError}</div>}
 
+        {storageError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{storageError}</div>}
+
         {success && <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">{success}</div>}
 
         <div className="bg-white app-card shadow-sm border border-gray-100">
-          <ArticleForm formData={formData} onChange={handleFormChange} isEditing={true} loading={updateLoading} />
+          <ArticleForm formData={formData} onChange={handleFormChange} onStorageError={handleStorageError} isEditing={true} loading={updateLoading} />
         </div>
       </div>
     </>
@@ -136,4 +152,5 @@ const UpdateArticlePage = () => {
 };
 
 export default UpdateArticlePage;
+
 

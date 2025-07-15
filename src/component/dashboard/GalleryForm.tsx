@@ -1,8 +1,9 @@
 import React, { useState, useRef } from "react";
-import { FiUpload, FiX, FiImage } from "react-icons/fi";
+import { FiUpload, FiX, FiImage, FiAlertTriangle } from "react-icons/fi";
 import FormInput from "@/component/common/FormInput";
 import FormTextarea from "@/component/common/FormTextarea";
 import FormSelect from "@/component/common/FormSelect";
+import { useStorageValidation } from "@/hooks/useStorage";
 
 interface GalleryFormProps {
   formData?: {
@@ -14,14 +15,17 @@ interface GalleryFormProps {
     order?: number;
   };
   onChange?: (field: string, value: string | File | boolean | number) => void;
+  onStorageError?: (message: string) => void;
   isEditing?: boolean;
   loading?: boolean;
 }
 
-const GalleryForm = ({ formData = {}, onChange, isEditing = false, loading = false }: GalleryFormProps) => {
+const GalleryForm = ({ formData = {}, onChange, onStorageError, isEditing = false, loading = false }: GalleryFormProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(formData.imageUrl || null);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { validateUpload, checkStorageStatus } = useStorageValidation();
 
   const categoryOptions = [
     { value: "umum", label: "Umum" },
@@ -37,7 +41,19 @@ const GalleryForm = ({ formData = {}, onChange, isEditing = false, loading = fal
     }
   };
 
-  const handleImageChange = (file: File) => {
+  const handleImageChange = async (file: File) => {
+    const validation = await validateUpload(file);
+    
+    if (!validation.canUpload) {
+      setStorageError(validation.message || "Storage penuh!");
+      if (onStorageError) {
+        onStorageError(validation.message || "Storage penuh!");
+      }
+      return;
+    }
+
+    setStorageError(null);
+
     handleChange("image", file);
     
     const reader = new FileReader();
@@ -78,6 +94,7 @@ const GalleryForm = ({ formData = {}, onChange, isEditing = false, loading = fal
 
   const clearImage = () => {
     setPreviewUrl(null);
+    setStorageError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -91,6 +108,17 @@ const GalleryForm = ({ formData = {}, onChange, isEditing = false, loading = fal
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Gambar {!isEditing && <span className="text-red-500">*</span>}
         </label>
+
+
+        {storageError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
+            <FiAlertTriangle className="text-red-500 mt-0.5 flex-shrink-0" size={16} />
+            <div>
+              <p className="text-sm font-medium text-red-800 mb-1">Storage Penuh!</p>
+              <p className="text-xs text-red-700">{storageError}</p>
+            </div>
+          </div>
+        )}
         
         <div
           className={`
@@ -223,4 +251,5 @@ const GalleryForm = ({ formData = {}, onChange, isEditing = false, loading = fal
 };
 
 export default GalleryForm;
+
 
