@@ -1,9 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useActiveGalleryImages } from "@/hooks/useGallery";
+import Link from "next/link";
 
 const GallerySection = () => {
   const [mounted, setMounted] = useState(false);
+  const { images: galleryImages, loading, error } = useActiveGalleryImages(10);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -11,41 +14,46 @@ const GallerySection = () => {
     }, 500);
     return () => clearTimeout(timer);
   }, []);
-  const galleryImages = [
+
+  // Fallback images if Firebase is empty or loading
+  const fallbackImages = [
     {
-      id: 1,
-      src: "/kantor_desa.jpg",
-      alt: "Kantor Desa Ngebruk",
+      id: "fallback-1",
+      imageUrl: "/kantor_desa.jpg",
       title: "Kantor Desa",
+      description: "Kantor Desa Ngebruk",
     },
     {
-      id: 2,
-      src: "/stasiun_ngebruk.JPG",
-      alt: "Stasiun Ngebruk",
+      id: "fallback-2",
+      imageUrl: "/stasiun_ngebruk.JPG",
       title: "Stasiun Ngebruk",
+      description: "Stasiun Ngebruk",
     },
     {
-      id: 3,
-      src: "/pasar_ngebruk.png",
-      alt: "Pasar Ngebruk",
+      id: "fallback-3",
+      imageUrl: "/pasar_ngebruk.png",
       title: "Pasar Ngebruk",
+      description: "Pasar Ngebruk",
     },
     {
-      id: 4,
-      src: "/kampung_gatot.png",
-      alt: "Kampung Gatot",
+      id: "fallback-4",
+      imageUrl: "/kampung_gatot.png",
       title: "Kampung Gatot",
+      description: "Kampung Gatot",
     },
     {
-      id: 5,
-      src: "/koka_caffee.png",
-      alt: "Koka Caffee",
+      id: "fallback-5",
+      imageUrl: "/koka_caffee.png",
       title: "Koka Caffee",
+      description: "Koka Caffee",
     },
   ];
 
-  const repeatedImagesRow1 = Array(4).fill(galleryImages).flat();
-  const repeatedImagesRow2 = Array(4).fill(galleryImages).flat();
+  // Use Firebase images if available, otherwise use fallback images
+  const displayImages = galleryImages.length > 0 ? galleryImages : fallbackImages;
+
+  const repeatedImagesRow1 = Array(4).fill(displayImages).flat();
+  const repeatedImagesRow2 = Array(4).fill(displayImages).flat();
 
   return (
     <section className={`py-8 md:py-12 bg-white smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
@@ -55,8 +63,8 @@ const GallerySection = () => {
             {repeatedImagesRow1.map((image, index) => (
               <div key={`row1-${index}`} className="flex-shrink-0 w-48 h-64 md:w-64 md:h-96 group cursor-pointer overflow-hidden rounded-lg bg-gray-100 hover-lift smooth-transition">
                 <img
-                  src={image.src}
-                  alt={image.alt}
+                  src={image.imageUrl}
+                  alt={image.title}
                   className="w-full h-full object-cover group-hover:scale-105 smooth-transition"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
@@ -73,8 +81,8 @@ const GallerySection = () => {
             {repeatedImagesRow2.map((image, index) => (
               <div key={`row2-${index}`} className="flex-shrink-0 w-48 h-64 md:w-64 md:h-96 group cursor-pointer overflow-hidden rounded-lg bg-gray-100 hover-lift smooth-transition">
                 <img
-                  src={image.src}
-                  alt={image.alt}
+                  src={image.imageUrl}
+                  alt={image.title}
                   className="w-full h-full object-cover group-hover:scale-105 smooth-transition"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
@@ -89,7 +97,9 @@ const GallerySection = () => {
 
       <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <div className="text-center">
-          <button className="bg-[#1B3A6D] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg font-semibold hover:bg-[#152f5a] smooth-transition text-sm md:text-base btn-animate">Lihat Galeri Lainnya</button>
+          <Link href="/galeri">
+            <button className="bg-[#1B3A6D] text-white px-6 md:px-8 py-2 md:py-3 rounded-lg font-semibold hover:bg-[#152f5a] smooth-transition text-sm md:text-base btn-animate">Lihat Galeri Lainnya</button>
+          </Link>
         </div>
       </div>
     </section>
