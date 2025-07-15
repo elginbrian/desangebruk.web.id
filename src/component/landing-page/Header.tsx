@@ -22,9 +22,9 @@ const Header = () => {
 
   const navigationItems = [
     { name: "Home", href: "/" },
-    { name: "Info Desa", href: "/info-desa" },
+    { name: "Tentang", href: "/info-desa" },
     { name: "Berita", href: "/berita" },
-    { name: "Kegiatan", href: "/kegiatan" },
+    { name: "Pengumuman", href: "/pengumuman" },
     { name: "Struktur", href: "/struktur" },
     { name: "Pelayanan", href: "/pelayanan" },
   ];
@@ -33,7 +33,6 @@ const Header = () => {
     <header className={`bg-white shadow-sm sticky top-0 z-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-
           <div className={`flex items-center hover-lift smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
             <img
               src="/logo.png"
@@ -50,8 +49,7 @@ const Header = () => {
             </div>
           </div>
 
-
-          <nav className={`hidden md:flex space-x-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
+          <nav className={`hidden xl:flex space-x-8 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
             {navigationItems.map((item, index) => (
               <Link key={item.name} href={item.href} className="text-gray-700 hover:text-[#1B3A6D] px-3 py-2 text-sm font-medium smooth-transition hover-lift" style={{ animationDelay: `${(index + 2) * 0.05}s` }}>
                 {item.name}
@@ -59,8 +57,7 @@ const Header = () => {
             ))}
           </nav>
 
-
-          <div className={`hidden md:flex items-center space-x-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
+          <div className={`hidden xl:flex items-center space-x-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
             {!loading && (
               <>
                 {isAuthenticated && profile ? (
@@ -74,18 +71,16 @@ const Header = () => {
             )}
           </div>
 
-
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-2 rounded-md text-gray-700 hover:text-[#1B3A6D] hover:bg-gray-100 smooth-transition hover-lift ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}
+            className={`xl:hidden p-2 rounded-md text-gray-700 hover:text-[#1B3A6D] hover:bg-gray-100 smooth-transition hover-lift ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}
           >
             {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
           </button>
         </div>
 
-
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 animate-slide-in-left">
+          <div className="xl:hidden py-4 border-t border-gray-200 animate-slide-in-left">
             <nav className="flex flex-col space-y-2">
               {navigationItems.map((item, index) => (
                 <Link
@@ -99,12 +94,10 @@ const Header = () => {
                 </Link>
               ))}
 
-
               {!loading && (
                 <>
                   {isAuthenticated && profile ? (
                     <div className="pt-4 border-t border-gray-200 space-y-3">
-
                       <div className="px-3 py-2 bg-gray-50 rounded-md">
                         <div className="flex items-center space-x-3">
                           <div className="w-8 h-8 bg-[#1B3A6D] rounded-full flex items-center justify-center">
@@ -117,12 +110,10 @@ const Header = () => {
                         </div>
                       </div>
 
-
                       <Link href="/dashboard" className="bg-[#1B3A6D] text-white px-3 py-2 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate flex items-center" onClick={() => setIsMenuOpen(false)}>
                         <FiUser className="mr-2" size={16} />
                         Dashboard
                       </Link>
-
 
                       <button
                         onClick={() => {
@@ -151,4 +142,3 @@ const Header = () => {
 };
 
 export default Header;
-
