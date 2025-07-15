@@ -3,21 +3,23 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiImage } from "react-icons/fi";
-import { useGalleryImages, useGalleryImageActions } from "@/hooks/useGallery";
+import { useGalleryImagesPagination, useGalleryImageActions } from "@/hooks/useGallery";
 import { useAuth } from "@/contexts/AuthContext";
 import PageHeader from "@/component/common/PageHeader";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
-import DataTable from "@/component/common/DataTable";
 import ActionButton from "@/component/common/ActionButton";
-import { LoadingSpinner, ErrorState } from "@/component/common/LoadingStates";
+import Pagination from "@/component/common/Pagination";
+import { LoadingSpinner, ErrorState, DataTableWithStates } from "@/component/common/LoadingStates";
 
 const GalleryPage = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
   const [mounted, setMounted] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const { images, loading, error, hasMore, fetchImages, loadMore, searchImages, clearSearch } = useGalleryImages();
+  const { images, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchImagesPaginated, searchImagesPaginated, goToPage } = useGalleryImagesPagination();
+
   const { remove, loading: deleteLoading } = useGalleryImageActions();
   const { user } = useAuth();
 
@@ -29,23 +31,36 @@ const GalleryPage = () => {
   }, []);
 
   useEffect(() => {
-    if (searchTerm.trim()) {
-      const timeoutId = setTimeout(() => {
-        searchImages(searchTerm);
-      }, 300);
-      return () => clearTimeout(timeoutId);
-    } else if (mounted && user) {
-      clearSearch();
+    if (mounted && user) {
       const getStatusFilter = () => {
         if (statusFilter === "Active") return "active";
         if (statusFilter === "Inactive") return "inactive";
         return "all";
       };
-      fetchImages(10, getStatusFilter()).catch((err) => {
-        console.error("Error fetching images:", err);
-      });
+      fetchImagesPaginated(1, 10, getStatusFilter());
     }
-  }, [searchTerm, mounted, user, statusFilter]);
+  }, [statusFilter, mounted, user]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim()) {
+        setIsSearching(true);
+        searchImagesPaginated(searchTerm);
+      } else {
+        setIsSearching(false);
+        if (mounted && user) {
+          const getStatusFilter = () => {
+            if (statusFilter === "Active") return "active";
+            if (statusFilter === "Inactive") return "inactive";
+            return "all";
+          };
+          fetchImagesPaginated(1, 10, getStatusFilter());
+        }
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, mounted, user]);
 
   const handleDelete = async (id: string | number) => {
     if (!window.confirm("Apakah Anda yakin ingin menghapus gambar ini?")) {
@@ -54,13 +69,16 @@ const GalleryPage = () => {
 
     const success = await remove(id as string);
     if (success) {
-      const getStatusFilter = () => {
-        if (statusFilter === "Active") return "active";
-        if (statusFilter === "Inactive") return "inactive";
-        return "all";
-      };
-
-      fetchImages(10, getStatusFilter());
+      if (isSearching) {
+        searchImagesPaginated(searchTerm);
+      } else {
+        const getStatusFilter = () => {
+          if (statusFilter === "Active") return "active";
+          if (statusFilter === "Inactive") return "inactive";
+          return "all";
+        };
+        fetchImagesPaginated(currentPage, 10, getStatusFilter());
+      }
     }
   };
 
@@ -68,16 +86,16 @@ const GalleryPage = () => {
     router.push(`/dashboard/gallery/update?id=${id}`);
   };
 
-  const handleLoadMore = () => {
-    if (hasMore && !loading) {
+  const handlePageChange = (page: number) => {
+    if (!isSearching) {
       const getStatusFilter = () => {
         if (statusFilter === "Active") return "active";
         if (statusFilter === "Inactive") return "inactive";
         return "all";
       };
-
-      loadMore(10, getStatusFilter());
+      fetchImagesPaginated(page, 10, getStatusFilter());
     }
+    goToPage(page);
   };
 
   const formatDate = (timestamp: any) => {
@@ -187,62 +205,47 @@ const GalleryPage = () => {
     { value: "Inactive", label: "Inactive" },
   ];
 
-  if (loading && images.length === 0) {
-    return (
-      <div className="flex-1 flex flex-col">
-        <PageHeader title="Kelola Galeri" subtitle="Kelola gambar-gambar yang ditampilkan di galeri website" actions={headerActions} mounted={mounted} />
-        <div className="flex-1 flex items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex-1 flex flex-col">
-        <PageHeader title="Kelola Galeri" subtitle="Kelola gambar-gambar yang ditampilkan di galeri website" actions={headerActions} mounted={mounted} />
-        <div className="flex-1 flex items-center justify-center">
-          <ErrorState message={error} onRetry={() => fetchImages()} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 flex flex-col">
       <PageHeader title="Kelola Galeri" subtitle="Kelola gambar-gambar yang ditampilkan di galeri website" actions={headerActions} mounted={mounted} />
 
-      <div className="flex-1 p-6 space-y-6">
-        <SearchAndFilterBar
-          title="Daftar Gambar Galeri"
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          searchPlaceholder="Cari berdasarkan judul, deskripsi, atau kategori..."
-          statusFilter={statusFilter}
-          onStatusFilterChange={setStatusFilter}
-          statusOptions={statusOptions}
-          mounted={mounted}
-        />
+      <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+        <div className="bg-white app-card shadow-sm border border-gray-100 hover-lift smooth-transition">
+          <SearchAndFilterBar
+            title="Daftar Gambar Galeri"
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            searchPlaceholder="Cari berdasarkan judul, deskripsi, atau kategori..."
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            statusOptions={statusOptions}
+            mounted={mounted}
+          />
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <DataTable columns={columns} data={images} editRoute={handleEdit} onDelete={handleDelete} mounted={mounted} />
+          <DataTableWithStates
+            columns={columns}
+            data={images}
+            editRoute={handleEdit}
+            onDelete={handleDelete}
+            mounted={mounted}
+            loading={loading && images.length === 0}
+            error={error}
+            onRetry={() => {
+              if (isSearching) {
+                searchImagesPaginated(searchTerm);
+              } else {
+                const getStatusFilter = () => {
+                  if (statusFilter === "Active") return "active";
+                  if (statusFilter === "Inactive") return "inactive";
+                  return "all";
+                };
+                fetchImagesPaginated(currentPage, 10, getStatusFilter());
+              }
+            }}
+            emptyMessage={searchTerm ? "Tidak ditemukan gambar yang sesuai dengan pencarian" : "Belum ada gambar yang diunggah"}
+          />
 
-          {hasMore && (
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-center">
-              <button onClick={handleLoadMore} disabled={loading} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
-                {loading ? "Memuat..." : "Muat Lebih Banyak"}
-              </button>
-            </div>
-          )}
-
-          {images.length === 0 && !loading && (
-            <div className="px-6 py-12 text-center">
-              <FiImage className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">Tidak ada gambar</h3>
-              <p className="mt-1 text-sm text-gray-500">Mulai dengan menambahkan gambar pertama Anda.</p>
-            </div>
-          )}
+          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
         </div>
       </div>
     </div>

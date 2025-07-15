@@ -93,17 +93,19 @@ export const getAnnouncements = async (
   statusFilter?: "all" | "active" | "inactive" | "expired"
 ): Promise<{ announcements: Announcement[]; lastVisible: QueryDocumentSnapshot<DocumentData> | null }> => {
   try {
-    let q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(pageSize));
+    let q;
 
     if (statusFilter && statusFilter !== "all") {
-      q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), limit(pageSize));
-    }
-
-    if (lastDoc) {
-      q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(pageSize));
-
-      if (statusFilter && statusFilter !== "all") {
+      if (lastDoc) {
         q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(pageSize));
+      } else {
+        q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"), limit(pageSize));
+      }
+    } else {
+      if (lastDoc) {
+        q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), startAfter(lastDoc), limit(pageSize));
+      } else {
+        q = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(pageSize));
       }
     }
 
@@ -125,7 +127,32 @@ export const getAnnouncements = async (
     return { announcements, lastVisible };
   } catch (error) {
     console.error("Error getting announcements:", error);
-    throw error;
+
+    try {
+      const fallbackQuery = query(collection(db, "announcements"), orderBy("createdAt", "desc"), limit(pageSize));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const announcements: Announcement[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data() as Announcement;
+        if (!statusFilter || statusFilter === "all" || data.status === statusFilter) {
+          announcements.push({
+            ...data,
+            id: doc.id,
+          });
+        }
+      });
+
+      const filteredAnnouncements = statusFilter && statusFilter !== "all" ? announcements.filter((announcement) => announcement.status === statusFilter) : announcements;
+
+      return {
+        announcements: filteredAnnouncements.slice(0, pageSize),
+        lastVisible: fallbackSnapshot.docs[fallbackSnapshot.docs.length - 1] || null,
+      };
+    } catch (fallbackError) {
+      console.error("Fallback query also failed:", fallbackError);
+      throw new Error("Gagal memuat pengumuman. Silakan coba lagi.");
+    }
   }
 };
 
@@ -222,10 +249,7 @@ export const deleteAnnouncement = async (id: string): Promise<void> => {
 
 export const getActiveAnnouncements = async (limitCount: number = 10): Promise<Announcement[]> => {
   try {
-    const q = query(
-      collection(db, "announcements"),
-      limit(100)
-    );
+    const q = query(collection(db, "announcements"), limit(100));
 
     const querySnapshot = await getDocs(q);
     const allAnnouncements: Announcement[] = [];
@@ -288,8 +312,8 @@ export const searchAnnouncements = async (searchTerm: string): Promise<Announcem
       const data = doc.data();
       if (data.title.toLowerCase().includes(searchTerm.toLowerCase()) || data.content.toLowerCase().includes(searchTerm.toLowerCase())) {
         announcements.push({
-          id: doc.id,
           ...data,
+          id: doc.id,
         } as Announcement);
       }
     });
@@ -297,7 +321,91 @@ export const searchAnnouncements = async (searchTerm: string): Promise<Announcem
     return announcements;
   } catch (error) {
     console.error("Error searching announcements:", error);
-    throw error;
+
+    try {
+      const fallbackQuery = query(collection(db, "announcements"));
+      const fallbackSnapshot = await getDocs(fallbackQuery);
+      const announcements: Announcement[] = [];
+
+      fallbackSnapshot.forEach((doc) => {
+        const data = doc.data();
+        if (data.title.toLowerCase().includes(searchTerm.toLowerCase()) || data.content.toLowerCase().includes(searchTerm.toLowerCase())) {
+          announcements.push({
+            ...data,
+            id: doc.id,
+          } as Announcement);
+        }
+      });
+
+      announcements.sort((a, b) => {
+        const dateA = a.createdAt instanceof Timestamp ? a.createdAt.toDate() : new Date(a.createdAt as any);
+        const dateB = b.createdAt instanceof Timestamp ? b.createdAt.toDate() : new Date(b.createdAt as any);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+      return announcements;
+    } catch (fallbackError) {
+      console.error("Fallback search failed:", fallbackError);
+      throw new Error("Gagal mencari pengumuman. Silakan coba lagi.");
+    }
+  }
+};
+
+export const getAnnouncementsWithPagination = async (
+  page: number = 1,
+  pageSize: number = 10,
+  statusFilter: "all" | "active" | "inactive" | "expired" = "all"
+): Promise<{ announcements: Announcement[]; totalPages: number; totalItems: number }> => {
+  try {
+    const offset = (page - 1) * pageSize;
+
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+    } else {
+      q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"));
+    }
+
+    const totalSnapshot = await getDocs(q);
+    const totalItems = totalSnapshot.size;
+    const totalPages = Math.ceil(totalItems / pageSize);
+
+    const announcements: Announcement[] = [];
+    totalSnapshot.forEach((doc) => {
+      const data = doc.data();
+      announcements.push({
+        id: doc.id,
+        ...data,
+      } as Announcement);
+    });
+
+    const paginatedAnnouncements = announcements.slice(offset, offset + pageSize);
+
+    return {
+      announcements: paginatedAnnouncements,
+      totalPages,
+      totalItems,
+    };
+  } catch (error) {
+    console.error("Error fetching announcements with pagination:", error);
+    throw new Error("Gagal memuat pengumuman");
+  }
+};
+
+export const getAnnouncementCountByStatus = async (statusFilter: "all" | "active" | "inactive" | "expired" = "all"): Promise<number> => {
+  try {
+    let q;
+    if (statusFilter === "all") {
+      q = query(collection(db, "announcements"));
+    } else {
+      q = query(collection(db, "announcements"), where("status", "==", statusFilter));
+    }
+
+    const snapshot = await getDocs(q);
+    return snapshot.size;
+  } catch (error) {
+    console.error("Error counting announcements:", error);
+    return 0;
   }
 };
 

@@ -2,7 +2,20 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
-import { GalleryImage, CreateGalleryImageData, UpdateGalleryImageData, getGalleryImages, getGalleryImageById, createGalleryImage, updateGalleryImage, deleteGalleryImageById, getActiveGalleryImages } from "@/lib/galleryService";
+import {
+  GalleryImage,
+  CreateGalleryImageData,
+  UpdateGalleryImageData,
+  createGalleryImage,
+  getGalleryImages,
+  getGalleryImageById,
+  updateGalleryImage,
+  deleteGalleryImage,
+  getActiveGalleryImages,
+  searchGalleryImages,
+  getGalleryImagesWithPagination,
+  getGalleryImageCountByStatus,
+} from "@/lib/galleryService";
 
 export const useGalleryImages = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -17,11 +30,7 @@ export const useGalleryImages = () => {
       setError(null);
 
       try {
-        const { images: newImages, lastVisible: newLastVisible } = await getGalleryImages(
-          pageSize,
-          reset ? undefined : lastVisible || undefined,
-          statusFilter
-        );
+        const { images: newImages, lastVisible: newLastVisible } = await getGalleryImages(pageSize, reset ? undefined : lastVisible || undefined, statusFilter);
 
         if (reset) {
           setImages(newImages);
@@ -34,8 +43,18 @@ export const useGalleryImages = () => {
         setHasMore(newImages.length === pageSize);
       } catch (err) {
         console.error("Gallery fetch error:", err);
-        setError(err instanceof Error ? err.message : "Failed to fetch gallery images");
-        setImages([]);
+
+        const errorMessage = err instanceof Error ? err.message : "Gagal memuat galeri";
+        if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+          setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+        } else {
+          setError(errorMessage);
+        }
+
+        if (reset) {
+          setImages([]);
+          setLastVisible(null);
+        }
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -52,39 +71,43 @@ export const useGalleryImages = () => {
     [hasMore, loading, fetchImages]
   );
 
-  const searchImages = useCallback(
-    async (searchTerm: string) => {
-      if (!searchTerm.trim()) {
-        clearSearch();
-        return;
+  const searchImages = useCallback(async (searchTerm: string) => {
+    if (!searchTerm.trim()) {
+      clearSearch();
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const { images: allImages } = await getGalleryImages(1000);
+      const filtered = allImages.filter(
+        (image) =>
+          image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (image.description && image.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (image.category && image.category.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+
+      setImages(filtered);
+      setLastVisible(null);
+      setHasMore(false);
+    } catch (err) {
+      console.error("Gallery search error:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari gambar";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
       }
 
-      setLoading(true);
-      setError(null);
-
-      try {
-        const { images: allImages } = await getGalleryImages(1000);
-        const filtered = allImages.filter(
-          (image) =>
-            image.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (image.description && image.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (image.category && image.category.toLowerCase().includes(searchTerm.toLowerCase()))
-        );
-
-        setImages(filtered);
-        setLastVisible(null);
-        setHasMore(false);
-      } catch (err) {
-        console.error("Gallery search error:", err);
-        setError(err instanceof Error ? err.message : "Failed to search gallery images");
-        setImages([]);
-        setHasMore(false);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+      setImages([]);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const clearSearch = useCallback(() => {
     setImages([]);
@@ -172,7 +195,7 @@ export const useGalleryImageActions = () => {
     setError(null);
 
     try {
-      await deleteGalleryImageById(id);
+      await deleteGalleryImage(id);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete gallery image");
@@ -210,12 +233,17 @@ export const useActiveGalleryImages = (limit?: number) => {
       setImages(activeImages);
     } catch (err) {
       console.error("Error fetching active gallery images:", err);
-      if (err instanceof Error && err.message.includes("collection")) {
-        setImages([]);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat galeri";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else if (errorMessage.includes("collection")) {
+        setError("Galeri sedang dimuat. Silakan coba lagi.");
       } else {
-        setError(err instanceof Error ? err.message : "Failed to fetch active gallery images");
-        setImages([]);
+        setError(errorMessage);
       }
+
+      setImages([]);
     } finally {
       setLoading(false);
     }
@@ -237,3 +265,89 @@ export const useActiveGalleryImages = (limit?: number) => {
   };
 };
 
+export const useGalleryImagesPagination = () => {
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const fetchImagesPaginated = async (page: number = 1, pageSize: number = 10, statusFilter: "all" | "active" | "inactive" = "all") => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { images: newImages, totalPages: newTotalPages, totalItems: newTotalItems } = await getGalleryImagesWithPagination(page, pageSize, statusFilter);
+
+      setImages(newImages);
+      setCurrentPage(page);
+      setTotalPages(newTotalPages);
+      setTotalItems(newTotalItems);
+      setItemsPerPage(pageSize);
+    } catch (err) {
+      console.error("Error fetching gallery images with pagination:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat gambar galeri";
+      setError(errorMessage);
+
+      setImages([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchImagesPaginated = async (searchTerm: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!searchTerm.trim()) {
+        await fetchImagesPaginated(1, itemsPerPage);
+        return;
+      }
+
+      const searchResults = await searchGalleryImages(searchTerm);
+      setImages(searchResults);
+      setCurrentPage(1);
+      setTotalPages(1);
+      setTotalItems(searchResults.length);
+    } catch (err) {
+      console.error("Error searching gallery images:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari gambar";
+      setError(errorMessage);
+
+      setImages([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  return {
+    images,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    fetchImagesPaginated,
+    searchImagesPaginated,
+    goToPage,
+    setError,
+  };
+};

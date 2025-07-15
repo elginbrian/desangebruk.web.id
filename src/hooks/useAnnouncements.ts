@@ -9,11 +9,13 @@ import {
   createAnnouncement,
   getAnnouncements,
   getAnnouncementById,
-  getAnnouncementBySlug,
   updateAnnouncement,
   deleteAnnouncement,
-  getActiveAnnouncements,
   searchAnnouncements,
+  getAnnouncementBySlug,
+  getActiveAnnouncements,
+  getAnnouncementsWithPagination,
+  getAnnouncementCountByStatus,
 } from "@/lib/announcementService";
 
 export const useAnnouncements = () => {
@@ -39,7 +41,20 @@ export const useAnnouncements = () => {
       setLastVisible(result.lastVisible);
       setHasMore(result.announcements.length === pageSize);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch announcements");
+      console.error("Error fetching announcements:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat pengumuman";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
+      }
+
+      if (reset) {
+        setAnnouncements([]);
+        setLastVisible(null);
+        setHasMore(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -60,7 +75,18 @@ export const useAnnouncements = () => {
       setLastVisible(null);
       setHasMore(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to search announcements");
+      console.error("Error searching announcements:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari pengumuman";
+      if (errorMessage.includes("index") || errorMessage.includes("Index")) {
+        setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
+      } else {
+        setError(errorMessage);
+      }
+
+      setAnnouncements([]);
+      setLastVisible(null);
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
@@ -224,7 +250,9 @@ export const useActiveAnnouncements = (limit?: number) => {
       if (results.length === 0) {
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch announcements";
+      console.error("Error fetching active announcements:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat pengumuman";
       if (errorMessage.includes("index") || errorMessage.includes("Index")) {
         setError("Sistem sedang diperbarui. Silakan coba lagi dalam beberapa saat.");
       } else {
@@ -268,3 +296,89 @@ export const useActiveAnnouncements = (limit?: number) => {
   };
 };
 
+export const useAnnouncementsPagination = () => {
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const fetchAnnouncementsPaginated = async (page: number = 1, pageSize: number = 10, statusFilter: "all" | "active" | "inactive" | "expired" = "all") => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { announcements: newAnnouncements, totalPages: newTotalPages, totalItems: newTotalItems } = await getAnnouncementsWithPagination(page, pageSize, statusFilter);
+
+      setAnnouncements(newAnnouncements);
+      setCurrentPage(page);
+      setTotalPages(newTotalPages);
+      setTotalItems(newTotalItems);
+      setItemsPerPage(pageSize);
+    } catch (err) {
+      console.error("Error fetching announcements with pagination:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal memuat pengumuman";
+      setError(errorMessage);
+
+      setAnnouncements([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchAnnouncementsPaginated = async (searchTerm: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      if (!searchTerm.trim()) {
+        await fetchAnnouncementsPaginated(1, itemsPerPage);
+        return;
+      }
+
+      const searchResults = await searchAnnouncements(searchTerm);
+      setAnnouncements(searchResults);
+      setCurrentPage(1);
+      setTotalPages(1);
+      setTotalItems(searchResults.length);
+    } catch (err) {
+      console.error("Error searching announcements:", err);
+
+      const errorMessage = err instanceof Error ? err.message : "Gagal mencari pengumuman";
+      setError(errorMessage);
+
+      setAnnouncements([]);
+      setCurrentPage(1);
+      setTotalPages(0);
+      setTotalItems(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  return {
+    announcements,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    fetchAnnouncementsPaginated,
+    searchAnnouncementsPaginated,
+    goToPage,
+    setError,
+  };
+};
