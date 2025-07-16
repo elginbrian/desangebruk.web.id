@@ -47,7 +47,7 @@ const Header = () => {
   };
 
   return (
-    <header className={`bg-white shadow-sm sticky top-0 z-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+    <header className={`bg-white sticky shadow-sm top-0 z-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className={`flex items-center smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
@@ -97,7 +97,6 @@ const Header = () => {
             {isMenuOpen ? <FiX size={24} className="smooth-transition" /> : <FiMenu size={24} className="smooth-transition" />}
           </button>
         </div>
-
 
         <div className={`xl:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="py-4 border-t border-gray-200">
@@ -172,4 +171,3 @@ const Header = () => {
 };
 
 export default Header;
-
