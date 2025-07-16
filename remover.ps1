@@ -37,7 +37,21 @@ $tsxFiles = Get-ChildItem -Path $projectRoot -Filter "*.tsx" -Recurse -ErrorActi
     $shouldInclude
 }
 
-$files = $tsFiles + $tsxFiles
+$cssFiles = Get-ChildItem -Path $projectRoot -Filter "*.css" -Recurse -ErrorAction SilentlyContinue | Where-Object {
+    $filePath = $_.FullName
+    $shouldInclude = $true
+    
+    foreach ($excludePath in $excludePaths) {
+        if ($filePath -match [regex]::Escape("$projectRoot\$excludePath")) {
+            $shouldInclude = $false
+            break
+        }
+    }
+    
+    $shouldInclude
+}
+
+$files = $tsFiles + $tsxFiles + $cssFiles
 
 function Is-ImportantComment {
     param (
