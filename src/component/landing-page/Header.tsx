@@ -31,14 +31,12 @@ const Header = () => {
     { name: "Pelayanan", href: "/pelayanan" },
   ];
 
-  // Function to check if current path is active
   const isActivePath = (href: string) => {
     if (href === "/" && pathname === "/") return true;
     if (href !== "/" && pathname.startsWith(href)) return true;
     return false;
   };
 
-  // Function to get active class for navigation links
   const getNavLinkClass = (href: string, isMobile: boolean = false) => {
     const baseClass = isMobile ? "navbar-link text-gray-700 px-3 py-3 text-sm font-medium rounded-md transition-all duration-300" : "navbar-link text-gray-700 px-4 py-2 text-sm font-medium rounded-md";
 
@@ -100,7 +98,7 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Enhanced Mobile Menu */}
+
         <div className={`xl:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-1">
@@ -174,3 +172,4 @@ const Header = () => {
 };
 
 export default Header;
+

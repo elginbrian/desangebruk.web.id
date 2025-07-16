@@ -29,7 +29,6 @@ const ActivePageTitle = ({ className = "" }: ActivePageTitleProps) => {
       "/dashboard": { title: "Dashboard", subtitle: "Panel administrasi website" },
     };
 
-    // Handle dynamic routes
     if (pathSegments.length > 1) {
       const baseRoute = `/${pathSegments[0]}`;
       const pageInfo = pageMap[baseRoute];
@@ -54,7 +53,7 @@ const ActivePageTitle = ({ className = "" }: ActivePageTitleProps) => {
         <h1 className={`text-3xl md:text-4xl font-bold mb-2 smooth-transition ${mounted ? "animate-slide-in-down" : "animate-on-load"}`}>{title}</h1>
         <p className={`text-lg text-blue-100 smooth-transition ${mounted ? "animate-slide-in-up" : "animate-on-load"}`}>{subtitle}</p>
 
-        {/* Active page indicator line */}
+
         <div className="mt-4 flex justify-center">
           <div className="w-20 h-1 bg-white rounded-full animate-scale-in"></div>
         </div>
@@ -64,3 +63,4 @@ const ActivePageTitle = ({ className = "" }: ActivePageTitleProps) => {
 };
 
 export default ActivePageTitle;
+

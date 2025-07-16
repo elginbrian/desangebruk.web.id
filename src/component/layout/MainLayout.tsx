@@ -22,12 +22,10 @@ const MainLayout = ({
 }: MainLayoutProps) => {
   const pathname = usePathname();
   
-  // Don't show indicators on auth pages
   const isAuthPage = pathname.startsWith("/login") || 
                      pathname.startsWith("/register") || 
                      pathname.startsWith("/forgot-password");
   
-  // Don't show indicators on dashboard pages
   const isDashboardPage = pathname.startsWith("/dashboard");
   
   const shouldShowPageIndicator = showPageIndicator && !isAuthPage && !isDashboardPage;
@@ -49,3 +47,4 @@ const MainLayout = ({
 };
 
 export default MainLayout;
+

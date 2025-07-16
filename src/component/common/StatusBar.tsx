@@ -42,7 +42,7 @@ const StatusBar = () => {
   return (
     <div className="fixed bottom-4 left-4 z-40 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-md shadow-sm px-3 py-2 hidden lg:block">
       <div className="flex items-center space-x-3 text-xs text-gray-600">
-        {/* Current Page */}
+
         <div className="flex items-center space-x-1">
           {icon}
           <span className="font-medium text-[#1B3A6D]">{name}</span>
@@ -50,7 +50,7 @@ const StatusBar = () => {
 
         <div className="w-px h-3 bg-gray-300"></div>
 
-        {/* Location */}
+
         <div className="flex items-center space-x-1">
           <FiMapPin size={12} />
           <span>Desa Ngebruk</span>
@@ -58,7 +58,7 @@ const StatusBar = () => {
 
         <div className="w-px h-3 bg-gray-300"></div>
 
-        {/* Time */}
+
         <div className="flex items-center space-x-1">
           <FiClock size={12} />
           <span>
@@ -74,3 +74,4 @@ const StatusBar = () => {
 };
 
 export default StatusBar;
+
