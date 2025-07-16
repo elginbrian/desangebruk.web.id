@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Sidebar from "@/component/common/Sidebar";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import ProtectedRoute from "@/component/ProtectedRoute";
 import useStorageRefreshInitializer from "@/hooks/useStorageRefreshInitializer";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
