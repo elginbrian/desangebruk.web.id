@@ -1,7 +1,8 @@
 import React from "react";
-import FormInput from "../common/FormInput";
-import FormTextarea from "../common/FormTextarea";
-import FormSelect from "../common/FormSelect";
+import AnnouncementBasicFields from "./AnnouncementBasicFields";
+import AnnouncementDateFields from "./AnnouncementDateFields";
+import AnnouncementPriorityField from "./AnnouncementPriorityField";
+import { FORM_FIELDS } from "@/constants/announcementFormConstants";
 
 interface AnnouncementFormProps {
   formData?: {
@@ -17,13 +18,7 @@ interface AnnouncementFormProps {
 }
 
 const AnnouncementForm = ({ formData = {}, onChange, isEditing = false, loading = false }: AnnouncementFormProps) => {
-  const priorityOptions = [
-    { value: "normal", label: "Normal" },
-    { value: "penting", label: "Penting" },
-    { value: "urgent", label: "Urgent" },
-  ];
-
-  const handleChange = (field: string, value: string) => {
+  const handleFieldChange = (field: string, value: string) => {
     if (onChange) {
       onChange(field, value);
     }
@@ -31,16 +26,11 @@ const AnnouncementForm = ({ formData = {}, onChange, isEditing = false, loading 
 
   return (
     <form className="space-y-4">
-      <FormInput label="Judul Pengumuman" name="title" value={formData.title || ""} placeholder="Masukkan judul pengumuman..." onChange={(e) => handleChange("title", e.target.value)} disabled={loading} required />
+      <AnnouncementBasicFields title={formData.title || ""} content={formData.content || ""} onFieldChange={handleFieldChange} loading={loading} />
 
-      <FormTextarea label="Isi Pengumuman" name="content" value={formData.content || ""} placeholder="Tulis isi pengumuman di sini..." rows={6} onChange={(e) => handleChange("content", e.target.value)} disabled={loading} required />
+      <AnnouncementDateFields startDate={formData.startDate || ""} endDate={formData.endDate || ""} onFieldChange={handleFieldChange} loading={loading} />
 
-      <div className="grid grid-cols-2 gap-3">
-        <FormInput label="Tanggal Mulai" name="startDate" type="date" value={formData.startDate || ""} onChange={(e) => handleChange("startDate", e.target.value)} disabled={loading} required />
-        <FormInput label="Tanggal Berakhir" name="endDate" type="date" value={formData.endDate || ""} onChange={(e) => handleChange("endDate", e.target.value)} disabled={loading} required />
-      </div>
-
-      <FormSelect label="Tingkat Prioritas" name="priority" value={formData.priority || "normal"} options={priorityOptions} onChange={(e) => handleChange("priority", e.target.value)} disabled={loading} />
+      <AnnouncementPriorityField priority={formData.priority || "normal"} onFieldChange={handleFieldChange} loading={loading} />
     </form>
   );
 };
