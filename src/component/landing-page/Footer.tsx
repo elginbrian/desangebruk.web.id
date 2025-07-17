@@ -84,7 +84,7 @@ const Footer = () => {
           </div>
         </div>
       </div>
-      <div className={`bg-[#152d55] py-4 md:py-3 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+      <div className={`bg-[#152d55] py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
             <img
