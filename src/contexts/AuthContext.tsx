@@ -36,8 +36,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     const unsubscribe = onAuthStateChange(async (user) => {
       setUser(user);
 
@@ -50,18 +57,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const newProfile: UserProfile = {
               uid: user.uid,
               email: user.email || "",
-              name: user.displayName || "Admin",
-              role: "admin",
+              name: user.displayName || user.email?.split('@')[0] || "Pengguna",
+              role: "pending",
               createdAt: new Date(),
             };
+            
+            try {
+              const { setDoc, doc } = await import("firebase/firestore");
+              const { db } = await import("@/lib/firebase");
+              await setDoc(doc(db, "users", user.uid), newProfile);
+            } catch (firestoreError) {
+              console.error("Error saving new profile to Firestore:", firestoreError);
+            }
+            
             setProfile(newProfile);
           }
         } catch (error) {
           const fallbackProfile: UserProfile = {
             uid: user.uid,
             email: user.email || "",
-            name: user.displayName || "Admin", 
-            role: "admin",
+            name: user.displayName || user.email?.split('@')[0] || "Pengguna",
+            role: "pending",
             createdAt: new Date(),
           };
           setProfile(fallbackProfile);
@@ -74,7 +90,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [mounted]);
 
   const refreshProfile = async () => {
     if (user) {
@@ -83,8 +99,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (userProfile) {
           setProfile(userProfile);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     }
   };
 

@@ -20,9 +20,16 @@ export const useAuthActions = () => {
         setError(result.error.message);
         return { success: false, error: result.error.message };
       }
-
+      const userRole = result.profile.role;
+      
       setTimeout(() => {
-        router.push("/dashboard");
+        if (userRole === "pending") {
+          router.push("/pending-approval");
+        } else if (userRole === "admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/unauthorized");
+        }
       }, 100);
 
       return { success: true };
@@ -48,7 +55,7 @@ export const useAuthActions = () => {
       }
 
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push("/register-success");
       }, 100);
 
       return { success: true };

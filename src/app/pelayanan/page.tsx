@@ -47,7 +47,6 @@ const PelayananPage = () => {
     }));
   };
 
-  // Service data based on the actual procedures from the notice board
   const layananData = [
     {
       id: "persyaratan-pengurusan-ektp",
@@ -146,7 +145,7 @@ const PelayananPage = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Left Column - Title and Content */}
+
           <div className="lg:col-span-3">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">Layanan Desa Ngebruk</h1>
 
@@ -157,7 +156,7 @@ const PelayananPage = () => {
               </p>
             </div>
 
-            {/* Accordion Services */}
+
             <div className="space-y-3">
               {layananData.map((layanan, index) => (
                 <div key={layanan.id} className={`bg-white rounded-lg shadow-sm overflow-hidden smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`} style={{ animationDelay: `${index * 0.05}s` }}>
@@ -169,7 +168,6 @@ const PelayananPage = () => {
                   {expandedItems[layanan.id] && (
                     <div className="px-6 py-4 bg-gray-50">
                       {layanan.subLayanan ? (
-                        // Render sub-layanan untuk KK
                         <div className="space-y-6">
                           {layanan.subLayanan.map((subLayanan, subIndex) => (
                             <div key={subLayanan.id} className="bg-white rounded-lg p-4 border border-gray-200">
@@ -189,7 +187,6 @@ const PelayananPage = () => {
                           ))}
                         </div>
                       ) : (
-                        // Render normal untuk layanan lainnya
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-3 text-sm">Persyaratan</h4>
                           <ul className="space-y-2">
@@ -223,3 +220,4 @@ const PelayananPage = () => {
 };
 
 export default PelayananPage;
+
