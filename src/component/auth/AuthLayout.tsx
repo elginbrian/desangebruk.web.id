@@ -11,9 +11,7 @@ interface AuthLayoutProps {
 const AuthLayout = ({ children, imageSrc, title, subtitle, mounted = true }: AuthLayoutProps) => {
   return (
     <div className="min-h-screen flex">
-
       <div className={`hidden lg:flex lg:w-1/2 relative smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
-
         <div
           className="absolute inset-0 bg-cover bg-center smooth-transition"
           style={{
@@ -23,9 +21,7 @@ const AuthLayout = ({ children, imageSrc, title, subtitle, mounted = true }: Aut
 
         <div className="absolute inset-0 bg-[#1226459e] smooth-transition"></div>
 
-
         <div className={`relative z-10 flex flex-col justify-start items-start p-8 text-white w-full smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-
           <div className={`mb-4 mt-4 smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
             <div className="flex items-center mb-6">
               <img
@@ -48,13 +44,11 @@ const AuthLayout = ({ children, imageSrc, title, subtitle, mounted = true }: Aut
             </div>
           </div>
 
-
           <div className={`max-w-sm smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
             <h1 className="text-2xl font-semibold mb-4 leading-tight text-white smooth-transition">{title}</h1>
           </div>
         </div>
       </div>
-
 
       <div className={`w-full lg:w-1/2 flex items-center justify-center bg-gray-50 p-8 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
         <div className={`w-full max-w-sm smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>{children}</div>
@@ -64,4 +58,3 @@ const AuthLayout = ({ children, imageSrc, title, subtitle, mounted = true }: Aut
 };
 
 export default AuthLayout;
-
