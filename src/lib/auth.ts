@@ -6,7 +6,7 @@ export interface UserProfile {
   uid: string;
   email: string;
   name: string;
-  role: "admin" | "user";
+  role: "admin" | "pending";
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -29,7 +29,7 @@ export const signUpWithEmail = async (email: string, password: string, name: str
       uid: user.uid,
       email: email,
       name: name,
-      role: "admin",
+      role: "pending",
       createdAt: new Date(),
     };
 
@@ -189,4 +189,5 @@ const getAuthErrorMessage = (errorCode: string): string => {
       return "Terjadi kesalahan. Silakan coba lagi.";
   }
 };
+
 
