@@ -37,7 +37,7 @@ const DashboardPage = () => {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       <PageHeader
         title="Dashboard"
         subtitle="Selamat datang di panel admin Desa Ngebruk"
@@ -60,7 +60,7 @@ const DashboardPage = () => {
         }
       />
 
-      <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
+      <div className={`app-content smooth-transition flex-1 ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         <StorageIndicator />
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
@@ -115,8 +115,30 @@ const DashboardPage = () => {
           </div>
         </div>
       </div>
-    </>
+
+
+      <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition mt-8 ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
+            <img
+              src="/logo-mmd.png"
+              alt="Logo MMD"
+              className="w-10 h-10 md:w-8 md:h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = "none";
+              }}
+            />
+            <div className="text-center md:text-left">
+              <p className="text-black font-medium text-[10px] md:text-[10px] mb-[2px] smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>
+              <p className="text-black/70 text-[10px] md:text-[10px] leading-relaxed smooth-transition">Program Mahasiswa Membangun Desa, Fakultas Ilmu Komputer, Universitas Brawijaya</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default DashboardPage;
+

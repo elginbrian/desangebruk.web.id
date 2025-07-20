@@ -14,6 +14,7 @@ const UpdateArticlePage = () => {
 
   const { article, loading: fetchLoading, error: fetchError } = useArticle(articleId || undefined);
   const { update, loading: updateLoading, error: updateError } = useArticleActions();
+  const [mounted, setMounted] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -25,6 +26,13 @@ const UpdateArticlePage = () => {
 
   const [success, setSuccess] = useState<string | null>(null);
   const [storageError, setStorageError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (article) {
@@ -44,7 +52,7 @@ const UpdateArticlePage = () => {
     } else if (typeof value === "string") {
       setFormData((prev) => ({ ...prev, [field]: value }));
     }
-    
+
     if (storageError) {
       setStorageError(null);
     }
@@ -132,11 +140,9 @@ const UpdateArticlePage = () => {
   );
 
   return (
-    <>
-      <PageHeader title="Edit Berita" subtitle="Edit artikel berita yang sudah ada" actions={headerActions} />
-
-
-      <div className="app-content">
+    <div className="flex flex-col min-h-full">
+      <PageHeader title="Edit Berita" subtitle="Edit artikel berita yang sudah ada" actions={headerActions} mounted={mounted} />
+      <div className={`app-content smooth-transition flex-1 ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         {updateError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{updateError}</div>}
 
         {storageError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{storageError}</div>}
@@ -147,10 +153,28 @@ const UpdateArticlePage = () => {
           <ArticleForm formData={formData} onChange={handleFormChange} onStorageError={handleStorageError} isEditing={true} loading={updateLoading} />
         </div>
       </div>
-    </>
+
+      <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
+            <img
+              src="/logo-mmd.png"
+              alt="Logo MMD"
+              className="w-10 h-10 md:w-8 md:h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = "none";
+              }}
+            />
+            <div className="text-center md:text-left">
+              <p className="text-black font-medium text-[10px] md:text-[10px] mb-[2px] smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>
+              <p className="text-black/70 text-[10px] md:text-[10px] leading-relaxed smooth-transition">Program Mahasiswa Membangun Desa, Fakultas Ilmu Komputer, Universitas Brawijaya</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
-
 export default UpdateArticlePage;
-
 
