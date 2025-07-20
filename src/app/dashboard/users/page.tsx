@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { FiUsers, FiRefreshCw, FiEdit2, FiTrash2, FiCalendar } from "react-icons/fi";
+import { FiUsers, FiRefreshCw, FiEdit2, FiTrash2, FiCalendar, FiUser } from "react-icons/fi";
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
@@ -197,9 +197,9 @@ const UsersPage = () => {
   ];
 
   const headerActions = (
-    <ActionButton onClick={handleRefresh} disabled={loading} className="flex items-center gap-2 whitespace-nowrap">
-      <FiRefreshCw className={loading ? "animate-spin" : ""} size={14} />
-      Refresh
+    <ActionButton onClick={() => (window.location.href = "/dashboard/profile")} disabled={loading} className="flex items-center gap-2 whitespace-nowrap">
+      <FiUser size={14} />
+      Profil Saya
     </ActionButton>
   );
 
@@ -219,13 +219,11 @@ const UsersPage = () => {
       <PageHeader title="Kelola Akun" subtitle="Kelola pengguna dan atur hak akses ke dashboard" actions={headerActions} mounted={mounted} />
 
       <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-
         {mounted && success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md smooth-transition">
             <p className="text-green-600 text-sm">{success}</p>
           </div>
         )}
-
 
         {mounted && actionError && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
@@ -268,4 +266,3 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
-
