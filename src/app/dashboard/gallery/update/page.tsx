@@ -16,6 +16,7 @@ const UpdateGalleryPage = () => {
   const { user, profile } = useAuth();
   const { image, loading: imageLoading, error: imageError } = useGalleryImage(imageId || undefined);
   const { update, loading, error } = useGalleryImageActions();
+  const [mounted, setMounted] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -29,6 +30,13 @@ const UpdateGalleryPage = () => {
 
   const [success, setSuccess] = useState<string | null>(null);
   const [storageError, setStorageError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (image) {
@@ -149,10 +157,10 @@ const UpdateGalleryPage = () => {
   );
 
   return (
-    <>
-      <PageHeader title="Edit Gambar Galeri" subtitle="Edit gambar yang ada di galeri website" actions={headerActions} />
+    <div className="flex flex-col min-h-full">
+      <PageHeader title="Edit Gambar Galeri" subtitle="Edit gambar yang ada di galeri website" actions={headerActions} mounted={mounted} />
 
-      <div className="app-content">
+      <div className={`app-content smooth-transition flex-1 ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         {error && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{error}</div>}
 
         {storageError && <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">{storageError}</div>}
@@ -163,7 +171,28 @@ const UpdateGalleryPage = () => {
           <GalleryForm formData={formData} onChange={handleFormChange} onStorageError={handleStorageError} isEditing={true} loading={loading} />
         </div>
       </div>
-    </>
+
+
+      <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
+            <img
+              src="/logo-mmd.png"
+              alt="Logo MMD"
+              className="w-10 h-10 md:w-8 md:h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = "none";
+              }}
+            />
+            <div className="text-center md:text-left">
+              <p className="text-black font-medium text-[10px] md:text-[10px] mb-[2px] smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>
+              <p className="text-black/70 text-[10px] md:text-[10px] leading-relaxed smooth-transition">Program Mahasiswa Membangun Desa, Fakultas Ilmu Komputer, Universitas Brawijaya</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

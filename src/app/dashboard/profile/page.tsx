@@ -116,18 +116,15 @@ const ProfilePage = () => {
   );
 
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       <PageHeader title="Profil Pengguna" subtitle="Kelola informasi profil Anda" actions={headerActions} mounted={mounted} />
 
-
-      <div className={`app-content smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-
+      <div className={`app-content smooth-transition flex-1 ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-md smooth-transition">
             <p className="text-green-600 text-sm">{success}</p>
           </div>
         )}
-
 
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md smooth-transition">
@@ -136,7 +133,6 @@ const ProfilePage = () => {
         )}
 
         <div className="bg-white app-card shadow-sm border border-gray-100">
-
           <div className="flex items-center space-x-4 mb-6 pb-6 border-b border-gray-200">
             <div className="w-16 h-16 bg-[#1B3A6D] rounded-full flex items-center justify-center">
               <span className="text-white text-xl font-bold">{profile.name?.charAt(0).toUpperCase() || "A"}</span>
@@ -147,28 +143,12 @@ const ProfilePage = () => {
             </div>
           </div>
 
-
           <form className="space-y-4">
             <FormInput label="Nama Lengkap" name="name" value={formData.name} onChange={handleInputChange} placeholder="Masukkan nama lengkap..." disabled={!isEditing} />
 
-            <FormInput
-              label="Email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              placeholder="Masukkan email..."
-              disabled={true}
-            />
+            <FormInput label="Email" name="email" type="email" value={formData.email} onChange={handleInputChange} placeholder="Masukkan email..." disabled={true} />
 
-            <FormInput
-              label="Role"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-              placeholder="Role pengguna..."
-              disabled={true}
-            />
+            <FormInput label="Role" name="role" value={formData.role} onChange={handleInputChange} placeholder="Role pengguna..." disabled={true} />
 
             <div className="pt-4">
               <label className="block text-xs font-medium text-black mb-2">UID Pengguna</label>
@@ -179,7 +159,28 @@ const ProfilePage = () => {
           </form>
         </div>
       </div>
-    </>
+
+
+      <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
+            <img
+              src="/logo-mmd.png"
+              alt="Logo MMD"
+              className="w-10 h-10 md:w-8 md:h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.style.display = "none";
+              }}
+            />
+            <div className="text-center md:text-left">
+              <p className="text-black font-medium text-[10px] md:text-[10px] mb-[2px] smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>
+              <p className="text-black/70 text-[10px] md:text-[10px] leading-relaxed smooth-transition">Program Mahasiswa Membangun Desa, Fakultas Ilmu Komputer, Universitas Brawijaya</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

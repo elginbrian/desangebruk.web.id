@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FiMenu, FiX, FiUser, FiLogOut } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiLogOut, FiSettings, FiBarChart } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthActions } from "@/hooks/useAuth";
 import UserDropdown from "@/component/common/UserDropdown";
@@ -21,6 +21,18 @@ const Header = () => {
     }, 50);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.classList.add("sidebar-open");
+    } else {
+      document.body.classList.remove("sidebar-open");
+    }
+
+    return () => {
+      document.body.classList.remove("sidebar-open");
+    };
+  }, [isMenuOpen]);
 
   const navigationItems = [
     { name: "Home", href: "/" },
@@ -90,6 +102,7 @@ const Header = () => {
             )}
           </div>
 
+
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`xl:hidden p-2 rounded-md text-gray-700 hover:text-[#1B3A6D] hover:bg-gray-100 smooth-transition hover-lift ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}
@@ -98,29 +111,40 @@ const Header = () => {
           </button>
         </div>
 
-        <div className={`xl:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="py-4 border-t border-gray-200">
-            <nav className="flex flex-col space-y-1">
-              {navigationItems.map((item, index) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`${getNavLinkClass(item.href, true)} mobile-menu-stagger-${index + 1} ${isMenuOpen ? "mobile-menu-item animate" : "mobile-menu-item"}`}
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{
-                    animationDelay: `${index * 0.1}s`,
-                    transitionDelay: `${index * 0.05}s`,
+
+        <div className="mobile-menu-sidebar-container">
+          <div className={`mobile-menu-overlay ${isMenuOpen ? "open" : ""}`} onClick={() => setIsMenuOpen(false)} />
+          <div className={`mobile-menu-sidebar ${isMenuOpen ? "open" : ""}`}>
+            <div className="mobile-sidebar-header">
+              <button onClick={() => setIsMenuOpen(false)} className="mobile-sidebar-close">
+                <FiX size={20} />
+              </button>
+              <div className="flex items-center space-x-3">
+                <img
+                  src="/logo.png"
+                  alt="Desa Ngebruk"
+                  className="h-10 w-10 object-contain"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
                   }}
-                >
-                  <span className="relative">
-                    {item.name}
-                    {isActivePath(item.href) && <span className="absolute -right-1 top-1/2 transform -translate-y-1/2 w-1 h-1 bg-[#1B3A6D] rounded-full"></span>}
-                  </span>
+                />
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">Desa Ngebruk</h2>
+                  <p className="text-sm text-gray-500">Kecamatan Sumberpucung</p>
+                </div>
+              </div>
+            </div>
+
+            <nav className="mobile-sidebar-nav">
+              {navigationItems.map((item, index) => (
+                <Link key={item.name} href={item.href} className={`${getNavLinkClass(item.href, true)} mobile-menu-stagger-${index + 1}`} onClick={() => setIsMenuOpen(false)}>
+                  {item.name}
                 </Link>
               ))}
 
               {!loading && (
-                <div className="pt-4 border-t border-gray-200 mt-4">
+                <div className="mobile-menu-auth-section">
                   {isAuthenticated && profile ? (
                     <div className="space-y-3">
                       <div className="px-3 py-3 bg-gray-50 rounded-md smooth-transition hover:bg-gray-100">
@@ -135,13 +159,22 @@ const Header = () => {
                         </div>
                       </div>
 
+                      <Link href="/dashboard" className="block w-full bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate text-center" onClick={() => setIsMenuOpen(false)}>
+                        <div className="flex items-center justify-center">
+                          <FiBarChart className="mr-2" size={16} />
+                          Dashboard
+                        </div>
+                      </Link>
+
                       <Link
-                        href="/dashboard"
-                        className="bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate flex items-center justify-center"
+                        href="/dashboard/profile"
+                        className="block w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-md text-sm font-medium hover:bg-gray-200 smooth-transition btn-animate text-center"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <FiUser className="mr-2" size={16} />
-                        Dashboard
+                        <div className="flex items-center justify-center">
+                          <FiUser className="mr-2" size={16} />
+                          Profil Saya
+                        </div>
                       </Link>
 
                       <button
@@ -149,14 +182,93 @@ const Header = () => {
                           logout();
                           setIsMenuOpen(false);
                         }}
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md text-left flex items-center justify-center"
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md"
                       >
-                        <FiLogOut className="mr-2" size={16} />
-                        Logout
+                        <div className="flex items-center justify-center">
+                          <FiLogOut className="mr-2" size={16} />
+                          Logout
+                        </div>
                       </button>
                     </div>
                   ) : (
-                    <Link href="/login" className="bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate flex items-center justify-center" onClick={() => setIsMenuOpen(false)}>
+                    <Link href="/login" className="block w-full bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate text-center" onClick={() => setIsMenuOpen(false)}>
+                      Login
+                    </Link>
+                  )}
+                </div>
+              )}
+            </nav>
+          </div>
+        </div>
+
+
+        <div className={`mobile-menu-standard xl:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="py-4 border-t border-gray-200">
+            <nav className="flex flex-col space-y-1">
+              {navigationItems.map((item, index) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`${getNavLinkClass(item.href, true)} mobile-menu-stagger-${index + 1} ${isMenuOpen ? "mobile-menu-item animate" : "mobile-menu-item"}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    animationDelay: `${index * 0.1}s`,
+                    transitionDelay: `${index * 0.05}s`,
+                  }}
+                >
+                  {item.name}
+                </Link>
+              ))}
+
+              {!loading && (
+                <div className="mobile-menu-auth-section">
+                  {isAuthenticated && profile ? (
+                    <div className="space-y-3">
+                      <div className="px-3 py-3 bg-gray-50 rounded-md smooth-transition hover:bg-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-[#1B3A6D] rounded-full flex items-center justify-center user-avatar">
+                            <FiUser className="text-white" size={18} />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-900">{profile.name}</p>
+                            <p className="text-xs text-gray-500">{profile.email}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Link href="/dashboard" className="block w-full bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate text-center" onClick={() => setIsMenuOpen(false)}>
+                        <div className="flex items-center justify-center">
+                          <FiBarChart className="mr-2" size={16} />
+                          Dashboard
+                        </div>
+                      </Link>
+
+                      <Link
+                        href="/dashboard/profile"
+                        className="block w-full bg-gray-100 text-gray-700 px-4 py-3 rounded-md text-sm font-medium hover:bg-gray-200 smooth-transition btn-animate text-center"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        <div className="flex items-center justify-center">
+                          <FiUser className="mr-2" size={16} />
+                          Profil Saya
+                        </div>
+                      </Link>
+
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                        }}
+                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md"
+                      >
+                        <div className="flex items-center justify-center">
+                          <FiLogOut className="mr-2" size={16} />
+                          Logout
+                        </div>
+                      </button>
+                    </div>
+                  ) : (
+                    <Link href="/login" className="block w-full bg-[#1B3A6D] text-white px-4 py-3 rounded-md text-sm font-medium hover:bg-[#152f5a] smooth-transition btn-animate text-center" onClick={() => setIsMenuOpen(false)}>
                       Login
                     </Link>
                   )}
@@ -171,3 +283,4 @@ const Header = () => {
 };
 
 export default Header;
+
