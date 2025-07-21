@@ -15,7 +15,6 @@ const NotFoundPage = () => {
       setMounted(true);
     }, 100);
 
-    // Function to handle overflow
     const handleOverflow = () => {
       if (window.innerWidth >= 1024) {
         document.body.style.overflow = "hidden";
@@ -26,10 +25,8 @@ const NotFoundPage = () => {
       }
     };
 
-    // Set initial overflow
     handleOverflow();
 
-    // Add resize listener
     window.addEventListener("resize", handleOverflow);
 
     return () => {
@@ -132,3 +129,4 @@ const NotFoundPage = () => {
 };
 
 export default NotFoundPage;
+

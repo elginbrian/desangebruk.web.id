@@ -15,7 +15,6 @@ const RegisterSuccessPage = () => {
     const originalOverflow = document.body.style.overflow;
     const originalHeight = document.body.style.height;
 
-    // Only apply overflow hidden on large screens
     const applyOverflowHidden = () => {
       if (window.innerWidth >= 1024) {
         document.body.style.overflow = "hidden";
@@ -125,3 +124,4 @@ const RegisterSuccessPage = () => {
 };
 
 export default RegisterSuccessPage;
+

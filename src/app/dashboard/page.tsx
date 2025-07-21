@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDashboardStats } from "@/hooks/useStatistics";
 import { useUserStats } from "@/hooks/useUsers";
 import VisitorStatsCard from "@/component/dashboard/VisitorStatsCard";
-import { FiBell, FiFileText, FiUsers, FiClock } from "react-icons/fi";
+import { FiBell, FiFileText, FiUsers, FiClock, FiGithub, FiExternalLink, FiGlobe, FiServer, FiDatabase } from "react-icons/fi";
 
 const DashboardPage = () => {
   const [mounted, setMounted] = useState(false);
@@ -61,8 +61,6 @@ const DashboardPage = () => {
       />
 
       <div className={`app-content smooth-transition flex-1 ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-        <StorageIndicator />
-
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
           <div className="xl:col-span-2 space-y-6">
             <VisitorStatsCard />
