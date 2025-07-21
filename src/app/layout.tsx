@@ -18,6 +18,21 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Desa Ngebruk, Kecamatan Sumberpucung, Kabupaten Malang",
   description: "Website resmi Desa Ngebruk, Kecamatan Sumberpucung, Kabupaten Malang, Jawa Timur. Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal.",
+  icons: {
+    icon: [
+      {
+        url: "/logo-mmd.png",
+        sizes: "any",
+      },
+    ],
+    shortcut: "/logo-mmd.png",
+    apple: [
+      {
+        url: "/logo-mmd.png",
+        sizes: "180x180",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
