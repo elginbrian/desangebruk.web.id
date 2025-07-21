@@ -35,8 +35,8 @@ const Header = () => {
   }, [isMenuOpen]);
 
   const navigationItems = [
-    { name: "Home", href: "/" },
-    { name: "Tentang", href: "/tentang" },
+    { name: "Beranda", href: "/" },
+    { name: "Profil Desa", href: "/profil-desa" },
     { name: "Berita", href: "/berita" },
     { name: "Pengumuman", href: "/pengumuman" },
     { name: "Struktur", href: "/struktur" },
@@ -102,7 +102,6 @@ const Header = () => {
             )}
           </div>
 
-
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`xl:hidden p-2 rounded-md text-gray-700 hover:text-[#1B3A6D] hover:bg-gray-100 smooth-transition hover-lift ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}
@@ -110,7 +109,6 @@ const Header = () => {
             {isMenuOpen ? <FiX size={24} className="smooth-transition" /> : <FiMenu size={24} className="smooth-transition" />}
           </button>
         </div>
-
 
         <div className="mobile-menu-sidebar-container">
           <div className={`mobile-menu-overlay ${isMenuOpen ? "open" : ""}`} onClick={() => setIsMenuOpen(false)} />
@@ -201,7 +199,6 @@ const Header = () => {
           </div>
         </div>
 
-
         <div className={`mobile-menu-standard xl:hidden overflow-hidden transition-all duration-300 ${isMenuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"}`}>
           <div className="py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-1">
@@ -283,4 +280,3 @@ const Header = () => {
 };
 
 export default Header;
-
