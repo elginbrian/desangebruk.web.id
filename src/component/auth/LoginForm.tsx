@@ -17,28 +17,10 @@ interface LoginFormProps {
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const LoginForm: FC<LoginFormProps> = ({
-  mounted,
-  formData,
-  showPassword,
-  loading,
-  onInputChange,
-  onTogglePassword,
-  onSubmit
-}) => {
+const LoginForm: FC<LoginFormProps> = ({ mounted, formData, showPassword, loading, onInputChange, onTogglePassword, onSubmit }) => {
   return (
     <form onSubmit={onSubmit} className={`space-y-4 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}>
-      <AuthInput
-        label="Alamat Email"
-        type="email"
-        id="email"
-        name="email"
-        value={formData.email}
-        onChange={onInputChange}
-        placeholder="Masukkan email..."
-        required
-        mounted={mounted}
-      />
+      <AuthInput label="Alamat Email" type="email" id="email" name="email" value={formData.email} onChange={onInputChange} placeholder="Masukkan email..." required mounted={mounted} />
 
       <AuthInput
         label="Kata Sandi"
@@ -52,12 +34,6 @@ const LoginForm: FC<LoginFormProps> = ({
         showPassword={showPassword}
         onTogglePassword={onTogglePassword}
         mounted={mounted}
-      />
-
-      <LoginOptions
-        mounted={mounted}
-        rememberMe={formData.rememberMe}
-        onRememberMeChange={onInputChange}
       />
 
       <AuthButton type="submit" variant="primary" mounted={mounted} disabled={loading}>
