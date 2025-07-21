@@ -1,6 +1,6 @@
 "use client";
 
-import { FiHome, FiFileText, FiBell, FiLogOut, FiX, FiUser, FiImage, FiUsers } from "react-icons/fi";
+import { FiHome, FiFileText, FiBell, FiLogOut, FiX, FiUser, FiImage, FiUsers, FiBookOpen } from "react-icons/fi";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -41,6 +41,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { icon: FiBell, text: "Kelola Pengumuman", href: "/dashboard/announcement" },
     { icon: FiImage, text: "Kelola Galeri", href: "/dashboard/gallery" },
     { icon: FiUsers, text: "Kelola Akun", href: "/dashboard/users" },
+    { icon: FiBookOpen, text: "Panduan Admin", href: "/dashboard/panduan" },
   ];
 
   return (
@@ -108,7 +109,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           </ul>
         </nav>
 
-
         <StorageProgress />
 
         <div className="px-4 py-3 border-t border-white/10 space-y-3 flex-shrink-0">
@@ -123,4 +123,3 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 };
 
 export default Sidebar;
-
