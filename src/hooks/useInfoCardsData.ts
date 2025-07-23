@@ -18,7 +18,7 @@ export const useInfoCardsData = () => {
     {
       icon: FiUsers,
       title: "Jumlah Penduduk",
-      value: "8.192",
+      value: "7.847",
       subtitle: "Jiwa",
     },
     {
