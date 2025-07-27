@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { FiUsers, FiRefreshCw, FiEdit2, FiTrash2, FiCalendar, FiUser } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiUsers, FiCalendar, FiUser } from "react-icons/fi";
 import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
-import DataTable from "@/component/common/DataTable";
 import { DataTableWithStates } from "@/component/common/LoadingStates";
-import { useUsers, useUserActions } from "@/hooks/useUsers";
+import Pagination from "@/component/common/Pagination";
+import { useUsersPagination, useUserActions } from "@/hooks/useUsers";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
@@ -16,9 +16,10 @@ const UsersPage = () => {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All Status");
+  const [isSearching, setIsSearching] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const { users, loading, error, refetch } = useUsers();
+  const { users, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchUsersPaginated, searchUsersPaginated, goToPage, changeItemsPerPage } = useUsersPagination();
   const { updateRole, removeUser, loading: actionLoading, error: actionError, clearError } = useUserActions();
   const { user: currentUser } = useAuth();
 
@@ -30,6 +31,38 @@ const UsersPage = () => {
   }, []);
 
   useEffect(() => {
+    if (mounted) {
+      const getRoleFilter = () => {
+        if (roleFilter === "admin") return "admin";
+        if (roleFilter === "pending") return "pending";
+        return "all";
+      };
+      fetchUsersPaginated(1, itemsPerPage, getRoleFilter());
+    }
+  }, [roleFilter, mounted]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchTerm.trim()) {
+        setIsSearching(true);
+        searchUsersPaginated(searchTerm);
+      } else {
+        setIsSearching(false);
+        if (mounted) {
+          const getRoleFilter = () => {
+            if (roleFilter === "admin") return "admin";
+            if (roleFilter === "pending") return "pending";
+            return "all";
+          };
+          fetchUsersPaginated(1, itemsPerPage, getRoleFilter());
+        }
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm, mounted]);
+
+  useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
         setSuccess(null);
@@ -38,24 +71,20 @@ const UsersPage = () => {
     }
   }, [success]);
 
-  const filteredUsers = useMemo(() => {
-    console.log("Raw users from hook:", users);
-
-    return users.filter((user) => {
-      if (!user) return false;
-
-      const matchesSearch = (user?.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) || (user?.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
-      const matchesRole = roleFilter === "All Status" || user?.role === roleFilter;
-
-      return matchesSearch && matchesRole;
-    });
-  }, [users, searchTerm, roleFilter]);
-
   const handleUpdateRole = async (userId: string, newRole: "admin" | "pending") => {
     const success = await updateRole(userId, newRole);
     if (success) {
       setSuccess("Role pengguna berhasil diperbarui");
-      refetch();
+      if (isSearching) {
+        searchUsersPaginated(searchTerm);
+      } else {
+        const getRoleFilter = () => {
+          if (roleFilter === "admin") return "admin";
+          if (roleFilter === "pending") return "pending";
+          return "all";
+        };
+        fetchUsersPaginated(currentPage, itemsPerPage, getRoleFilter());
+      }
     }
   };
 
@@ -64,13 +93,52 @@ const UsersPage = () => {
       const success = await removeUser(userId);
       if (success) {
         setSuccess("Pengguna berhasil dihapus");
-        refetch();
+        if (isSearching) {
+          searchUsersPaginated(searchTerm);
+        } else {
+          const getRoleFilter = () => {
+            if (roleFilter === "admin") return "admin";
+            if (roleFilter === "pending") return "pending";
+            return "all";
+          };
+          fetchUsersPaginated(currentPage, itemsPerPage, getRoleFilter());
+        }
       }
     }
   };
 
+  const handlePageChange = (page: number) => {
+    if (!isSearching) {
+      const getRoleFilter = () => {
+        if (roleFilter === "admin") return "admin";
+        if (roleFilter === "pending") return "pending";
+        return "all";
+      };
+      fetchUsersPaginated(page, itemsPerPage, getRoleFilter());
+    }
+    goToPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    const getRoleFilter = () => {
+      if (roleFilter === "admin") return "admin";
+      if (roleFilter === "pending") return "pending";
+      return "all";
+    };
+    changeItemsPerPage(newItemsPerPage, getRoleFilter());
+  };
+
   const handleRefresh = () => {
-    refetch();
+    if (isSearching) {
+      searchUsersPaginated(searchTerm);
+    } else {
+      const getRoleFilter = () => {
+        if (roleFilter === "admin") return "admin";
+        if (roleFilter === "pending") return "pending";
+        return "all";
+      };
+      fetchUsersPaginated(currentPage, itemsPerPage, getRoleFilter());
+    }
     clearError();
   };
 
@@ -117,9 +185,6 @@ const UsersPage = () => {
       label: "Pengguna",
       sortable: false,
       render: (name: any, user: any) => {
-        console.log("User object in render:", user);
-        console.log("Name value:", name);
-
         if (!user) {
           return <span className="text-sm text-gray-400">Data kosong</span>;
         }
@@ -245,20 +310,19 @@ const UsersPage = () => {
 
           <DataTableWithStates
             columns={columns}
-            data={filteredUsers}
+            data={users}
             onDelete={(userId) => handleDeleteUser(String(userId))}
             mounted={mounted}
             loading={loading}
             error={error}
             onRetry={handleRefresh}
-            emptyMessage={
-              users.length > 0 && filteredUsers.length === 0
-                ? `Data pengguna ditemukan (${users.length}) tetapi tidak dapat ditampilkan. Periksa format data.`
-                : searchTerm
-                ? "Tidak ada pengguna yang ditemukan dengan kata kunci tersebut."
-                : "Belum ada pengguna yang terdaftar."
-            }
+            emptyMessage={searchTerm ? "Tidak ada pengguna yang ditemukan dengan kata kunci tersebut." : "Belum ada pengguna yang terdaftar."}
           />
+
+
+          {!isSearching && (
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} onItemsPerPageChange={handleItemsPerPageChange} />
+          )}
         </div>
       </div>
 
@@ -315,3 +379,4 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
+
