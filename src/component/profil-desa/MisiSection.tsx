@@ -4,11 +4,16 @@ import React from "react";
 
 const MisiSection = () => {
   const misiList = [
-    "Meningkatkan kualitas sumber daya manusia melalui pendidikan dan pelatihan",
-    "Mengembangkan potensi ekonomi desa berbasis pertanian dan pariwisata",
-    "Meningkatkan pelayanan publik yang prima dan transparan",
-    "Membangun infrastruktur desa yang mendukung kesejahteraan masyarakat",
-    "Melestarikan budaya lokal dan nilai-nilai kearifan lokal",
+    "Ikut melaksanakan/mengamalkan ajaran agama dalam kehidupan bermasyarakat berbangsa berbangsa dan bernegara sebagai wujud peningkatan keimanan dan ketaqwaan kepada Tuhan Yang Maha Esa.",
+    "Mewujudkan dan mendorong terjadinya usaha-usaha kerukunan antar dan intern warga masyarakat yang disebabkan karena adanya perbedaan agama, keyakinan, organisasi, dan lainnya dalam suasana saling menghargai dan menghormati.",
+    "Mengembangkan kehidupan masyarakat untuk terwujudnya tatanan masyarakat yang taat kepada peraturan perundang- undangan dalam rangka meningkatkan kehidupan masyarakat yang aman,tertib,tentram dan damai serta meningkatakan persatuan dan kesatuan dalam wadah negara kesatuan Republik Indonesia.",
+    "Tewujudnya peningkatan kualitas kehidupan masyarakat yang ditandai terpenuhinya kebutuhan pangan, sandang, papan, kesehatan, pendidikan, dan lapangan kerja.",
+    "Membangun dan meningkatkan hasil pertanian dengan jalan penataan pengairan, perbaikan jalan sawah jalan usaha tani, pemupukan, dan pola tanam yang baik.",
+    "Pengembangan sektor pertanian dan perdagangan yang berorientasi pada mekanisme pasar.",
+    "Menumbuhkembangkan usaha kecil dan menengah.",
+    "Pemberdayaan ekonomi masyarakat khususnya UMKM (Usaha Kecil Menengah dan Mikro) yang berdaya saing tinggi.",
+    "Membangun dan mendorong usaha-usaha untuk pengembangan dan optimalisasi sektor pertanian, perkebunan, peternakan, dan perikanan, baik tahap produksi maupun tahap pengolahan hasilnya.",
+    "Meningkatkan kemajuan dan kemandirian melalui penyelenggaraan otonomi desa yang bertanggung jawab dan didukung dengan penyelenggaran pemerintahan yang bersih,transparan dan profesional.",
   ];
 
   return (
