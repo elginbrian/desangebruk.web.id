@@ -1,28 +1,22 @@
 
 @keyframes snow {
   0% {
-    transform: translateY(-100vh) translateX(0) rotate(0deg) scale(0.5);
+    transform: translateY(-100vh) translateX(0) rotate(0deg) scale(0.8);
     opacity: 0;
   }
   5% {
     opacity: 1;
-    transform: translateY(-90vh) translateX(5px) rotate(45deg) scale(1);
-  }
-  25% {
-    transform: translateY(-50vh) translateX(min(20px, 3vw)) rotate(180deg) scale(1.1);
+    transform: translateY(-90vh) translateX(3px) rotate(30deg) scale(1);
   }
   50% {
-    transform: translateY(0vh) translateX(min(40px, 6vw)) rotate(270deg) scale(1);
-  }
-  75% {
-    transform: translateY(50vh) translateX(min(60px, 9vw)) rotate(360deg) scale(0.9);
+    transform: translateY(-10vh) translateX(min(25px, 4vw)) rotate(180deg) scale(1);
   }
   95% {
     opacity: 1;
-    transform: translateY(90vh) translateX(min(75px, 11vw)) rotate(450deg) scale(0.8);
+    transform: translateY(90vh) translateX(min(40px, 6vw)) rotate(330deg) scale(0.9);
   }
   100% {
-    transform: translateY(100vh) translateX(min(80px, 12vw)) rotate(480deg) scale(0.6);
+    transform: translateY(100vh) translateX(min(45px, 7vw)) rotate(360deg) scale(0.7);
     opacity: 0;
   }
 }
@@ -42,12 +36,12 @@
 
 .snow-flake {
   position: absolute;
-  color: rgba(255, 255, 255, 0.95);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 10px;
   animation: snow ease-in-out infinite;
   user-select: none;
-  text-shadow: 0 0 4px rgba(255, 255, 255, 0.6), 0 0 8px rgba(173, 216, 230, 0.3);
-  filter: blur(0.5px);
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.4);
+  filter: blur(0.2px);
 }
 
 @keyframes snowAccumulate {
@@ -77,28 +71,18 @@
 
 @keyframes clouds {
   0% {
-    transform: translateX(-120px);
+    transform: translateX(-150px);
     opacity: 0;
   }
-  5% {
+  8% {
     opacity: 1;
   }
-  95% {
+  92% {
     opacity: 1;
   }
   100% {
-    transform: translateX(min(calc(100vw + 120px), calc(100% + 120px)));
+    transform: translateX(min(calc(100vw + 150px), calc(100% + 150px)));
     opacity: 0;
-  }
-}
-
-@keyframes cloudsFloat {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-8px);
   }
 }
 
@@ -107,8 +91,11 @@
   100% {
     transform: translateY(0px);
   }
-  50% {
-    transform: translateY(-5px);
+  33% {
+    transform: translateY(-3px);
+  }
+  66% {
+    transform: translateY(2px);
   }
 }
 
@@ -127,12 +114,11 @@
 
 .cloud {
   position: absolute;
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 50px;
-  animation: clouds linear infinite, gentleFloat 6s ease-in-out infinite;
-  filter: blur(1.5px);
-  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.1);
-  position: relative;
+  animation: clouds linear infinite, gentleFloat 8s ease-in-out infinite;
+  filter: blur(1px);
+  box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.05);
 }
 
 .cloud:nth-child(even) {
@@ -205,17 +191,17 @@
 
 @keyframes fog {
   0% {
-    transform: translateX(-150%);
+    transform: translateX(-120%);
     opacity: 0;
   }
-  20% {
-    opacity: 0.7;
+  15% {
+    opacity: 0.5;
   }
-  80% {
-    opacity: 0.7;
+  85% {
+    opacity: 0.5;
   }
   100% {
-    transform: translateX(150%);
+    transform: translateX(120%);
     opacity: 0;
   }
 }
@@ -224,15 +210,11 @@
   0%,
   100% {
     filter: blur(1.5px);
-    opacity: 0.6;
+    opacity: 0.4;
   }
-  33% {
+  50% {
     filter: blur(2px);
-    opacity: 0.8;
-  }
-  66% {
-    filter: blur(2.5px);
-    opacity: 0.7;
+    opacity: 0.6;
   }
 }
 
@@ -253,10 +235,10 @@
   position: absolute;
   width: 100%;
   max-width: 100vw;
-  height: 120px;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 20%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0.15) 80%, transparent 100%);
-  animation: fog 20s ease-in-out infinite, fogDensity 15s ease-in-out infinite;
-  filter: blur(2px);
+  height: 80px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 25%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.1) 75%, transparent 100%);
+  animation: fog 25s ease-in-out infinite, fogDensity 18s ease-in-out infinite;
+  filter: blur(1.5px);
 }
 
 .fog-layer:nth-child(1) {

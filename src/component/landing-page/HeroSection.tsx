@@ -16,20 +16,25 @@ const useWeatherOverlayClass = () => {
     const descLower = description.toLowerCase();
 
     if (codeNum >= 200 && codeNum <= 299) return "weather-overlay-stormy";
-    if (descLower.includes("thunderstorm") || descLower.includes("lightning")) return "weather-overlay-stormy";
+    if (descLower.includes("thunderstorm") || descLower.includes("lightning") || descLower.includes("storm")) return "weather-overlay-stormy";
 
-    if (codeNum >= 500 && codeNum <= 504) return "weather-overlay-heavy-rain";
     if (codeNum >= 300 && codeNum <= 399) return "weather-overlay-drizzle";
-    if (codeNum >= 520 && codeNum <= 531) return "weather-overlay-rainy";
-    if (descLower.includes("heavy rain") || descLower.includes("torrential")) return "weather-overlay-heavy-rain";
-    if (descLower.includes("light rain") || descLower.includes("drizzle")) return "weather-overlay-drizzle";
+    if (descLower.includes("drizzle") || descLower.includes("light rain")) return "weather-overlay-drizzle";
+
+    if (codeNum >= 500 && codeNum <= 599) {
+      if (codeNum === 500 || codeNum === 501) return "weather-overlay-rainy";
+      if (codeNum >= 502 && codeNum <= 504) return "weather-overlay-heavy-rain";
+      if (codeNum >= 520 && codeNum <= 531) return "weather-overlay-rainy";
+      return "weather-overlay-rainy";
+    }
+    if (descLower.includes("heavy rain") || descLower.includes("torrential") || descLower.includes("extreme rain")) return "weather-overlay-heavy-rain";
     if (descLower.includes("moderate rain") || descLower.includes("rain")) return "weather-overlay-rainy";
 
     if (codeNum >= 600 && codeNum <= 699) return "weather-overlay-snowy";
-    if (descLower.includes("snow") || descLower.includes("blizzard")) return "weather-overlay-snowy";
+    if (descLower.includes("snow") || descLower.includes("blizzard") || descLower.includes("sleet")) return "weather-overlay-snowy";
 
     if (codeNum >= 700 && codeNum <= 799) return "weather-overlay-foggy";
-    if (descLower.includes("fog") || descLower.includes("mist") || descLower.includes("haze")) return "weather-overlay-foggy";
+    if (descLower.includes("fog") || descLower.includes("mist") || descLower.includes("haze") || descLower.includes("dust") || descLower.includes("sand")) return "weather-overlay-foggy";
 
     if (codeNum === 800) return "weather-overlay-sunny";
     if (descLower.includes("clear") || descLower.includes("sunny")) return "weather-overlay-sunny";
@@ -39,6 +44,9 @@ const useWeatherOverlayClass = () => {
     if (codeNum === 803) return "weather-overlay-broken-clouds";
     if (codeNum === 804) return "weather-overlay-overcast";
     if (descLower.includes("overcast")) return "weather-overlay-overcast";
+    if (descLower.includes("broken cloud")) return "weather-overlay-broken-clouds";
+    if (descLower.includes("scattered cloud")) return "weather-overlay-scattered-clouds";
+    if (descLower.includes("few cloud")) return "weather-overlay-few-clouds";
     if (descLower.includes("cloud")) return "weather-overlay-scattered-clouds";
 
     return "weather-overlay-few-clouds";
@@ -156,3 +164,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
