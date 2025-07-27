@@ -22,28 +22,19 @@ export const useArticleStats = () => {
         const totalCount = totalSnapshot.data().count;
         setTotalArticles(totalCount);
 
-        const publishedQuery = query(
-          collection(db, "articles"),
-          where("status", "==", "published")
-        );
+        const publishedQuery = query(collection(db, "articles"), where("status", "==", "published"));
         const publishedSnapshot = await getCountFromServer(publishedQuery);
         const publishedCount = publishedSnapshot.data().count;
         setTotalPublished(publishedCount);
 
-        const draftQuery = query(
-          collection(db, "articles"),
-          where("status", "==", "draft")
-        );
+        const draftQuery = query(collection(db, "articles"), where("status", "==", "draft"));
         const draftSnapshot = await getCountFromServer(draftQuery);
         const draftCount = draftSnapshot.data().count;
         setTotalDraft(draftCount);
 
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const monthlyQuery = query(
-          collection(db, "articles"),
-          where("createdAt", ">=", Timestamp.fromDate(startOfMonth))
-        );
+        const monthlyQuery = query(collection(db, "articles"), where("createdAt", ">=", Timestamp.fromDate(startOfMonth)));
         const monthlySnapshot = await getCountFromServer(monthlyQuery);
         const monthlyCount = monthlySnapshot.data().count;
         setMonthlyChange(monthlyCount);
@@ -89,28 +80,18 @@ export const useAnnouncementStats = () => {
         setTotalAnnouncements(totalCount);
 
         const now = new Date();
-        const activeQuery = query(
-          collection(db, "announcements"),
-          where("startDate", "<=", now.toISOString().split('T')[0]),
-          where("endDate", ">=", now.toISOString().split('T')[0])
-        );
+        const activeQuery = query(collection(db, "announcements"), where("startDate", "<=", now.toISOString().split("T")[0]), where("endDate", ">=", now.toISOString().split("T")[0]));
         const activeSnapshot = await getCountFromServer(activeQuery);
         const activeCount = activeSnapshot.data().count;
         setActiveAnnouncements(activeCount);
 
-        const expiredQuery = query(
-          collection(db, "announcements"),
-          where("endDate", "<", now.toISOString().split('T')[0])
-        );
+        const expiredQuery = query(collection(db, "announcements"), where("endDate", "<", now.toISOString().split("T")[0]));
         const expiredSnapshot = await getCountFromServer(expiredQuery);
         const expiredCount = expiredSnapshot.data().count;
         setExpiredAnnouncements(expiredCount);
 
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const monthlyQuery = query(
-          collection(db, "announcements"),
-          where("createdAt", ">=", Timestamp.fromDate(startOfMonth))
-        );
+        const monthlyQuery = query(collection(db, "announcements"), where("createdAt", ">=", Timestamp.fromDate(startOfMonth)));
         const monthlySnapshot = await getCountFromServer(monthlyQuery);
         const monthlyCount = monthlySnapshot.data().count;
         setMonthlyChange(monthlyCount);
@@ -149,50 +130,56 @@ export const useVisitorStats = () => {
     const fetchAndUpdateVisitorStats = async () => {
       try {
         setLoading(true);
-        
-        const { getVisitorStats, updateVisitorStats, getTodayVisitorCount, cleanupOldVisitorData } = await import("@/lib/visitorService");
-        
+
+        const { getVisitorStats, updateVisitorStats, getTodayVisitorCount, cleanupOldVisitorData, ensureHistoricalData } = await import("@/lib/visitorService");
+
         await updateVisitorStats();
-        
+
+        await ensureHistoricalData(30);
+
         const stats = await getVisitorStats();
-        
+
         if (stats) {
           setTotalVisitors(stats.totalVisitors);
           setPageViews(stats.pageViews);
-          
+
           const todayCount = getTodayVisitorCount(stats);
           setDailyVisitors(todayCount);
           setTodayChange(todayCount);
-          
-          const lastCleanup = localStorage.getItem('lastCleanupDate');
-          const today = new Date().toISOString().split('T')[0];
-          
-          if (lastCleanup !== today) {
+
+          const lastCleanup = localStorage.getItem("lastCleanupDate");
+          const today = new Date().toISOString().split("T")[0];
+          const oneWeekAgo = new Date();
+          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+          if (!lastCleanup || new Date(lastCleanup) < oneWeekAgo) {
             await cleanupOldVisitorData();
-            localStorage.setItem('lastCleanupDate', today);
+            localStorage.setItem("lastCleanupDate", today);
           }
         } else {
-          setTotalVisitors(56742);
-          setDailyVisitors(147);
-          setTodayChange(147);
-          setPageViews(89432);
+          setTotalVisitors(0);
+          setDailyVisitors(0);
+          setTodayChange(0);
+          setPageViews(0);
         }
 
         setError(null);
       } catch (err) {
         console.error("Error fetching visitor stats:", err);
         setError("Gagal memuat statistik pengunjung");
-        
-        setTotalVisitors(56742);
-        setDailyVisitors(147);
-        setTodayChange(147);
-        setPageViews(89432);
+
+        setTotalVisitors(0);
+        setDailyVisitors(0);
+        setTodayChange(0);
+        setPageViews(0);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAndUpdateVisitorStats();
+    const timer = setTimeout(fetchAndUpdateVisitorStats, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return {

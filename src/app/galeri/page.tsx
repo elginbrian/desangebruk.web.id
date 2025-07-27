@@ -29,16 +29,6 @@ const GalleryPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    console.log("Gallery Debug Info:", {
-      images,
-      loading,
-      error,
-      imagesLength: images?.length,
-      firstImage: images?.[0],
-    });
-  }, [images, loading, error]);
-
   const categories = [
     { value: "all", label: "Semua" },
     { value: "umum", label: "Umum" },
@@ -331,4 +321,3 @@ const GalleryPage = () => {
 };
 
 export default GalleryPage;
-
