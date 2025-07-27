@@ -18,9 +18,9 @@ const PetaLokasiSection = () => {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Informasi Ringkas */}
+
           <div className="lg:col-span-1 space-y-4">
-            {/* Stats Cards */}
+
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-white rounded-lg shadow-sm p-4 text-center border-l-4 border-[#1B3A6D]">
                 <div className="text-lg font-bold text-[#1B3A6D]">505,275</div>
@@ -32,7 +32,7 @@ const PetaLokasiSection = () => {
               </div>
             </div>
 
-            {/* Batas Desa */}
+
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">Batas Wilayah Desa</h3>
               <div className="space-y-2">
@@ -45,7 +45,7 @@ const PetaLokasiSection = () => {
               </div>
             </div>
 
-            {/* Info Tambahan */}
+
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h3 className="text-sm font-semibold text-gray-900 mb-3 border-b border-gray-200 pb-2">Informasi Lokasi</h3>
               <div className="space-y-2 text-xs">
@@ -61,7 +61,7 @@ const PetaLokasiSection = () => {
             </div>
           </div>
 
-          {/* Peta */}
+
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-4">
               <iframe
@@ -84,3 +84,4 @@ const PetaLokasiSection = () => {
 };
 
 export default PetaLokasiSection;
+

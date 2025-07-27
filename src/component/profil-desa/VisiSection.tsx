@@ -10,7 +10,7 @@ const VisiSection = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Visi</h2>
           <div className="bg-white rounded-lg shadow-sm p-6 mx-auto max-w-4xl ">
             <blockquote className="text-sm md:text-medium text-gray-700 leading-relaxed italic">
-              "Desa Ngebruk sebagai Desa Wisata yang mampu mengelola potensi Desa dan pembangunan berkelanjutan untuk mewujudkan masyarakat yang sejahtera"
+              "Terwujudnya masyarakat adil, makmur, dan sejahtera melalui peningkatan kualitas sumber daya manusia yang terdidik, maju, aman dengan didukung pengembangan ekonomi berbasis sumber daya alam."
             </blockquote>
           </div>
         </div>

@@ -22,7 +22,7 @@ const ProfilDesaPage = () => {
     <div className={`min-h-screen flex flex-col smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <Header />
 
-      {/* Hero Section */}
+
       <section className="bg-[#1B3A6D] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -33,16 +33,16 @@ const ProfilDesaPage = () => {
       </section>
 
       <div className="flex-grow">
-        {/* Visi Section */}
+
         <VisiSection />
 
-        {/* Misi Section */}
+
         <MisiSection />
 
-        {/* Peta Lokasi Section */}
+
         <PetaLokasiSection />
 
-        {/* Informasi Umum Section */}
+
         <InformasiUmumSection />
       </div>
 
@@ -52,3 +52,4 @@ const ProfilDesaPage = () => {
 };
 
 export default ProfilDesaPage;
+

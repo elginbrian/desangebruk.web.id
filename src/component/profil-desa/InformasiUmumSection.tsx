@@ -47,7 +47,7 @@ const InformasiUmumSection = () => {
     { jenis: "Buruh Tani", jumlah: 1298, icon: "🌾" },
     { jenis: "Petani", jumlah: 817, icon: "👨‍🌾" },
     { jenis: "Swasta", jumlah: 614, icon: "💼" },
-    { jenis: "Wiraswasta/Dagang", jumlah: 489, icon: "🏪" },
+    { jenis: "Wiraswasta", jumlah: 489, icon: "🏪" },
     { jenis: "Tukang Bangunan", jumlah: 192, icon: "🔨" },
     { jenis: "Lainnya", jumlah: 175, icon: "👥" },
   ];
@@ -61,7 +61,7 @@ const InformasiUmumSection = () => {
         </div>
 
         <div className="space-y-8">
-          {/* Penggunaan Lahan */}
+
           <div className="bg-gray-50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Penggunaan Lahan</h3>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -75,7 +75,7 @@ const InformasiUmumSection = () => {
             </div>
           </div>
 
-          {/* Data Penduduk per Dusun dan Agama */}
+
           <div className="grid lg:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-lg p-5">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Data Penduduk per Dusun</h3>
@@ -96,7 +96,7 @@ const InformasiUmumSection = () => {
               </div>
             </div>
 
-            {/* Data Agama */}
+
             <div className="bg-gray-50 rounded-lg p-5">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Komposisi Agama</h3>
               <div className="space-y-2">
@@ -115,7 +115,7 @@ const InformasiUmumSection = () => {
             </div>
           </div>
 
-          {/* Mata Pencaharian */}
+
           <div className="bg-gray-50 rounded-lg p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">Mata Pencaharian Utama</h3>
             <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
@@ -136,3 +136,4 @@ const InformasiUmumSection = () => {
 };
 
 export default InformasiUmumSection;
+
