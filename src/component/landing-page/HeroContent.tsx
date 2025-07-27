@@ -10,7 +10,7 @@ const HeroContent = ({ mounted }: HeroContentProps) => {
       description: "Dapatkan berita terkini, agenda kegiatan, dan pengumuman lengkap dari Desa Ngebruk.",
     },
     {
-      number: "02", 
+      number: "02",
       title: "Nikmati pelayanan lebih mudah",
       description: "Unduh formulir administrasi, cek persyaratan, dan datang dengan lebih siap.",
     },
@@ -19,12 +19,8 @@ const HeroContent = ({ mounted }: HeroContentProps) => {
   return (
     <div className={`relative z-10 w-full px-4 sm:px-6 lg:px-8 text-left text-white smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <div className="max-w-7xl mx-auto">
-        <h1 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
-          Selamat Datang di Desa Ngebruk
-        </h1>
-        <p className={`text-sm sm:text-base md:text-lg mb-8 text-gray-200 max-w-2xl smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>
-          Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal
-        </p>
+        <h1 className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>Selamat Datang di Desa Ngebruk</h1>
+        <p className={`text-sm sm:text-base md:text-lg mb-8 text-gray-200 max-w-2xl smooth-transition ${mounted ? "smooth-reveal stagger-2" : "animate-on-load"}`}>Kampung Damai & Budaya Luhur, Harmoni Alam dan Kearifan Lokal</p>
 
         <div className={`w-full h-px bg-white mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-3" : "animate-on-load"}`}></div>
 

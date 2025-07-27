@@ -5,6 +5,7 @@ import { useActiveGalleryImages } from "@/hooks/useGallery";
 import { usePageVisitor } from "@/hooks/usePageVisitor";
 import Header from "@/component/landing-page/Header";
 import Footer from "@/component/landing-page/Footer";
+import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner } from "@/component/common/LoadingStates";
 
 const GalleryPage = () => {
@@ -12,6 +13,8 @@ const GalleryPage = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   const [selectedImageData, setSelectedImageData] = useState<any>(null);
 
@@ -51,6 +54,25 @@ const GalleryPage = () => {
     return matchesCategory && matchesSearch;
   });
 
+  const totalPages = Math.ceil(filteredImages.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentImages = filteredImages.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, searchTerm]);
+
   useEffect(() => {
     console.log("Filtered images:", {
       selectedCategory,
@@ -87,7 +109,7 @@ const GalleryPage = () => {
 
   return (
     <>
-      <div className={`min-h-screen bg-gray-50 ${selectedImage ? "blur-sm" : ""}`}>
+      <div className={`min-h-screen bg-white ${selectedImage ? "blur-sm" : ""}`}>
         <Header />
 
         <main>
@@ -130,7 +152,7 @@ const GalleryPage = () => {
                         key={category.value}
                         onClick={() => setSelectedCategory(category.value)}
                         className={`px-4 py-2 md:px-6 md:py-3 rounded-lg font-medium text-sm md:text-base transition-colors flex items-center gap-2 ${
-                          selectedCategory === category.value ? "bg-[#1B3A6D] text-white" : "bg-white text-gray-700 hover:bg-gray-100"
+                          selectedCategory === category.value ? "bg-[#1B3A6D] text-white" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
                         }`}
                       >
                         {category.label}
@@ -213,27 +235,40 @@ const GalleryPage = () => {
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                  {filteredImages.map((image, index) => (
-                    <div
-                      key={image.id}
-                      className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                      onClick={() => openImageModal(image)}
-                    >
-                      <div className="aspect-square overflow-hidden">
-                        <img src={image.imageUrl} alt={image.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                      <div className="p-4">
-                        <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{image.title}</h3>
-                        {image.description && <p className="text-sm text-gray-600 line-clamp-2">{image.description}</p>}
-                        <div className="mt-2">
-                          <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded capitalize">{categories.find((c) => c.value === image.category)?.label || image.category}</span>
+                <>
+                  <div className="grid mb-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                    {currentImages.map((image, index) => (
+                      <div
+                        key={image.id}
+                        className={`bg-white border-1 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                        onClick={() => openImageModal(image)}
+                      >
+                        <div className="aspect-square overflow-hidden">
+                          <img src={image.imageUrl} alt={image.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-semibold text-gray-900 mb-2 line-clamp-1">{image.title}</h3>
+                          {image.description && <p className="text-sm text-gray-600 line-clamp-2">{image.description}</p>}
+                          <div className="mt-2">
+                            <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded capitalize">{categories.find((c) => c.value === image.category)?.label || image.category}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={filteredImages.length}
+                    loading={loading}
+                    onItemsPerPageChange={handleItemsPerPageChange}
+                    itemsPerPageOptions={[8, 12, 16]}
+                  />
+                </>
               )}
             </div>
           </section>
@@ -296,3 +331,4 @@ const GalleryPage = () => {
 };
 
 export default GalleryPage;
+

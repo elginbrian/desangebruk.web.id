@@ -5,6 +5,7 @@ import { FiSearch } from "react-icons/fi";
 import Header from "@/component/landing-page/Header";
 import Footer from "@/component/landing-page/Footer";
 import NewsCard from "@/component/common/NewsCard";
+import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, NewsCardSkeleton } from "@/component/common/LoadingStates";
 import { usePublishedArticles } from "@/hooks/useArticles";
 import usePageVisitor from "@/hooks/usePageVisitor";
@@ -14,7 +15,7 @@ const BeritaPage = () => {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const articlesPerPage = 9;
+  const [articlesPerPage, setArticlesPerPage] = useState(12);
 
   const { articles, loading, error, refetch } = usePublishedArticles();
 
@@ -41,6 +42,11 @@ const BeritaPage = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setArticlesPerPage(newItemsPerPage);
+    setCurrentPage(1);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -70,7 +76,6 @@ const BeritaPage = () => {
     <div className={`min-h-screen flex flex-col smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
       <Header />
 
-
       <section className="bg-[#1B3A6D] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -79,7 +84,6 @@ const BeritaPage = () => {
           </div>
         </div>
       </section>
-
 
       <section className="py-8 bg-white">
         <div className={`mb-8 smooth-transition ${mounted ? "smooth-reveal stagger-1" : "animate-on-load"}`}>
@@ -109,7 +113,6 @@ const BeritaPage = () => {
         </div>
       </section>
 
-
       <main className="flex-grow bg-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
@@ -128,40 +131,16 @@ const BeritaPage = () => {
                 ))}
               </div>
 
-
-
-              <div className="flex justify-center items-center space-x-2">
-                <button 
-                  onClick={() => handlePageChange(currentPage - 1)} 
-                  disabled={currentPage === 1} 
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Sebelumnya
-                </button>
-
-                {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((page) => (
-                  <button 
-                    key={page} 
-                    onClick={() => handlePageChange(page)} 
-                    disabled={totalPages <= 1}
-                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      currentPage === page 
-                        ? "bg-[#1B3A6D] text-white" 
-                        : "text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 border border-gray-300"
-                    } ${totalPages <= 1 ? "cursor-default" : ""}`}
-                  >
-                    {page}
-                  </button>
-                ))}
-
-                <button 
-                  onClick={() => handlePageChange(currentPage + 1)} 
-                  disabled={currentPage === totalPages || totalPages <= 1} 
-                  className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Selanjutnya
-                </button>
-              </div>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={articlesPerPage}
+                totalItems={filteredArticles.length}
+                loading={loading}
+                onItemsPerPageChange={handleItemsPerPageChange}
+                itemsPerPageOptions={[6, 12, 18, 24]}
+              />
             </>
           ) : (
             <EmptyState title={searchTerm ? "Tidak ada berita yang ditemukan" : "Belum ada berita"} description={searchTerm ? "Coba gunakan kata kunci yang berbeda" : "Berita akan muncul di sini setelah dipublikasikan"} className="py-12" />
@@ -175,5 +154,4 @@ const BeritaPage = () => {
 };
 
 export default BeritaPage;
-
 

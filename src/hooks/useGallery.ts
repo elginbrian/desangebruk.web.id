@@ -337,11 +337,6 @@ export const useGalleryImagesPagination = () => {
     }
   };
 
-  const changeItemsPerPage = async (newItemsPerPage: number, currentStatusFilter: "all" | "active" | "inactive" = "all") => {
-    setItemsPerPage(newItemsPerPage);
-    await fetchImagesPaginated(1, newItemsPerPage, currentStatusFilter);
-  };
-
   return {
     images,
     loading,
@@ -353,8 +348,6 @@ export const useGalleryImagesPagination = () => {
     fetchImagesPaginated,
     searchImagesPaginated,
     goToPage,
-    changeItemsPerPage,
     setError,
   };
 };
-

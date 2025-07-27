@@ -5,12 +5,12 @@ import Footer from "@/component/landing-page/Footer";
 import TabSelector from "@/component/pengumuman/TabSelector";
 import SearchBar from "@/component/pengumuman/SearchBar";
 import AnnouncementList from "@/component/pengumuman/AnnouncementList";
-import Pagination from "@/component/pengumuman/Pagination";
+import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, CardSkeleton } from "@/component/common/LoadingStates";
 import { usePengumuman } from "@/hooks/usePengumuman";
 
 const PengumumanPage = () => {
-  const { mounted, searchTerm, currentPage, totalPages, currentAnnouncements, loading, error, refetch, handlePageChange, handleSearchChange } = usePengumuman();
+  const { mounted, searchTerm, currentPage, totalPages, currentAnnouncements, itemsPerPage, filteredAnnouncements, loading, error, refetch, handlePageChange, handleItemsPerPageChange, handleSearchChange } = usePengumuman();
 
   return (
     <div className={`min-h-screen bg-gray-50 smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
@@ -41,7 +41,16 @@ const PengumumanPage = () => {
         ) : currentAnnouncements.length > 0 ? (
           <>
             <AnnouncementList mounted={mounted} announcements={currentAnnouncements} />
-            <Pagination mounted={mounted} currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={filteredAnnouncements.length}
+              loading={loading}
+              onItemsPerPageChange={handleItemsPerPageChange}
+              itemsPerPageOptions={[5, 10, 15, 20]}
+            />
           </>
         ) : (
           <EmptyState

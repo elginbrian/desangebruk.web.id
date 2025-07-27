@@ -18,7 +18,7 @@ const GalleryPage = () => {
   const [mounted, setMounted] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const { images, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchImagesPaginated, searchImagesPaginated, goToPage, changeItemsPerPage } = useGalleryImagesPagination();
+  const { images, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchImagesPaginated, searchImagesPaginated, goToPage } = useGalleryImagesPagination();
 
   const { remove, loading: deleteLoading } = useGalleryImageActions();
   const { user } = useAuth();
@@ -37,7 +37,7 @@ const GalleryPage = () => {
         if (statusFilter === "Inactive") return "inactive";
         return "all";
       };
-      fetchImagesPaginated(1, itemsPerPage, getStatusFilter());
+      fetchImagesPaginated(1, 10, getStatusFilter());
     }
   }, [statusFilter, mounted, user]);
 
@@ -54,7 +54,7 @@ const GalleryPage = () => {
             if (statusFilter === "Inactive") return "inactive";
             return "all";
           };
-          fetchImagesPaginated(1, itemsPerPage, getStatusFilter());
+          fetchImagesPaginated(1, 10, getStatusFilter());
         }
       }
     }, 300);
@@ -77,7 +77,7 @@ const GalleryPage = () => {
           if (statusFilter === "Inactive") return "inactive";
           return "all";
         };
-        fetchImagesPaginated(currentPage, itemsPerPage, getStatusFilter());
+        fetchImagesPaginated(currentPage, 10, getStatusFilter());
       }
     }
   };
@@ -93,18 +93,9 @@ const GalleryPage = () => {
         if (statusFilter === "Inactive") return "inactive";
         return "all";
       };
-      fetchImagesPaginated(page, itemsPerPage, getStatusFilter());
+      fetchImagesPaginated(page, 10, getStatusFilter());
     }
     goToPage(page);
-  };
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    const getStatusFilter = () => {
-      if (statusFilter === "Active") return "active";
-      if (statusFilter === "Inactive") return "inactive";
-      return "all";
-    };
-    changeItemsPerPage(newItemsPerPage, getStatusFilter());
   };
 
   const formatDate = (timestamp: any) => {
@@ -248,16 +239,13 @@ const GalleryPage = () => {
                   if (statusFilter === "Inactive") return "inactive";
                   return "all";
                 };
-                fetchImagesPaginated(currentPage, itemsPerPage, getStatusFilter());
+                fetchImagesPaginated(currentPage, 10, getStatusFilter());
               }
             }}
             emptyMessage={searchTerm ? "Tidak ditemukan gambar yang sesuai dengan pencarian" : "Belum ada gambar yang diunggah"}
           />
 
-
-          {!isSearching && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} onItemsPerPageChange={handleItemsPerPageChange} />
-          )}
+          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
         </div>
       </div>
 
@@ -314,4 +302,3 @@ const GalleryPage = () => {
 };
 
 export default GalleryPage;
-
