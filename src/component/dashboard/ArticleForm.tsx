@@ -104,9 +104,7 @@ const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = fals
 
   return (
     <div className="space-y-6">
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-
         <div className="space-y-4">
           <label className="block text-sm font-medium text-gray-700">Gambar Berita {!isEditing && <span className="text-red-500">*</span>}</label>
 
@@ -120,12 +118,10 @@ const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = fals
             </div>
           )}
 
-
           <div>
             <p className="text-xs text-gray-600 mb-2">
               {isEditing && formData.imageUrl && !previewUrl ? "Gambar saat ini:" : previewUrl ? (isEditing ? "Gambar baru:" : "Preview:") : isEditing && formData.imageUrl ? "Upload gambar baru:" : ""}
             </p>
-
 
             {(isEditing && formData.imageUrl && !previewUrl) || previewUrl ? (
               <div>
@@ -154,10 +150,8 @@ const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = fals
                     }}
                   />
 
-
                   <div className="absolute bottom-2 left-2 bg-black bg-opacity-70 text-white px-2 py-1 rounded text-xs">{previewUrl ? (isEditing ? "Gambar baru" : "Preview") : "Gambar sebelumnya"}</div>
                 </div>
-
 
                 <div className="flex gap-2 mt-3">
                   <button
@@ -224,13 +218,11 @@ const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = fals
               </div>
             )}
 
-
             {((isEditing && formData.imageUrl && !previewUrl) || previewUrl) && <p className="text-xs text-gray-500 mt-2">Klik "Preview" untuk melihat gambar ukuran penuh di tab baru, atau "Ganti Gambar" untuk memilih gambar lain</p>}
           </div>
 
           <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" disabled={loading} />
         </div>
-
 
         <div className="space-y-6">
           <FormInput label="Judul Berita" name="title" value={formData.title || ""} placeholder="Masukkan judul berita..." onChange={(e) => handleChange("title", e.target.value)} disabled={loading} required />
@@ -245,4 +237,3 @@ const ArticleForm = ({ formData = {}, onChange, onStorageError, isEditing = fals
 };
 
 export default ArticleForm;
-

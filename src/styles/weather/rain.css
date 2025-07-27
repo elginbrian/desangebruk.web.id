@@ -1,75 +1,75 @@
 @keyframes rain {
   0% {
-    transform: translateY(-100vh) translateX(0) scaleY(0.3);
+    transform: translateY(-100vh) translateX(0) scaleY(0.4);
     opacity: 0;
   }
-  3% {
+  5% {
     opacity: 1;
-    transform: translateY(-95vh) translateX(2px) scaleY(1);
+    transform: translateY(-90vh) translateX(1px) scaleY(1);
   }
-  97% {
+  95% {
     opacity: 1;
-    transform: translateY(95vh) translateX(min(35px, 5vw)) scaleY(1);
+    transform: translateY(90vh) translateX(min(25px, 4vw)) scaleY(1);
   }
   100% {
-    transform: translateY(100vh) translateX(min(40px, 6vw)) scaleY(0.8);
+    transform: translateY(100vh) translateX(min(30px, 5vw)) scaleY(0.6);
     opacity: 0;
   }
 }
 
 @keyframes drizzle {
   0% {
-    transform: translateY(-100vh) translateX(0) scaleY(0.2);
+    transform: translateY(-100vh) translateX(0) scaleY(0.3);
     opacity: 0;
   }
-  5% {
-    opacity: 0.8;
-    transform: translateY(-90vh) translateX(1px) scaleY(1);
+  8% {
+    opacity: 0.7;
+    transform: translateY(-85vh) translateX(0.5px) scaleY(1);
   }
-  95% {
-    opacity: 0.8;
-    transform: translateY(90vh) translateX(15px) scaleY(1);
+  92% {
+    opacity: 0.7;
+    transform: translateY(85vh) translateX(10px) scaleY(1);
   }
   100% {
-    transform: translateY(100vh) translateX(20px) scaleY(0.6);
+    transform: translateY(100vh) translateX(15px) scaleY(0.5);
     opacity: 0;
   }
 }
 
 @keyframes heavyRain {
   0% {
-    transform: translateY(-100vh) translateX(0) scaleY(0.4);
+    transform: translateY(-100vh) translateX(0) scaleY(0.5);
     opacity: 0;
   }
-  2% {
+  4% {
     opacity: 1;
-    transform: translateY(-96vh) translateX(3px) scaleY(1);
+    transform: translateY(-92vh) translateX(2px) scaleY(1);
   }
-  98% {
+  96% {
     opacity: 1;
-    transform: translateY(96vh) translateX(min(50px, 8vw)) scaleY(1.2);
+    transform: translateY(92vh) translateX(min(35px, 6vw)) scaleY(1.1);
   }
   100% {
-    transform: translateY(100vh) translateX(min(55px, 9vw)) scaleY(1);
+    transform: translateY(100vh) translateX(min(40px, 7vw)) scaleY(0.8);
     opacity: 0;
   }
 }
 
 @keyframes stormyRain {
   0% {
-    transform: translateY(-100vh) translateX(0) rotate(-12deg) scaleY(0.5);
+    transform: translateY(-100vh) translateX(0) rotate(-8deg) scaleY(0.6);
     opacity: 0;
   }
-  2% {
+  4% {
     opacity: 1;
-    transform: translateY(-96vh) translateX(4px) rotate(-12deg) scaleY(1);
+    transform: translateY(-92vh) translateX(2px) rotate(-8deg) scaleY(1);
   }
-  98% {
+  96% {
     opacity: 1;
-    transform: translateY(96vh) translateX(var(--wind-offset, 60px)) rotate(-12deg) scaleY(1.1);
+    transform: translateY(92vh) translateX(var(--wind-offset, 35px)) rotate(-8deg) scaleY(1);
   }
   100% {
-    transform: translateY(100vh) translateX(var(--wind-offset, 65px)) rotate(-12deg) scaleY(0.9);
+    transform: translateY(100vh) translateX(var(--wind-offset, 40px)) rotate(-8deg) scaleY(0.7);
     opacity: 0;
   }
 }
@@ -97,27 +97,26 @@
 
 .rain-drop {
   position: absolute;
-  width: 1.5px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 20%, rgba(173, 216, 230, 0.6) 60%, rgba(255, 255, 255, 0.3) 100%);
+  width: 1.2px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(173, 216, 230, 0.5) 70%, rgba(255, 255, 255, 0.3) 100%);
   animation: rain ease-in-out infinite;
   border-radius: 0 0 50% 50%;
-  filter: blur(0.3px);
+  filter: blur(0.2px);
   transform-origin: center;
-  box-shadow: 0 0 1px rgba(255, 255, 255, 0.2);
 }
 
 .rain-drop.stormy {
-  width: 2px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.9) 15%, rgba(173, 216, 230, 0.8) 40%, rgba(135, 206, 235, 0.6) 70%, rgba(255, 255, 255, 0.4) 100%);
+  width: 1.6px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 20%, rgba(173, 216, 230, 0.6) 50%, rgba(135, 206, 235, 0.4) 80%, rgba(255, 255, 255, 0.3) 100%);
   animation: stormyRain ease-in-out infinite;
-  filter: blur(0.25px) brightness(1.1);
+  filter: blur(0.15px);
 }
 
 .rain-drop.heavy {
-  width: 2.5px;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.95) 10%, rgba(173, 216, 230, 0.9) 30%, rgba(135, 206, 235, 0.7) 60%, rgba(255, 255, 255, 0.5) 100%);
+  width: 2px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 15%, rgba(173, 216, 230, 0.7) 40%, rgba(135, 206, 235, 0.5) 70%, rgba(255, 255, 255, 0.4) 100%);
   animation: heavyRain ease-in-out infinite;
-  filter: blur(0.2px) brightness(1.15);
+  filter: blur(0.1px);
 }
 
 .rain-container.drizzle .rain-drop {
@@ -129,49 +128,21 @@
 }
 
 .rain-container.storm-rain {
-  filter: brightness(0.9) contrast(1.2) saturate(1.1);
-  animation: stormSway 3s ease-in-out infinite;
+  filter: brightness(0.92) contrast(1.1) saturate(1.05);
 }
 
-@keyframes stormSway {
+@keyframes gentleStormSway {
   0%,
   100% {
     transform: translateX(0);
   }
-  25% {
-    transform: translateX(-8px);
-  }
-  75% {
-    transform: translateX(5px);
-  }
-}
-
-@keyframes windSway {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-10px);
-  }
-  75% {
-    transform: translateX(5px);
+  50% {
+    transform: translateX(-3px);
   }
 }
 
 .rain-container.storm-rain {
-  animation: windSway 4s ease-in-out infinite;
-}
-
-@keyframes rainRipple {
-  0% {
-    transform: scale(0);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0;
-  }
+  animation: gentleStormSway 6s ease-in-out infinite;
 }
 
 .rain-container::after {
@@ -180,90 +151,25 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: repeating-linear-gradient(90deg, transparent 0px, rgba(255, 255, 255, 0.3) 2px, transparent 4px);
-  animation: rainSplash 0.5s ease-out infinite;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, transparent 0px, rgba(255, 255, 255, 0.2) 1px, transparent 3px);
+  opacity: 0.3;
   pointer-events: none;
 }
 
-@keyframes windLeaf {
-  0% {
-    transform: translateX(-50px) translateY(-20px) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.7;
-  }
-  90% {
-    opacity: 0.3;
-  }
-  100% {
-    transform: translateX(calc(100vw + 50px)) translateY(100px) rotate(720deg);
-    opacity: 0;
-  }
-}
 
-.storm-rain::before {
-  content: "🍃";
-  position: absolute;
-  top: 20%;
-  left: -50px;
-  font-size: 16px;
-  animation: windLeaf 8s ease-in-out infinite;
-  animation-delay: 2s;
-  z-index: 3;
-}
 
-.storm-rain::after {
-  content: "🍃";
-  position: absolute;
-  top: 40%;
-  left: -50px;
-  font-size: 12px;
-  animation: windLeaf 12s ease-in-out infinite;
-  animation-delay: 5s;
-  z-index: 3;
-  filter: opacity(0.7);
-}
-
-.rain-drop::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  width: 1px;
-  height: 8px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.4));
-  transform: translateX(-50%);
-}
-
-.rain-drop.stormy::before {
-  height: 12px;
-  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.6));
-}
-
-.rain-container.storm-rain .rain-drop:nth-child(odd) {
-  animation-duration: 0.3s;
-  width: 2.5px;
-}
-
-.rain-container.storm-rain .rain-drop:nth-child(even) {
-  animation-duration: 0.4s;
-  width: 2px;
-}
-
-.rain-container.storm-rain .rain-drop:nth-child(3n) {
-  animation-duration: 0.25s;
-  width: 3px;
-  filter: blur(0.1px) brightness(1.2);
+.rain-container.storm-rain .rain-drop {
+  animation-duration: 1.2s; /* Konsisten untuk semua */
+  width: 1.6px; /* Ukuran konsisten */
 }
 
 .storm-rain {
-  filter: brightness(0.9) contrast(1.2) saturate(1.1);
+  filter: brightness(0.94) contrast(1.05);
 }
 
 .lightning-container:has(.lightning-flash[style*="opacity: 1"]) ~ .rain-container .rain-drop {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(173, 216, 230, 0.8), rgba(255, 255, 255, 0.4));
-  filter: brightness(1.4);
-  transition: all 0.1s ease-out;
+  filter: brightness(1.2);
+  transition: filter 0.2s ease-out;
 }
+

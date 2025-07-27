@@ -14,6 +14,12 @@ const WeatherOverlay = ({ weather, weatherVisible, onWeatherOverlayClass }: Weat
 
   const weatherOverlayClass = onWeatherOverlayClass(weather.icon, weather.description);
 
+  console.log("Weather overlay mapping:", {
+    icon: weather.icon,
+    description: weather.description,
+    overlayClass: weatherOverlayClass,
+  });
+
   return (
     <>
       <div className={`absolute inset-0 transition-all duration-1000 ease-in-out ${weatherOverlayClass} ${weatherVisible ? "opacity-100" : "opacity-0"}`}></div>
@@ -27,3 +33,4 @@ const WeatherOverlay = ({ weather, weatherVisible, onWeatherOverlayClass }: Weat
 };
 
 export default WeatherOverlay;
+

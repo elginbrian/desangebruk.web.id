@@ -27,20 +27,25 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
     const descLower = desc.toLowerCase();
 
     if (codeNum >= 200 && codeNum <= 299) return "stormy";
-    if (codeNum >= 300 && codeNum <= 399) return "drizzle";
-    if (codeNum >= 500 && codeNum <= 531) return "rainy";
-    if (codeNum === 502 || codeNum === 503 || codeNum === 504) return "heavy-rain";
+    if (descLower.includes("thunderstorm") || descLower.includes("lightning") || descLower.includes("storm")) return "stormy";
 
-    if (descLower.includes("heavy rain") || descLower.includes("torrential")) return "heavy-rain";
-    if (descLower.includes("light rain") || descLower.includes("drizzle")) return "drizzle";
+    if (codeNum >= 300 && codeNum <= 399) return "drizzle";
+    if (descLower.includes("drizzle") || descLower.includes("light rain")) return "drizzle";
+
+    if (codeNum >= 500 && codeNum <= 599) {
+      if (codeNum === 500 || codeNum === 501) return "rainy";
+      if (codeNum >= 502 && codeNum <= 504) return "heavy-rain";
+      if (codeNum >= 520 && codeNum <= 531) return "rainy";
+      return "rainy";
+    }
+    if (descLower.includes("heavy rain") || descLower.includes("torrential") || descLower.includes("extreme rain")) return "heavy-rain";
     if (descLower.includes("moderate rain") || descLower.includes("rain")) return "rainy";
-    if (descLower.includes("thunderstorm") || descLower.includes("lightning")) return "stormy";
 
     if (codeNum >= 600 && codeNum <= 699) return "snowy";
-    if (descLower.includes("snow") || descLower.includes("blizzard")) return "snowy";
+    if (descLower.includes("snow") || descLower.includes("blizzard") || descLower.includes("sleet")) return "snowy";
 
     if (codeNum >= 700 && codeNum <= 799) return "foggy";
-    if (descLower.includes("fog") || descLower.includes("mist") || descLower.includes("haze")) return "foggy";
+    if (descLower.includes("fog") || descLower.includes("mist") || descLower.includes("haze") || descLower.includes("dust") || descLower.includes("sand")) return "foggy";
 
     if (codeNum === 800) return "sunny";
     if (descLower.includes("clear") || descLower.includes("sunny")) return "sunny";
@@ -49,40 +54,47 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
     if (codeNum === 802) return "scattered-clouds";
     if (codeNum === 803) return "broken-clouds";
     if (codeNum === 804) return "overcast";
-    if (descLower.includes("cloud") || descLower.includes("overcast")) return "overcast";
+    if (descLower.includes("overcast")) return "overcast";
+    if (descLower.includes("broken cloud")) return "broken-clouds";
+    if (descLower.includes("scattered cloud")) return "scattered-clouds";
+    if (descLower.includes("few cloud")) return "few-clouds";
+    if (descLower.includes("cloud")) return "scattered-clouds";
 
     return "few-clouds";
   };
 
   const weatherType = getWeatherType(weatherCode, description);
 
+  console.log("Weather mapping debug:", {
+    weatherCode,
+    description,
+    mappedType: weatherType,
+  });
+
   const generateRainDrops = (isStormy = false, isHeavy = false) => {
     const drops = [];
-    let baseDropCount = intensity === "light" ? 25 : intensity === "medium" ? 50 : 80;
+    let baseDropCount = intensity === "light" ? 15 : intensity === "medium" ? 25 : 35;
 
-    if (isHeavy) baseDropCount = baseDropCount * 2.5;
-    else if (isStormy) baseDropCount = baseDropCount * 1.8;
+    if (isHeavy) baseDropCount = Math.min(baseDropCount * 1.5, 50);
+    else if (isStormy) baseDropCount = Math.min(baseDropCount * 1.3, 45);
 
     const dropCount = baseDropCount;
 
     for (let i = 0; i < dropCount; i++) {
-      const delay = Math.random() * (isStormy ? 1.5 : isHeavy ? 1 : 3);
-      const baseDuration = isHeavy ? 0.3 : isStormy ? 0.4 : 0.8;
-      const duration = baseDuration + Math.random() * (isHeavy ? 0.2 : isStormy ? 0.3 : 0.6);
-      const left = Math.random() * 110;
+      const delay = Math.random() * (isStormy ? 2 : isHeavy ? 1.5 : 4);
+      const baseDuration = isHeavy ? 0.8 : isStormy ? 1 : 1.5;
+      const duration = baseDuration + Math.random() * (isHeavy ? 0.4 : isStormy ? 0.5 : 0.8);
+      const left = Math.random() * 105;
 
-      const minHeight = isHeavy ? 20 : isStormy ? 15 : 8;
-      const maxHeight = isHeavy ? 40 : isStormy ? 25 : 15;
-      const height = minHeight + Math.random() * (maxHeight - minHeight);
+      const height = isHeavy ? 12 + Math.random() * 8 : isStormy ? 10 + Math.random() * 6 : 8 + Math.random() * 4;
 
-      const baseOpacity = isHeavy ? 0.6 : isStormy ? 0.4 : 0.3;
-      const opacity = baseOpacity + Math.random() * (isHeavy ? 0.4 : isStormy ? 0.6 : 0.5);
+      const baseOpacity = isHeavy ? 0.4 : isStormy ? 0.35 : 0.25;
+      const opacity = baseOpacity + Math.random() * 0.2;
 
-      const windIntensity = isHeavy ? 100 : isStormy ? 80 : 40;
+      const windIntensity = isHeavy ? 40 : isStormy ? 35 : 20;
       const windOffset = Math.random() * windIntensity;
 
-      const isThickDrop = Math.random() < (isHeavy ? 0.3 : isStormy ? 0.2 : 0.1);
-      const dropWidth = isThickDrop ? (isHeavy ? 3 : 2.5) : isHeavy ? 2 : isStormy ? 2 : 1.5;
+      const dropWidth = isHeavy ? 1.8 + Math.random() * 0.4 : isStormy ? 1.6 + Math.random() * 0.3 : 1.2 + Math.random() * 0.2;
 
       drops.push(
         <div
@@ -96,7 +108,7 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
               animationDelay: `${delay}s`,
               animationDuration: `${duration}s`,
               opacity: effectsVisible ? opacity : 0,
-              transition: "opacity 0.5s ease-in-out",
+              transition: "opacity 0.8s ease-in-out",
               "--wind-offset": `${windOffset}px`,
             } as React.CSSProperties
           }
@@ -108,15 +120,17 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
 
   const generateSnowFlakes = () => {
     const flakes = [];
-    const flakeCount = intensity === "light" ? 20 : intensity === "medium" ? 40 : 70;
+    const flakeCount = intensity === "light" ? 12 : intensity === "medium" ? 20 : 30;
 
     for (let i = 0; i < flakeCount; i++) {
-      const delay = Math.random() * 4;
-      const duration = 4 + Math.random() * 3;
+      const delay = Math.random() * 6;
+      const duration = 6 + Math.random() * 4;
       const left = Math.random() * 100;
       const symbols = ["❄", "❅", "❆"];
       const symbol = symbols[Math.floor(Math.random() * symbols.length)];
-      const opacity = 0.4 + Math.random() * 0.4;
+      const opacity = 0.5 + Math.random() * 0.3;
+
+      const size = 8 + Math.random() * 4;
 
       flakes.push(
         <div
@@ -126,9 +140,9 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
             left: `${left}%`,
             animationDelay: `${delay}s`,
             animationDuration: `${duration}s`,
-            fontSize: `${6 + Math.random() * 6}px`,
+            fontSize: `${size}px`,
             opacity: effectsVisible ? opacity : 0,
-            transition: "opacity 0.8s ease-in-out",
+            transition: "opacity 1s ease-in-out",
           }}
         >
           {symbol}
@@ -140,24 +154,24 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
 
   const generateClouds = (cloudType = "normal") => {
     const clouds = [];
-    let cloudCount = intensity === "light" ? 2 : intensity === "medium" ? 3 : 4;
+    let cloudCount = intensity === "light" ? 1 : intensity === "medium" ? 2 : 3;
 
-    if (cloudType === "few") cloudCount = Math.max(1, Math.floor(cloudCount * 0.5));
-    if (cloudType === "scattered") cloudCount = Math.floor(cloudCount * 0.8);
+    if (cloudType === "few") cloudCount = 1;
+    if (cloudType === "scattered") cloudCount = Math.max(1, Math.floor(cloudCount * 0.8));
     if (cloudType === "broken") cloudCount = Math.floor(cloudCount * 1.2);
-    if (cloudType === "overcast") cloudCount = Math.floor(cloudCount * 1.5);
+    if (cloudType === "overcast") cloudCount = Math.floor(cloudCount * 1.4);
 
     for (let i = 0; i < cloudCount; i++) {
-      const delay = Math.random() * 20;
-      const baseDuration = cloudType === "overcast" ? 40 : 30;
-      const duration = baseDuration + Math.random() * 20;
-      const top = cloudType === "overcast" ? Math.random() * 60 : 5 + Math.random() * 30;
-      const width = 60 + Math.random() * 40;
-      const height = 20 + Math.random() * 20;
+      const delay = Math.random() * 30;
+      const baseDuration = cloudType === "overcast" ? 60 : 45;
+      const duration = baseDuration + Math.random() * 30;
+      const top = cloudType === "overcast" ? Math.random() * 50 : 8 + Math.random() * 25;
+      const width = 80 + Math.random() * 60;
+      const height = 25 + Math.random() * 25;
 
-      let opacity = 0.15 + Math.random() * 0.15;
-      if (cloudType === "few") opacity *= 0.6;
-      if (cloudType === "overcast") opacity *= 1.8;
+      let opacity = 0.1 + Math.random() * 0.1;
+      if (cloudType === "few") opacity *= 0.7;
+      if (cloudType === "overcast") opacity *= 1.5;
 
       clouds.push(
         <div
@@ -170,7 +184,7 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
             animationDelay: `${delay}s`,
             animationDuration: `${duration}s`,
             opacity: effectsVisible ? opacity : 0,
-            transition: "opacity 1s ease-in-out",
+            transition: "opacity 1.5s ease-in-out",
           }}
         />
       );
@@ -179,31 +193,23 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
   };
 
   const generateFogLayers = () => {
+    const layerCount = intensity === "light" ? 2 : intensity === "medium" ? 3 : 4;
+    
     return (
       <>
-        <div
-          className="fog-layer"
-          style={{
-            opacity: effectsVisible ? 0.6 : 0,
-            transition: "opacity 1.2s ease-in-out",
-          }}
-        />
-        <div
-          className="fog-layer"
-          style={{
-            opacity: effectsVisible ? 0.4 : 0,
-            transition: "opacity 1.5s ease-in-out",
-            transitionDelay: "0.3s",
-          }}
-        />
-        <div
-          className="fog-layer"
-          style={{
-            opacity: effectsVisible ? 0.5 : 0,
-            transition: "opacity 1.8s ease-in-out",
-            transitionDelay: "0.6s",
-          }}
-        />
+        {[...Array(layerCount)].map((_, i) => (
+          <div
+            key={i}
+            className="fog-layer"
+            style={{
+              opacity: effectsVisible ? (0.3 - i * 0.05) : 0,
+              transition: `opacity ${1.5 + i * 0.3}s ease-in-out`,
+              transitionDelay: `${i * 0.4}s`,
+              top: `${15 + i * 20}%`,
+              height: `${100 - i * 10}px`,
+            }}
+          />
+        ))}
       </>
     );
   };
@@ -212,27 +218,34 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
     return (
       <>
 
-        <div className="lightning-flash" />
+        <div 
+          className="lightning-flash" 
+          style={{
+            opacity: effectsVisible ? 0.6 : 0,
+            transition: "opacity 1s ease-in-out",
+          }}
+        />
 
 
         <div
           className="lightning-bolt"
           style={{
-            opacity: effectsVisible ? 1 : 0,
-            transition: "opacity 0.8s ease-in-out",
+            opacity: effectsVisible ? 0.8 : 0,
+            transition: "opacity 1s ease-in-out",
+            transform: "scale(0.7)",
           }}
         />
 
 
         <div className="lightning-streaks">
-          {[...Array(3)].map((_, i) => (
+          {[...Array(2)].map((_, i) => (
             <div
               key={i}
               className={`lightning-streak lightning-streak-${i + 1}`}
               style={{
-                opacity: effectsVisible ? 0.8 : 0,
-                transition: `opacity 0.6s ease-in-out`,
-                transitionDelay: `${i * 0.1}s`,
+                opacity: effectsVisible ? 0.5 : 0,
+                transition: `opacity 0.8s ease-in-out`,
+                transitionDelay: `${i * 0.15}s`,
               }}
             />
           ))}
@@ -277,8 +290,32 @@ const WeatherEffects: React.FC<WeatherEffectsProps> = ({ weatherCode, descriptio
 
       case "sunny":
         return (
-          <div className={`sun-rays-container transition-opacity duration-1500 ${effectsVisible ? "opacity-100" : "opacity-0"}`}>
-            <div className="sun-rays" />
+          <div className={`sun-rays-container transition-opacity duration-2000 ${effectsVisible ? "opacity-100" : "opacity-0"}`}>
+            <div 
+              className="sun-rays"
+              style={{
+                opacity: effectsVisible ? 0.8 : 0,
+                transition: "opacity 2s ease-in-out",
+              }}
+            />
+
+            {intensity !== "light" && (
+              <div className="sun-particles">
+                {[...Array(8)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="sun-particle"
+                    style={{
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 40}%`,
+                      animationDelay: `${Math.random() * 3}s`,
+                      opacity: effectsVisible ? 0.3 : 0,
+                      transition: `opacity ${1.5 + Math.random()}s ease-in-out`,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         );
 
