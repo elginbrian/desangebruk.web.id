@@ -16,7 +16,7 @@ import { useAnnouncementsPagination, useAnnouncementActions } from "@/hooks/useA
 const AnnouncementPage = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [statusFilter, setStatusFilter] = useState("Semua Status");
   const [mounted, setMounted] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -33,8 +33,13 @@ const AnnouncementPage = () => {
 
   useEffect(() => {
     if (mounted) {
-      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-      fetchAnnouncementsPaginated(1, 10, statusFilterValue);
+      const getStatusFilter = () => {
+        if (statusFilter === "Active") return "active";
+        if (statusFilter === "Inactive") return "inactive";
+        if (statusFilter === "Expired") return "expired";
+        return "all";
+      };
+      fetchAnnouncementsPaginated(1, 10, getStatusFilter());
     }
   }, [statusFilter, mounted]);
 
@@ -46,8 +51,13 @@ const AnnouncementPage = () => {
       } else {
         setIsSearching(false);
         if (mounted) {
-          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-          fetchAnnouncementsPaginated(1, 10, statusFilterValue);
+          const getStatusFilter = () => {
+            if (statusFilter === "Active") return "active";
+            if (statusFilter === "Inactive") return "inactive";
+            if (statusFilter === "Expired") return "expired";
+            return "all";
+          };
+          fetchAnnouncementsPaginated(1, 10, getStatusFilter());
         }
       }
     }, 500);
@@ -62,8 +72,13 @@ const AnnouncementPage = () => {
         if (isSearching) {
           searchAnnouncementsPaginated(searchTerm);
         } else {
-          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-          fetchAnnouncementsPaginated(currentPage, 10, statusFilterValue);
+          const getStatusFilter = () => {
+            if (statusFilter === "Active") return "active";
+            if (statusFilter === "Inactive") return "inactive";
+            if (statusFilter === "Expired") return "expired";
+            return "all";
+          };
+          fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
         }
       }
     }
@@ -75,8 +90,13 @@ const AnnouncementPage = () => {
 
   const handlePageChange = (page: number) => {
     if (!isSearching) {
-      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-      fetchAnnouncementsPaginated(page, 10, statusFilterValue);
+      const getStatusFilter = () => {
+        if (statusFilter === "Active") return "active";
+        if (statusFilter === "Inactive") return "inactive";
+        if (statusFilter === "Expired") return "expired";
+        return "all";
+      };
+      fetchAnnouncementsPaginated(page, 10, getStatusFilter());
     }
     goToPage(page);
   };
@@ -110,9 +130,9 @@ const AnnouncementPage = () => {
 
   const statusOptions = [
     { value: "All Status", label: "Semua Status" },
-    { value: "active", label: "Aktif" },
-    { value: "inactive", label: "Belum Aktif" },
-    { value: "expired", label: "Kedaluwarsa" },
+    { value: "Active", label: "Aktif" },
+    { value: "Inactive", label: "Belum Aktif" },
+    { value: "Expired", label: "Kedaluwarsa" },
   ];
 
   const columns = [
@@ -201,8 +221,13 @@ const AnnouncementPage = () => {
               if (isSearching) {
                 searchAnnouncementsPaginated(searchTerm);
               } else {
-                const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter.toLowerCase() as "active" | "inactive" | "expired");
-                fetchAnnouncementsPaginated(currentPage, 10, statusFilterValue);
+                const getStatusFilter = () => {
+                  if (statusFilter === "Active") return "active";
+                  if (statusFilter === "Inactive") return "inactive";
+                  if (statusFilter === "Expired") return "expired";
+                  return "all";
+                };
+                fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
               }
             }}
             emptyMessage={searchTerm ? "Tidak ditemukan pengumuman yang sesuai" : "Belum ada pengumuman"}

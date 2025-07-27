@@ -359,27 +359,26 @@ export const getAnnouncementsWithPagination = async (
   try {
     const offset = (page - 1) * pageSize;
 
-    let q;
-    if (statusFilter === "all") {
-      q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
-    } else {
-      q = query(collection(db, "announcements"), where("status", "==", statusFilter), orderBy("createdAt", "desc"));
-    }
-
+    const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
     const totalSnapshot = await getDocs(q);
-    const totalItems = totalSnapshot.size;
-    const totalPages = Math.ceil(totalItems / pageSize);
 
-    const announcements: Announcement[] = [];
+    const allAnnouncements: Announcement[] = [];
     totalSnapshot.forEach((doc) => {
       const data = doc.data();
-      announcements.push({
+      allAnnouncements.push({
         id: doc.id,
         ...data,
       } as Announcement);
     });
 
-    const paginatedAnnouncements = announcements.slice(offset, offset + pageSize);
+    let filteredAnnouncements = allAnnouncements;
+    if (statusFilter !== "all") {
+      filteredAnnouncements = allAnnouncements.filter((announcement) => announcement.status === statusFilter);
+    }
+
+    const totalItems = filteredAnnouncements.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const paginatedAnnouncements = filteredAnnouncements.slice(offset, offset + pageSize);
 
     return {
       announcements: paginatedAnnouncements,
@@ -394,15 +393,22 @@ export const getAnnouncementsWithPagination = async (
 
 export const getAnnouncementCountByStatus = async (statusFilter: "all" | "active" | "inactive" | "expired" = "all"): Promise<number> => {
   try {
-    let q;
+    const q = query(collection(db, "announcements"));
+    const snapshot = await getDocs(q);
+
     if (statusFilter === "all") {
-      q = query(collection(db, "announcements"));
-    } else {
-      q = query(collection(db, "announcements"), where("status", "==", statusFilter));
+      return snapshot.size;
     }
 
-    const snapshot = await getDocs(q);
-    return snapshot.size;
+    let count = 0;
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.status === statusFilter) {
+        count++;
+      }
+    });
+
+    return count;
   } catch (error) {
     console.error("Error counting announcements:", error);
     return 0;
