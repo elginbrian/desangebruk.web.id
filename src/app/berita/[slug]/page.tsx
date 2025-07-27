@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { FiCalendar, FiUser, FiClock, FiArrowLeft } from "react-icons/fi";
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/component/landing-page/Header";
 import Footer from "@/component/landing-page/Footer";
 import { getArticleBySlug } from "@/lib/articleService";
 import { Article } from "@/lib/articleService";
+import { usePublishedArticles } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -18,6 +20,7 @@ const BeritaDetailPage = () => {
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { articles: relatedArticles } = usePublishedArticles(4);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -86,20 +89,85 @@ const BeritaDetailPage = () => {
 
   if (error || !article) {
     return (
-      <div className="min-h-screen flex flex-col bg-white">
+      <main className="min-h-screen flex flex-col lg:block">
         <Header />
-        <div className="flex-grow flex items-center justify-center bg-white">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">{error || "Artikel tidak ditemukan"}</h2>
-            <p className="text-gray-600 mb-4">Artikel yang Anda cari mungkin telah dipindahkan atau dihapus.</p>
-            <Link href="/berita" className="inline-flex items-center gap-2 px-4 py-2 bg-[#1B3A6D] text-white rounded hover:bg-[#152f5a] transition-colors">
-              <FiArrowLeft size={16} />
-              Kembali ke Berita
-            </Link>
+        <div className="h-screen lg:h-screen lg:w-screen bg-gray-100 flex items-center justify-center px-4 sm:px-6 lg:px-8 lg:fixed lg:inset-0 lg:overflow-hidden">
+          <div className={`max-w-6xl w-full smooth-transition ${mounted ? "smooth-reveal" : "animate-on-load"}`}>
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+              <div className="flex-1 flex justify-center lg:justify-end relative">
+                <div className="relative">
+                  <Image height={400} width={600} src="/not-found.png" alt="Artikel tidak ditemukan" className="max-w-full h-auto" />
+                </div>
+              </div>
+
+              <div className="flex-1 text-center lg:text-left max-w-md lg:max-w-lg">
+                <div className="space-y-6">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">Artikel Tidak Ditemukan</h1>
+
+                  <p className="text-gray-600 text-sm sm:text-base md:text-lg leading-relaxed">{error || "Artikel yang Anda cari tidak ditemukan atau mungkin telah dipindahkan."}</p>
+
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <Link
+                      href="/berita"
+                      className="bg-[#1B3A6D] text-white px-8 py-2 rounded-lg font-medium border-2 border-[#1B3A6D] hover:bg-[#1B3A6D] hover:text-white transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Kembali ke Berita
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <Footer />
-      </div>
+        <div className={`w-full bg-gray-200 py-4 md:py-4 smooth-transition lg:fixed lg:bottom-0 lg:left-0 lg:z-20 ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-3">
+              <div className="flex items-center gap-3 mb-2 md:mb-0">
+                <img
+                  src="/logo-ub.png"
+                  alt="Logo UB"
+                  className="w-8 h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+                <img
+                  src="/logo-filkom.png"
+                  alt="Logo FILKOM"
+                  className="w-auto h-5 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+                <img
+                  src="/logo-diktisaintek.png"
+                  alt="Logo Diktisaintek Berdampak"
+                  className="w-auto h-6 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+                <img
+                  src="/logo-mmd.png"
+                  alt="Logo MMD"
+                  className="w-8 h-8 object-contain smooth-transition hover:scale-110 flex-shrink-0"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.style.display = "none";
+                  }}
+                />
+              </div>
+              <div className="text-center md:text-left">
+                <p className="text-black font-medium text-[10px] md:text-[10px] mb-[2px] smooth-transition">Dikembangkan oleh Tim MMD FILKOM 49 Tahun 2025</p>
+                <p className="text-black/70 text-[10px] md:text-[10px] leading-relaxed smooth-transition">Program Mahasiswa Membangun Desa, Fakultas Ilmu Komputer, Universitas Brawijaya</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     );
   }
 
@@ -163,7 +231,7 @@ const BeritaDetailPage = () => {
           {/* Article Body */}
           <div className="prose prose-lg max-w-none">
             <div
-              className="article-content"
+              className="article-content text-justify leading-relaxed"
               dangerouslySetInnerHTML={{
                 __html: article.content.replace(/\n/g, "<br />"),
               }}
@@ -183,6 +251,61 @@ const BeritaDetailPage = () => {
             </div>
           </footer>
         </article>
+
+        {/* Related Articles */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Berita Terkait</h2>
+
+          {relatedArticles.length > 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div className="divide-y divide-gray-200">
+                {relatedArticles
+                  .filter((related) => related.id !== article.id)
+                  .slice(0, 3)
+                  .map((related, index) => (
+                    <Link key={related.id} href={`/berita/${related.slug}`} className="block">
+                      <div className="hover:bg-gray-50 transition-colors cursor-pointer group">
+                        <div className="flex items-center">
+                          {/* Featured Image */}
+
+                          {/* Content */}
+                          <div className="flex-1 p-6 flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              {/* Title */}
+                              <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#1B3A6D] transition-colors">{related.title}</h3>
+
+                              {/* Meta Info */}
+                              <div className="flex items-center gap-4 text-sm text-gray-600">
+                                <div className="flex items-center gap-1">
+                                  <FiUser size={14} />
+                                  <span>{related.authorName}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <FiCalendar size={14} />
+                                  <span>{formatDate(related.createdAt)}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Arrow Icon */}
+                            <div className="flex-shrink-0 ml-4">
+                              <svg className="w-5 h-5 text-gray-400 group-hover:text-[#1B3A6D] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+              <p className="text-gray-500">Tidak ada berita terkait</p>
+            </div>
+          )}
+        </section>
       </main>
 
       <Footer />
