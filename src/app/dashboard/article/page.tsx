@@ -21,7 +21,7 @@ const ArticlePage = () => {
   const [mounted, setMounted] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const { articles, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchArticlesPaginated, searchArticlesPaginated, goToPage, changeItemsPerPage } = useArticlesPagination();
+  const { articles, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchArticlesPaginated, searchArticlesPaginated, goToPage } = useArticlesPagination();
 
   const { remove, loading: deleteLoading } = useArticleActions();
 
@@ -39,7 +39,7 @@ const ArticlePage = () => {
         if (statusFilter === "Draft") return "draft";
         return "all";
       };
-      fetchArticlesPaginated(1, itemsPerPage, getStatusFilter());
+      fetchArticlesPaginated(1, 10, getStatusFilter());
     }
   }, [statusFilter, mounted]);
 
@@ -56,7 +56,7 @@ const ArticlePage = () => {
             if (statusFilter === "Draft") return "draft";
             return "all";
           };
-          fetchArticlesPaginated(1, itemsPerPage, getStatusFilter());
+          fetchArticlesPaginated(1, 10, getStatusFilter());
         }
       }
     }, 500);
@@ -76,7 +76,7 @@ const ArticlePage = () => {
             if (statusFilter === "Draft") return "draft";
             return "all";
           };
-          fetchArticlesPaginated(currentPage, itemsPerPage, getStatusFilter());
+          fetchArticlesPaginated(currentPage, 10, getStatusFilter());
         }
       }
     }
@@ -93,18 +93,9 @@ const ArticlePage = () => {
         if (statusFilter === "Draft") return "draft";
         return "all";
       };
-      fetchArticlesPaginated(page, itemsPerPage, getStatusFilter());
+      fetchArticlesPaginated(page, 10, getStatusFilter());
     }
     goToPage(page);
-  };
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    const getStatusFilter = () => {
-      if (statusFilter === "Published") return "published";
-      if (statusFilter === "Draft") return "draft";
-      return "all";
-    };
-    changeItemsPerPage(newItemsPerPage, getStatusFilter());
   };
 
   const formatDate = (timestamp: any) => {
@@ -220,16 +211,13 @@ const ArticlePage = () => {
                   if (statusFilter === "Draft") return "draft";
                   return "all";
                 };
-                fetchArticlesPaginated(currentPage, itemsPerPage, getStatusFilter());
+                fetchArticlesPaginated(currentPage, 10, getStatusFilter());
               }
             }}
             emptyMessage={searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}
           />
 
-
-          {!isSearching && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} onItemsPerPageChange={handleItemsPerPageChange} />
-          )}
+          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
         </div>
       </div>
       <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
@@ -284,4 +272,3 @@ const ArticlePage = () => {
   );
 };
 export default ArticlePage;
-

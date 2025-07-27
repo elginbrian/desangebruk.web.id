@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllUsers, getUsersByRole, updateUserRole, deleteUser, getUserStats, getUsersWithPagination, searchUsers, UserListItem } from "@/lib/userService";
+import { getAllUsers, getUsersByRole, updateUserRole, deleteUser, getUserStats, UserListItem } from "@/lib/userService";
 
 export const useUsers = () => {
   const [users, setUsers] = useState<UserListItem[]>([]);
@@ -34,99 +34,6 @@ export const useUsers = () => {
     loading,
     error,
     refetch,
-  };
-};
-
-export const useUsersPagination = () => {
-  const [users, setUsers] = useState<UserListItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalItems, setTotalItems] = useState(0);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-
-  const fetchUsersPaginated = async (page: number = 1, pageSize: number = 10, roleFilter: "all" | "admin" | "pending" = "all") => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const { users: newUsers, totalPages: newTotalPages, totalItems: newTotalItems } = await getUsersWithPagination(page, pageSize, roleFilter);
-
-      setUsers(newUsers);
-      setCurrentPage(page);
-      setTotalPages(newTotalPages);
-      setTotalItems(newTotalItems);
-      setItemsPerPage(pageSize);
-    } catch (err) {
-      console.error("Error fetching users with pagination:", err);
-
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch users";
-      setError(errorMessage);
-
-      setUsers([]);
-      setCurrentPage(1);
-      setTotalPages(0);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const searchUsersPaginated = async (searchTerm: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      if (!searchTerm.trim()) {
-        await fetchUsersPaginated(1, itemsPerPage);
-        return;
-      }
-
-      const searchResults = await searchUsers(searchTerm);
-      setUsers(searchResults);
-      setCurrentPage(1);
-      setTotalPages(1);
-      setTotalItems(searchResults.length);
-    } catch (err) {
-      console.error("Error searching users:", err);
-
-      const errorMessage = err instanceof Error ? err.message : "Failed to search users";
-      setError(errorMessage);
-
-      setUsers([]);
-      setCurrentPage(1);
-      setTotalPages(0);
-      setTotalItems(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const changeItemsPerPage = async (newItemsPerPage: number, currentRoleFilter: "all" | "admin" | "pending" = "all") => {
-    setItemsPerPage(newItemsPerPage);
-    await fetchUsersPaginated(1, newItemsPerPage, currentRoleFilter);
-  };
-
-  return {
-    users,
-    loading,
-    error,
-    currentPage,
-    totalPages,
-    totalItems,
-    itemsPerPage,
-    fetchUsersPaginated,
-    searchUsersPaginated,
-    goToPage,
-    changeItemsPerPage,
-    setError,
   };
 };
 
@@ -246,4 +153,3 @@ export const useUserStats = () => {
     refetch,
   };
 };
-

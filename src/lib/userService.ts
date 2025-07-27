@@ -73,69 +73,6 @@ export const deleteUser = async (userId: string): Promise<void> => {
   }
 };
 
-export const getUsersWithPagination = async (page: number = 1, pageSize: number = 10, roleFilter: "all" | "admin" | "pending" = "all"): Promise<{ users: UserListItem[]; totalPages: number; totalItems: number }> => {
-  try {
-    const offset = (page - 1) * pageSize;
-
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("createdAt", "desc"));
-    const totalSnapshot = await getDocs(q);
-
-    const allUsers: UserListItem[] = [];
-    totalSnapshot.forEach((doc) => {
-      const data = doc.data();
-      allUsers.push({
-        id: doc.id,
-        ...data,
-      } as UserListItem);
-    });
-
-    let filteredUsers = allUsers;
-    if (roleFilter !== "all") {
-      filteredUsers = allUsers.filter((user) => user.role === roleFilter);
-    }
-
-    const totalItems = filteredUsers.length;
-    const totalPages = Math.ceil(totalItems / pageSize);
-    const paginatedUsers = filteredUsers.slice(offset, offset + pageSize);
-
-    return {
-      users: paginatedUsers,
-      totalPages,
-      totalItems,
-    };
-  } catch (error) {
-    console.error("Error fetching users with pagination:", error);
-    throw new Error("Failed to fetch users with pagination");
-  }
-};
-
-export const searchUsers = async (searchTerm: string): Promise<UserListItem[]> => {
-  try {
-    const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("createdAt", "desc"));
-    const querySnapshot = await getDocs(q);
-
-    const users: UserListItem[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      const user: UserListItem = {
-        id: doc.id,
-        ...data,
-      } as UserListItem;
-
-      if ((user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) || (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))) {
-        users.push(user);
-      }
-    });
-
-    return users;
-  } catch (error) {
-    console.error("Error searching users:", error);
-    throw new Error("Failed to search users");
-  }
-};
-
 export const getUserStats = async () => {
   try {
     const [allUsers, pendingUsers, adminUsers] = await Promise.all([getAllUsers(), getUsersByRole("pending"), getUsersByRole("admin")]);

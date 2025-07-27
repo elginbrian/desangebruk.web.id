@@ -341,11 +341,6 @@ export const useArticlesPagination = () => {
     }
   };
 
-  const changeItemsPerPage = async (newItemsPerPage: number, currentStatusFilter: "all" | "published" | "draft" = "all") => {
-    setItemsPerPage(newItemsPerPage);
-    await fetchArticlesPaginated(1, newItemsPerPage, currentStatusFilter);
-  };
-
   return {
     articles,
     loading,
@@ -357,8 +352,6 @@ export const useArticlesPagination = () => {
     fetchArticlesPaginated,
     searchArticlesPaginated,
     goToPage,
-    changeItemsPerPage,
     setError,
   };
 };
-

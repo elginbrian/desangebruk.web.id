@@ -20,7 +20,7 @@ const AnnouncementPage = () => {
   const [mounted, setMounted] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const { announcements, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchAnnouncementsPaginated, searchAnnouncementsPaginated, goToPage, changeItemsPerPage } = useAnnouncementsPagination();
+  const { announcements, loading, error, currentPage, totalPages, totalItems, itemsPerPage, fetchAnnouncementsPaginated, searchAnnouncementsPaginated, goToPage } = useAnnouncementsPagination();
 
   const { remove, loading: deleteLoading } = useAnnouncementActions();
 
@@ -39,7 +39,7 @@ const AnnouncementPage = () => {
         if (statusFilter === "Expired") return "expired";
         return "all";
       };
-      fetchAnnouncementsPaginated(1, itemsPerPage, getStatusFilter());
+      fetchAnnouncementsPaginated(1, 10, getStatusFilter());
     }
   }, [statusFilter, mounted]);
 
@@ -57,7 +57,7 @@ const AnnouncementPage = () => {
             if (statusFilter === "Expired") return "expired";
             return "all";
           };
-          fetchAnnouncementsPaginated(1, itemsPerPage, getStatusFilter());
+          fetchAnnouncementsPaginated(1, 10, getStatusFilter());
         }
       }
     }, 500);
@@ -78,7 +78,7 @@ const AnnouncementPage = () => {
             if (statusFilter === "Expired") return "expired";
             return "all";
           };
-          fetchAnnouncementsPaginated(currentPage, itemsPerPage, getStatusFilter());
+          fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
         }
       }
     }
@@ -96,19 +96,9 @@ const AnnouncementPage = () => {
         if (statusFilter === "Expired") return "expired";
         return "all";
       };
-      fetchAnnouncementsPaginated(page, itemsPerPage, getStatusFilter());
+      fetchAnnouncementsPaginated(page, 10, getStatusFilter());
     }
     goToPage(page);
-  };
-
-  const handleItemsPerPageChange = (newItemsPerPage: number) => {
-    const getStatusFilter = () => {
-      if (statusFilter === "Active") return "active";
-      if (statusFilter === "Inactive") return "inactive";
-      if (statusFilter === "Expired") return "expired";
-      return "all";
-    };
-    changeItemsPerPage(newItemsPerPage, getStatusFilter());
   };
 
   const formatDate = (timestamp: any) => {
@@ -237,16 +227,13 @@ const AnnouncementPage = () => {
                   if (statusFilter === "Expired") return "expired";
                   return "all";
                 };
-                fetchAnnouncementsPaginated(currentPage, itemsPerPage, getStatusFilter());
+                fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
               }
             }}
             emptyMessage={searchTerm ? "Tidak ditemukan pengumuman yang sesuai" : "Belum ada pengumuman"}
           />
 
-
-          {!isSearching && (
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} onItemsPerPageChange={handleItemsPerPageChange} />
-          )}
+          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
         </div>
       </div>
 
@@ -303,4 +290,3 @@ const AnnouncementPage = () => {
 };
 
 export default AnnouncementPage;
-

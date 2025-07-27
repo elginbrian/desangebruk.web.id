@@ -6,7 +6,7 @@ export const usePengumuman = () => {
   const [mounted, setMounted] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
   const { announcements, loading, error, refetch } = useActiveAnnouncements();
 
@@ -34,16 +34,24 @@ export const usePengumuman = () => {
     setCurrentPage(1);
   };
 
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   return {
     mounted,
     searchTerm,
     currentPage,
     totalPages,
     currentAnnouncements,
+    itemsPerPage,
+    filteredAnnouncements,
     loading,
     error,
     refetch,
     handlePageChange,
     handleSearchChange,
+    handleItemsPerPageChange,
   };
 };

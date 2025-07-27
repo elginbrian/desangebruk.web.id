@@ -368,11 +368,6 @@ export const useAnnouncementsPagination = () => {
     }
   };
 
-  const changeItemsPerPage = async (newItemsPerPage: number, currentStatusFilter: "all" | "active" | "inactive" | "expired" = "all") => {
-    setItemsPerPage(newItemsPerPage);
-    await fetchAnnouncementsPaginated(1, newItemsPerPage, currentStatusFilter);
-  };
-
   return {
     announcements,
     loading,
@@ -384,8 +379,6 @@ export const useAnnouncementsPagination = () => {
     fetchAnnouncementsPaginated,
     searchAnnouncementsPaginated,
     goToPage,
-    changeItemsPerPage,
     setError,
   };
 };
-
