@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FiPlus, FiEdit2, FiTrash2, FiEye, FiEyeOff, FiImage } from "react-icons/fi";
 import { useGalleryImagesPagination, useGalleryImageActions } from "@/hooks/useGallery";
 import { useAuth } from "@/contexts/AuthContext";
+import { confirmDelete, showSuccess, showError } from "@/utils/confirmationUtils";
 import PageHeader from "@/component/common/PageHeader";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import ActionButton from "@/component/common/ActionButton";
@@ -63,12 +64,15 @@ const GalleryPage = () => {
   }, [searchTerm, mounted, user]);
 
   const handleDelete = async (id: string | number) => {
-    if (!window.confirm("Apakah Anda yakin ingin menghapus gambar ini?")) {
-      return;
-    }
+    const image = images.find((img) => img.id === id);
+    const imageTitle = image?.title || "gambar";
+
+    const confirmed = await confirmDelete("Hapus Gambar?", `Gambar "${imageTitle}" akan dihapus secara permanen dan tidak dapat dikembalikan!`, "Ya, Hapus Gambar!");
+    if (!confirmed) return;
 
     const success = await remove(id as string);
     if (success) {
+      showSuccess("Gambar Berhasil Dihapus", `Gambar "${imageTitle}" berhasil dihapus dari galeri`);
       if (isSearching) {
         searchImagesPaginated(searchTerm);
       } else {
@@ -79,6 +83,8 @@ const GalleryPage = () => {
         };
         fetchImagesPaginated(currentPage, 10, getStatusFilter());
       }
+    } else {
+      showError("Gagal Menghapus Gambar", "Terjadi kesalahan saat menghapus gambar");
     }
   };
 
@@ -245,7 +251,25 @@ const GalleryPage = () => {
             emptyMessage={searchTerm ? "Tidak ditemukan gambar yang sesuai dengan pencarian" : "Belum ada gambar yang diunggah"}
           />
 
-          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
+          {!isSearching && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              loading={loading}
+              onItemsPerPageChange={(newItemsPerPage) => {
+                const getStatusFilter = () => {
+                  if (statusFilter === "Active") return "active";
+                  if (statusFilter === "Inactive") return "inactive";
+                  return "all";
+                };
+                fetchImagesPaginated(1, newItemsPerPage, getStatusFilter());
+              }}
+              itemsPerPageOptions={[8, 12, 16, 24]}
+            />
+          )}
         </div>
       </div>
 

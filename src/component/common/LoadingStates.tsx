@@ -1,5 +1,5 @@
 import React from "react";
-import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FiEdit, FiTrash2, FiEye } from "react-icons/fi";
 import Link from "next/link";
 
 interface LoadingSpinnerProps {
@@ -121,6 +121,7 @@ interface DataTableProps {
   data: any[];
   editRoute?: string | ((id: string | number) => void);
   onDelete?: (id: string | number) => void;
+  viewRoute?: (item: any) => string | null;
   mounted?: boolean;
   loading?: boolean;
   error?: string | null;
@@ -128,7 +129,7 @@ interface DataTableProps {
   emptyMessage?: string;
 }
 
-export const DataTableWithStates = ({ columns, data, editRoute, onDelete, mounted = true, loading = false, error = null, onRetry, emptyMessage = "Tidak ada data" }: DataTableProps) => {
+export const DataTableWithStates = ({ columns, data, editRoute, onDelete, viewRoute, mounted = true, loading = false, error = null, onRetry, emptyMessage = "Tidak ada data" }: DataTableProps) => {
   if (loading) {
     return (
       <div className="space-y-4">
@@ -157,7 +158,7 @@ export const DataTableWithStates = ({ columns, data, editRoute, onDelete, mounte
                 {column.label}
               </th>
             ))}
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            {(editRoute || onDelete || viewRoute) && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
@@ -168,27 +169,36 @@ export const DataTableWithStates = ({ columns, data, editRoute, onDelete, mounte
                   {column.render ? column.render(item[column.key], item) : item[column.key]}
                 </td>
               ))}
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex gap-1">
-                  {editRoute &&
-                    (typeof editRoute === "function" ? (
-                      <button onClick={() => editRoute(item.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
-                        <FiEdit size={14} />
-                      </button>
-                    ) : (
-                      <Link href={`${editRoute}?id=${item.id}`}>
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
-                          <FiEdit size={14} />
+              {(editRoute || onDelete || viewRoute) && (
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex gap-1">
+                    {viewRoute && viewRoute(item) && (
+                      <Link href={viewRoute(item)!} target="_blank" rel="noopener noreferrer">
+                        <button className="p-1.5 text-green-600 hover:bg-green-50 rounded smooth-transition hover-lift">
+                          <FiEye size={14} />
                         </button>
                       </Link>
-                    ))}
-                  {onDelete && (
-                    <button onClick={() => onDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded smooth-transition hover-lift">
-                      <FiTrash2 size={14} />
-                    </button>
-                  )}
-                </div>
-              </td>
+                    )}
+                    {editRoute &&
+                      (typeof editRoute === "function" ? (
+                        <button onClick={() => editRoute(item.id)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                          <FiEdit size={14} />
+                        </button>
+                      ) : (
+                        <Link href={`${editRoute}?id=${item.id}`}>
+                          <button className="p-1.5 text-blue-600 hover:bg-blue-50 rounded smooth-transition hover-lift">
+                            <FiEdit size={14} />
+                          </button>
+                        </Link>
+                      ))}
+                    {onDelete && (
+                      <button onClick={() => onDelete(item.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded smooth-transition hover-lift">
+                        <FiTrash2 size={14} />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

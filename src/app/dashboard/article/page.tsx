@@ -11,6 +11,7 @@ import DataTable from "@/component/common/DataTable";
 import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
 import { useArticlesPagination, useArticleActions } from "@/hooks/useArticles";
+import { confirmDelete, showSuccess, showError } from "@/utils/confirmationUtils";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -65,25 +66,39 @@ const ArticlePage = () => {
   }, [searchTerm, mounted]);
 
   const handleDelete = async (id: string | number) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus artikel ini?")) {
-      const success = await remove(String(id));
-      if (success) {
-        if (isSearching) {
-          searchArticlesPaginated(searchTerm);
-        } else {
-          const getStatusFilter = () => {
-            if (statusFilter === "Published") return "published";
-            if (statusFilter === "Draft") return "draft";
-            return "all";
-          };
-          fetchArticlesPaginated(currentPage, 10, getStatusFilter());
-        }
+    const article = articles.find((a) => a.id === id);
+    const articleTitle = article?.title || "artikel";
+
+    const confirmed = await confirmDelete("Hapus Artikel?", `Artikel "${articleTitle}" akan dihapus secara permanen dan tidak dapat dikembalikan!`, "Ya, Hapus Artikel!");
+    if (!confirmed) return;
+
+    const success = await remove(String(id));
+    if (success) {
+      showSuccess("Artikel Berhasil Dihapus", `Artikel "${articleTitle}" berhasil dihapus dari sistem`);
+      if (isSearching) {
+        searchArticlesPaginated(searchTerm);
+      } else {
+        const getStatusFilter = () => {
+          if (statusFilter === "Published") return "published";
+          if (statusFilter === "Draft") return "draft";
+          return "all";
+        };
+        fetchArticlesPaginated(currentPage, 10, getStatusFilter());
       }
+    } else {
+      showError("Gagal Menghapus Artikel", "Terjadi kesalahan saat menghapus artikel");
     }
   };
 
   const handleEdit = (id: string | number) => {
     router.push(`/dashboard/article/update?id=${id}`);
+  };
+
+  const handleViewPublic = (article: any) => {
+    if (article.status === "published" && article.slug) {
+      return `/berita/${article.slug}`;
+    }
+    return null;
   };
 
   const handlePageChange = (page: number) => {
@@ -199,6 +214,7 @@ const ArticlePage = () => {
             data={articles}
             editRoute={handleEdit}
             onDelete={handleDelete}
+            viewRoute={handleViewPublic}
             mounted={mounted}
             loading={loading && articles.length === 0}
             error={error}
@@ -217,7 +233,25 @@ const ArticlePage = () => {
             emptyMessage={searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}
           />
 
-          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
+          {!isSearching && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              loading={loading}
+              onItemsPerPageChange={(newItemsPerPage) => {
+                const getStatusFilter = () => {
+                  if (statusFilter === "Published") return "published";
+                  if (statusFilter === "Draft") return "draft";
+                  return "all";
+                };
+                fetchArticlesPaginated(1, newItemsPerPage, getStatusFilter());
+              }}
+              itemsPerPageOptions={[5, 10, 25, 50]}
+            />
+          )}
         </div>
       </div>
       <div className={`w-full bg-gray-100 py-4 md:py-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>

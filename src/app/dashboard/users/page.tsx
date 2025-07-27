@@ -6,9 +6,11 @@ import PageHeader from "@/component/common/PageHeader";
 import ActionButton from "@/component/common/ActionButton";
 import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import DataTable from "@/component/common/DataTable";
+import Pagination from "@/component/common/Pagination";
 import { DataTableWithStates } from "@/component/common/LoadingStates";
 import { useUsers, useUserActions } from "@/hooks/useUsers";
 import { useAuth } from "@/contexts/AuthContext";
+import { confirmDelete, confirmRoleChange, showSuccess, showError } from "@/utils/confirmationUtils";
 import { format } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
@@ -17,6 +19,8 @@ const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("All Status");
   const [success, setSuccess] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { users, loading, error, refetch } = useUsers();
   const { updateRole, removeUser, loading: actionLoading, error: actionError, clearError } = useUserActions();
@@ -51,21 +55,54 @@ const UsersPage = () => {
     });
   }, [users, searchTerm, roleFilter]);
 
+  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentUsers = filteredUsers.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, roleFilter]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
   const handleUpdateRole = async (userId: string, newRole: "admin" | "pending") => {
+    const user = users.find((u) => (u.id || u.uid) === userId);
+    const userName = user?.name || "pengguna";
+    const roleLabel = newRole === "admin" ? "Administrator" : "Menunggu Persetujuan";
+
+    const confirmed = await confirmRoleChange(roleLabel, userName);
+    if (!confirmed) return;
+
     const success = await updateRole(userId, newRole);
     if (success) {
-      setSuccess("Role pengguna berhasil diperbarui");
+      showSuccess("Role Berhasil Diubah", `Role ${userName} berhasil diubah menjadi ${roleLabel}`);
       refetch();
+    } else {
+      showError("Gagal Mengubah Role", "Terjadi kesalahan saat mengubah role pengguna");
     }
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus pengguna ini?")) {
-      const success = await removeUser(userId);
-      if (success) {
-        setSuccess("Pengguna berhasil dihapus");
-        refetch();
-      }
+    const user = users.find((u) => (u.id || u.uid) === userId);
+    const userName = user?.name || "pengguna";
+
+    const confirmed = await confirmDelete("Hapus Pengguna?", `Pengguna "${userName}" akan dihapus secara permanen dan tidak dapat dikembalikan!`, "Ya, Hapus Pengguna!");
+    if (!confirmed) return;
+
+    const success = await removeUser(userId);
+    if (success) {
+      showSuccess("Pengguna Berhasil Dihapus", `Pengguna ${userName} berhasil dihapus dari sistem`);
+      refetch();
+    } else {
+      showError("Gagal Menghapus Pengguna", "Terjadi kesalahan saat menghapus pengguna");
     }
   };
 
@@ -245,7 +282,7 @@ const UsersPage = () => {
 
           <DataTableWithStates
             columns={columns}
-            data={filteredUsers}
+            data={currentUsers}
             onDelete={(userId) => handleDeleteUser(String(userId))}
             mounted={mounted}
             loading={loading}
@@ -258,6 +295,17 @@ const UsersPage = () => {
                 ? "Tidak ada pengguna yang ditemukan dengan kata kunci tersebut."
                 : "Belum ada pengguna yang terdaftar."
             }
+          />
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            itemsPerPage={itemsPerPage}
+            totalItems={filteredUsers.length}
+            loading={loading}
+            onItemsPerPageChange={handleItemsPerPageChange}
+            itemsPerPageOptions={[5, 10, 25, 50]}
           />
         </div>
       </div>
@@ -315,3 +363,4 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
+

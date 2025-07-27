@@ -8,6 +8,7 @@ import { FiClock, FiUser, FiMail, FiLogOut } from "react-icons/fi";
 import Header from "@/component/landing-page/Header";
 import Image from "next/image";
 import Link from "next/link";
+import { confirmLogout, showError } from "@/utils/confirmationUtils";
 
 const PendingApprovalPage = () => {
   const [mounted, setMounted] = useState(false);
@@ -51,8 +52,16 @@ const PendingApprovalPage = () => {
   }, [loading, user, profile, router]);
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      try {
+        await logout();
+        router.push("/login");
+      } catch (error) {
+        console.error("Error logging out:", error);
+        showError("Terjadi kesalahan saat logout");
+      }
+    }
   };
 
   if (loading || !profile) {

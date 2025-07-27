@@ -12,6 +12,7 @@ import SearchAndFilterBar from "@/component/common/SearchAndFilterBar";
 import Pagination from "@/component/common/Pagination";
 import { LoadingSpinner, ErrorState, EmptyState, DataTableWithStates } from "@/component/common/LoadingStates";
 import { useAnnouncementsPagination, useAnnouncementActions } from "@/hooks/useAnnouncements";
+import { confirmDelete, showSuccess, showError } from "@/utils/confirmationUtils";
 
 const AnnouncementPage = () => {
   const router = useRouter();
@@ -66,26 +67,40 @@ const AnnouncementPage = () => {
   }, [searchTerm, mounted]);
 
   const handleDelete = async (id: string | number) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus pengumuman ini?")) {
-      const success = await remove(id.toString());
-      if (success) {
-        if (isSearching) {
-          searchAnnouncementsPaginated(searchTerm);
-        } else {
-          const getStatusFilter = () => {
-            if (statusFilter === "Active") return "active";
-            if (statusFilter === "Inactive") return "inactive";
-            if (statusFilter === "Expired") return "expired";
-            return "all";
-          };
-          fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
-        }
+    const announcement = announcements.find((a) => a.id === id);
+    const announcementTitle = announcement?.title || "pengumuman";
+
+    const confirmed = await confirmDelete("Hapus Pengumuman?", `Pengumuman "${announcementTitle}" akan dihapus secara permanen dan tidak dapat dikembalikan!`, "Ya, Hapus Pengumuman!");
+    if (!confirmed) return;
+
+    const success = await remove(id.toString());
+    if (success) {
+      showSuccess("Pengumuman Berhasil Dihapus", `Pengumuman "${announcementTitle}" berhasil dihapus dari sistem`);
+      if (isSearching) {
+        searchAnnouncementsPaginated(searchTerm);
+      } else {
+        const getStatusFilter = () => {
+          if (statusFilter === "Active") return "active";
+          if (statusFilter === "Inactive") return "inactive";
+          if (statusFilter === "Expired") return "expired";
+          return "all";
+        };
+        fetchAnnouncementsPaginated(currentPage, 10, getStatusFilter());
       }
+    } else {
+      showError("Gagal Menghapus Pengumuman", "Terjadi kesalahan saat menghapus pengumuman");
     }
   };
 
   const handleEdit = (id: string | number) => {
     router.push(`/dashboard/announcement/update?id=${id}`);
+  };
+
+  const handleViewPublic = (announcement: any) => {
+    if (announcement.status === "active" && announcement.slug) {
+      return `/pengumuman/${announcement.slug}`;
+    }
+    return null;
   };
 
   const handlePageChange = (page: number) => {
@@ -214,6 +229,7 @@ const AnnouncementPage = () => {
             data={announcements}
             editRoute={handleEdit}
             onDelete={handleDelete}
+            viewRoute={handleViewPublic}
             mounted={mounted}
             loading={loading && announcements.length === 0}
             error={error}
@@ -233,7 +249,26 @@ const AnnouncementPage = () => {
             emptyMessage={searchTerm ? "Tidak ditemukan pengumuman yang sesuai" : "Belum ada pengumuman"}
           />
 
-          {!isSearching && totalPages > 1 && <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} itemsPerPage={itemsPerPage} totalItems={totalItems} loading={loading} />}
+          {!isSearching && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+              loading={loading}
+              onItemsPerPageChange={(newItemsPerPage) => {
+                const getStatusFilter = () => {
+                  if (statusFilter === "Active") return "active";
+                  if (statusFilter === "Inactive") return "inactive";
+                  if (statusFilter === "Expired") return "expired";
+                  return "all";
+                };
+                fetchAnnouncementsPaginated(1, newItemsPerPage, getStatusFilter());
+              }}
+              itemsPerPageOptions={[5, 10, 25, 50]}
+            />
+          )}
         </div>
       </div>
 

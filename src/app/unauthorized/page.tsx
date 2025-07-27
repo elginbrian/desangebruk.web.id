@@ -8,6 +8,7 @@ import { FiShield, FiLogOut, FiHome } from "react-icons/fi";
 import Header from "@/component/landing-page/Header";
 import Link from "next/link";
 import Image from "next/image";
+import { confirmLogout, showError } from "@/utils/confirmationUtils";
 
 const UnauthorizedPage = () => {
   const [mounted, setMounted] = useState(false);
@@ -51,8 +52,16 @@ const UnauthorizedPage = () => {
   }, [loading, user, profile, router]);
 
   const handleLogout = async () => {
-    await logout();
-    router.push("/login");
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      try {
+        await logout();
+        router.push("/login");
+      } catch (error) {
+        console.error("Error logging out:", error);
+        showError("Terjadi kesalahan saat logout");
+      }
+    }
   };
 
   const handleGoHome = () => {
