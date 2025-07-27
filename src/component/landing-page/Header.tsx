@@ -7,6 +7,7 @@ import { FiMenu, FiX, FiUser, FiLogOut, FiSettings, FiBarChart } from "react-ico
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthActions } from "@/hooks/useAuth";
 import UserDropdown from "@/component/common/UserDropdown";
+import { confirmLogout, showError } from "@/utils/confirmationUtils";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,6 +15,19 @@ const Header = () => {
   const pathname = usePathname();
   const { isAuthenticated, profile, loading } = useAuth();
   const { logout } = useAuthActions();
+
+  const handleLogout = async () => {
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      try {
+        await logout();
+        setIsMenuOpen(false);
+      } catch (error) {
+        console.error("Error logging out:", error);
+        showError("Terjadi kesalahan saat logout");
+      }
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -175,13 +189,7 @@ const Header = () => {
                         </div>
                       </Link>
 
-                      <button
-                        onClick={() => {
-                          logout();
-                          setIsMenuOpen(false);
-                        }}
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md"
-                      >
+                      <button onClick={handleLogout} className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md">
                         <div className="flex items-center justify-center">
                           <FiLogOut className="mr-2" size={16} />
                           Logout
@@ -251,13 +259,7 @@ const Header = () => {
                         </div>
                       </Link>
 
-                      <button
-                        onClick={() => {
-                          logout();
-                          setIsMenuOpen(false);
-                        }}
-                        className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md"
-                      >
+                      <button onClick={handleLogout} className="w-full text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-3 text-sm font-medium smooth-transition rounded-md">
                         <div className="flex items-center justify-center">
                           <FiLogOut className="mr-2" size={16} />
                           Logout

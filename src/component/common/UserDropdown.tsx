@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FiUser, FiSettings, FiLogOut, FiChevronDown, FiBarChart } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthActions } from "@/hooks/useAuth";
+import { confirmLogout, showError } from "@/utils/confirmationUtils";
 
 const UserDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,8 +27,16 @@ const UserDropdown = () => {
   }, []);
 
   const handleLogout = async () => {
-    setIsOpen(false);
-    await logout();
+    const confirmed = await confirmLogout();
+    if (confirmed) {
+      try {
+        setIsOpen(false);
+        await logout();
+      } catch (error) {
+        console.error("Error logging out:", error);
+        showError("Terjadi kesalahan saat logout");
+      }
+    }
   };
 
   if (!profile || !user) return null;
