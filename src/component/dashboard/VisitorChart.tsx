@@ -1,32 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  ArcElement,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, BarElement, ArcElement } from "chart.js";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 import { getVisitorStats, getTodayVisitorCount, getWeeklyVisitorCount } from "@/lib/visitorService";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Title, Tooltip, Legend);
 
 interface VisitorChartProps {
   type?: "line" | "bar" | "doughnut";
@@ -50,27 +29,14 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
     const fetchChartData = async () => {
       try {
         setLoading(true);
-        const stats = await getVisitorStats();
-        
-        if (stats) {
-          const days = timeRange === "7days" ? 7 : 30;
-          const labels: string[] = [];
-          const visitors: number[] = [];
-          
-          for (let i = days - 1; i >= 0; i--) {
-            const date = new Date();
-            date.setDate(date.getDate() - i);
-            const dateString = date.toISOString().split("T")[0];
-            const dayName = date.toLocaleDateString("id-ID", { 
-              weekday: "short",
-              day: "numeric",
-              month: "short"
-            });
-            
-            labels.push(dayName);
-            visitors.push(stats.dailyVisits[dateString] || 0);
-          }
+        const { getVisitorStats, getVisitorDataByRange, getTodayVisitorCount, getWeeklyVisitorCount, ensureHistoricalData } = await import("@/lib/visitorService");
 
+        const days = timeRange === "7days" ? 7 : 30;
+        await ensureHistoricalData(days);
+
+        const stats = await getVisitorStats();
+
+        if (stats) {
           if (type === "doughnut") {
             const todayVisitors = getTodayVisitorCount(stats);
             const weeklyVisitors = getWeeklyVisitorCount(stats);
@@ -82,21 +48,15 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
               datasets: [
                 {
                   data: [todayVisitors, weeklyVisitors - todayVisitors, otherVisitors],
-                  backgroundColor: [
-                    "#1B3A6D",
-                    "#4F87C7",
-                    "#E5E7EB",
-                  ],
-                  borderColor: [
-                    "#1B3A6D",
-                    "#4F87C7",
-                    "#E5E7EB",
-                  ],
+                  backgroundColor: ["#1B3A6D", "#4F87C7", "#E5E7EB"],
+                  borderColor: ["#1B3A6D", "#4F87C7", "#E5E7EB"],
                   borderWidth: 2,
                 },
               ],
             });
           } else {
+            const { labels, data: visitors } = getVisitorDataByRange(stats, days);
+
             setChartData({
               labels,
               datasets: [
@@ -117,12 +77,48 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
               ],
             });
           }
+        } else {
+          const labels = Array.from({ length: days }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - (days - 1 - i));
+            return date.toLocaleDateString("id-ID", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+            });
+          });
+          const data = Array(days).fill(0);
+
+          setChartData({
+            labels,
+            datasets: [
+              {
+                label: "Pengunjung Harian",
+                data,
+                borderColor: "#1B3A6D",
+                backgroundColor: "rgba(27, 58, 109, 0.1)",
+                borderWidth: 2,
+                fill: type === "line",
+                tension: 0.4,
+              },
+            ],
+          });
         }
       } catch (error) {
         console.error("Error fetching chart data:", error);
-        const labels = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
-        const data = [45, 52, 38, 67, 73, 89, 42];
-        
+
+        const days = timeRange === "7days" ? 7 : 30;
+        const labels = Array.from({ length: days }, (_, i) => {
+          const date = new Date();
+          date.setDate(date.getDate() - (days - 1 - i));
+          return date.toLocaleDateString("id-ID", {
+            weekday: "short",
+            day: "numeric",
+            month: "short",
+          });
+        });
+        const data = Array(days).fill(0);
+
         setChartData({
           labels,
           datasets: [
@@ -198,7 +194,7 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
             size: 11,
           },
           color: "#6B7280",
-          callback: function(value: any) {
+          callback: function (value: any) {
             return value >= 1000 ? (value / 1000).toFixed(1) + "k" : value;
           },
         },
@@ -253,20 +249,11 @@ const VisitorChart = ({ type = "line", timeRange = "7days", className = "" }: Vi
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-100 p-4 sm:p-6 smooth-transition hover-lift ${mounted ? "smooth-reveal" : "animate-on-load"} ${className}`}>
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-          {type === "doughnut" ? "Distribusi Pengunjung" : "Statistik Pengunjung"}
-        </h3>
-        <p className="text-sm text-gray-600">
-          {type === "doughnut" 
-            ? "Pembagian pengunjung berdasarkan periode" 
-            : `Data pengunjung ${timeRange === "7days" ? "7 hari" : "30 hari"} terakhir`
-          }
-        </p>
+        <h3 className="text-lg font-semibold text-gray-900 mb-1">{type === "doughnut" ? "Distribusi Pengunjung" : "Statistik Pengunjung"}</h3>
+        <p className="text-sm text-gray-600">{type === "doughnut" ? "Pembagian pengunjung berdasarkan periode" : `Data pengunjung ${timeRange === "7days" ? "7 hari" : "30 hari"} terakhir`}</p>
       </div>
-      
-      <div className="h-48 sm:h-64">
-        {renderChart()}
-      </div>
+
+      <div className="h-48 sm:h-64">{renderChart()}</div>
     </div>
   );
 };

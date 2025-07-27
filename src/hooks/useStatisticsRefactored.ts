@@ -76,12 +76,22 @@ export const useVisitorStats = () => {
     const loadStats = async () => {
       try {
         setLoading(true);
+
+        const { ensureHistoricalData } = await import("@/lib/visitorService");
+        await ensureHistoricalData(30);
+
         const visitorStats = await fetchVisitorStats();
         setStats(visitorStats);
         setError(null);
       } catch (err) {
         console.error("Error fetching visitor stats:", err);
         setError("Gagal memuat statistik pengunjung");
+
+        setStats({
+          totalVisitors: 0,
+          todayVisitors: 0,
+          monthlyVisitors: 0,
+        });
       } finally {
         setLoading(false);
       }
@@ -92,3 +102,4 @@ export const useVisitorStats = () => {
 
   return { ...stats, loading, error };
 };
+
