@@ -129,23 +129,39 @@ const BeritaPage = () => {
               </div>
 
 
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center space-x-2">
-                  <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed">
-                    Sebelumnya
-                  </button>
 
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button key={page} onClick={() => handlePageChange(page)} className={`px-3 py-2 text-sm rounded ${currentPage === page ? "bg-[#1B3A6D] text-white" : "text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-100"}`}>
-                      {page}
-                    </button>
-                  ))}
+              <div className="flex justify-center items-center space-x-2">
+                <button 
+                  onClick={() => handlePageChange(currentPage - 1)} 
+                  disabled={currentPage === 1} 
+                  className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Sebelumnya
+                </button>
 
-                  <button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages} className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed">
-                    Selanjutnya
+                {Array.from({ length: Math.max(1, totalPages) }, (_, i) => i + 1).map((page) => (
+                  <button 
+                    key={page} 
+                    onClick={() => handlePageChange(page)} 
+                    disabled={totalPages <= 1}
+                    className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      currentPage === page 
+                        ? "bg-[#1B3A6D] text-white" 
+                        : "text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 border border-gray-300"
+                    } ${totalPages <= 1 ? "cursor-default" : ""}`}
+                  >
+                    {page}
                   </button>
-                </div>
-              )}
+                ))}
+
+                <button 
+                  onClick={() => handlePageChange(currentPage + 1)} 
+                  disabled={currentPage === totalPages || totalPages <= 1} 
+                  className="px-3 py-2 text-sm text-gray-600 hover:text-[#1B3A6D] hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Selanjutnya
+                </button>
+              </div>
             </>
           ) : (
             <EmptyState title={searchTerm ? "Tidak ada berita yang ditemukan" : "Belum ada berita"} description={searchTerm ? "Coba gunakan kata kunci yang berbeda" : "Berita akan muncul di sini setelah dipublikasikan"} className="py-12" />
@@ -159,4 +175,5 @@ const BeritaPage = () => {
 };
 
 export default BeritaPage;
+
 

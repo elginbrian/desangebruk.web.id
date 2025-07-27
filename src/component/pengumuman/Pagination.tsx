@@ -17,20 +17,21 @@ const Pagination: FC<PaginationProps> = ({ mounted, currentPage, totalPages, onP
 
   return (
     <div className={`flex items-center justify-center gap-4 smooth-transition ${mounted ? "smooth-reveal stagger-4" : "animate-on-load"}`}>
-
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1}
-        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         «
       </button>
 
-
-      <button onClick={() => onPageChange(1)} disabled={currentPage === 1} className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+      <button
+        onClick={() => onPageChange(1)}
+        disabled={currentPage === 1}
+        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
         ‹
       </button>
-
 
       {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
         const page = i + 1;
@@ -38,35 +39,39 @@ const Pagination: FC<PaginationProps> = ({ mounted, currentPage, totalPages, onP
           <button
             key={page}
             onClick={() => onPageChange(page)}
-            className={`flex items-center justify-center w-8 h-8 rounded-full font-medium text-sm transition-colors ${currentPage === page ? "bg-[#1B3A6D] text-white" : "text-gray-700 hover:bg-gray-100"}`}
+            className={`flex items-center justify-center w-8 h-8 rounded-full font-medium text-sm transition-colors ${currentPage === page ? "bg-[#1B3A6D] text-white" : "text-gray-700 hover:bg-gray-100 hover:text-[#1B3A6D]"}`}
           >
             {page}
           </button>
         );
       })}
 
-
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages}
-        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         ›
       </button>
 
-
       <button
         onClick={() => onPageChange(totalPages)}
         disabled={currentPage === totalPages}
-        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="flex items-center justify-center w-8 h-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-[#1B3A6D] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
         »
       </button>
 
-
       <div className="flex items-center gap-2 ml-4">
         <span className="text-sm text-gray-600">Page</span>
-        <input type="number" min="1" max={totalPages} value={currentPage} onChange={handleInputChange} className="w-12 h-8 text-center text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#1B3A6D]" />
+        <input
+          type="number"
+          min="1"
+          max={totalPages}
+          value={currentPage}
+          onChange={handleInputChange}
+          className="w-12 h-8 text-center text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-[#1B3A6D] focus:border-[#1B3A6D]"
+        />
         <span className="text-sm text-gray-600">of {totalPages}</span>
       </div>
     </div>
@@ -74,4 +79,3 @@ const Pagination: FC<PaginationProps> = ({ mounted, currentPage, totalPages, onP
 };
 
 export default Pagination;
-
