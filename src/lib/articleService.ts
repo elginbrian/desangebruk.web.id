@@ -431,27 +431,26 @@ export const getArticlesWithPagination = async (page: number = 1, pageSize: numb
   try {
     const offset = (page - 1) * pageSize;
 
-    let q;
-    if (statusFilter === "all") {
-      q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
-    } else {
-      q = query(collection(db, "articles"), where("status", "==", statusFilter), orderBy("createdAt", "desc"));
-    }
-
+    const q = query(collection(db, "articles"), orderBy("createdAt", "desc"));
     const totalSnapshot = await getDocs(q);
-    const totalItems = totalSnapshot.size;
-    const totalPages = Math.ceil(totalItems / pageSize);
 
-    const articles: Article[] = [];
+    const allArticles: Article[] = [];
     totalSnapshot.forEach((doc) => {
       const data = doc.data();
-      articles.push({
+      allArticles.push({
         id: doc.id,
         ...data,
       } as Article);
     });
 
-    const paginatedArticles = articles.slice(offset, offset + pageSize);
+    let filteredArticles = allArticles;
+    if (statusFilter !== "all") {
+      filteredArticles = allArticles.filter((article) => article.status === statusFilter);
+    }
+
+    const totalItems = filteredArticles.length;
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const paginatedArticles = filteredArticles.slice(offset, offset + pageSize);
 
     return {
       articles: paginatedArticles,
@@ -466,15 +465,22 @@ export const getArticlesWithPagination = async (page: number = 1, pageSize: numb
 
 export const getArticleCountByStatus = async (statusFilter: "all" | "published" | "draft" = "all"): Promise<number> => {
   try {
-    let q;
+    const q = query(collection(db, "articles"));
+    const snapshot = await getDocs(q);
+
     if (statusFilter === "all") {
-      q = query(collection(db, "articles"));
-    } else {
-      q = query(collection(db, "articles"), where("status", "==", statusFilter));
+      return snapshot.size;
     }
 
-    const snapshot = await getDocs(q);
-    return snapshot.size;
+    let count = 0;
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.status === statusFilter) {
+        count++;
+      }
+    });
+
+    return count;
   } catch (error) {
     console.error("Error counting articles:", error);
     return 0;

@@ -34,8 +34,12 @@ const ArticlePage = () => {
 
   useEffect(() => {
     if (mounted) {
-      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
-      fetchArticlesPaginated(1, 10, statusFilterValue);
+      const getStatusFilter = () => {
+        if (statusFilter === "Published") return "published";
+        if (statusFilter === "Draft") return "draft";
+        return "all";
+      };
+      fetchArticlesPaginated(1, 10, getStatusFilter());
     }
   }, [statusFilter, mounted]);
 
@@ -47,8 +51,12 @@ const ArticlePage = () => {
       } else {
         setIsSearching(false);
         if (mounted) {
-          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
-          fetchArticlesPaginated(1, 10, statusFilterValue);
+          const getStatusFilter = () => {
+            if (statusFilter === "Published") return "published";
+            if (statusFilter === "Draft") return "draft";
+            return "all";
+          };
+          fetchArticlesPaginated(1, 10, getStatusFilter());
         }
       }
     }, 500);
@@ -63,8 +71,12 @@ const ArticlePage = () => {
         if (isSearching) {
           searchArticlesPaginated(searchTerm);
         } else {
-          const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
-          fetchArticlesPaginated(currentPage, 10, statusFilterValue);
+          const getStatusFilter = () => {
+            if (statusFilter === "Published") return "published";
+            if (statusFilter === "Draft") return "draft";
+            return "all";
+          };
+          fetchArticlesPaginated(currentPage, 10, getStatusFilter());
         }
       }
     }
@@ -76,8 +88,12 @@ const ArticlePage = () => {
 
   const handlePageChange = (page: number) => {
     if (!isSearching) {
-      const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
-      fetchArticlesPaginated(page, 10, statusFilterValue);
+      const getStatusFilter = () => {
+        if (statusFilter === "Published") return "published";
+        if (statusFilter === "Draft") return "draft";
+        return "all";
+      };
+      fetchArticlesPaginated(page, 10, getStatusFilter());
     }
     goToPage(page);
   };
@@ -138,8 +154,8 @@ const ArticlePage = () => {
 
   const statusOptions = [
     { value: "All Status", label: "All Status" },
-    { value: "published", label: "Published" },
-    { value: "draft", label: "Draft" },
+    { value: "Published", label: "Published" },
+    { value: "Draft", label: "Draft" },
   ];
 
   const headerActions = (
@@ -190,8 +206,12 @@ const ArticlePage = () => {
               if (isSearching) {
                 searchArticlesPaginated(searchTerm);
               } else {
-                const statusFilterValue = statusFilter === "All Status" ? "all" : (statusFilter as "published" | "draft");
-                fetchArticlesPaginated(currentPage, 10, statusFilterValue);
+                const getStatusFilter = () => {
+                  if (statusFilter === "Published") return "published";
+                  if (statusFilter === "Draft") return "draft";
+                  return "all";
+                };
+                fetchArticlesPaginated(currentPage, 10, getStatusFilter());
               }
             }}
             emptyMessage={searchTerm ? "Tidak ada artikel yang ditemukan dengan kata kunci tersebut." : "Belum ada artikel yang dibuat."}
