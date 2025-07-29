@@ -39,6 +39,8 @@ const RegisterForm: FC<RegisterFormProps> = ({ mounted, formData, showPassword, 
         mounted={mounted}
       />
 
+      <TermsCheckbox mounted={mounted} checked={formData.agreeToTerms} onChange={onInputChange} />
+
       <AuthButton type="submit" variant="primary" disabled={!formData.agreeToTerms || loading} mounted={mounted}>
         {loading ? "Mendaftar..." : "Daftar"}
       </AuthButton>
