@@ -47,6 +47,7 @@ export const useStorageProgress = () => {
       color,
       articlesSize: formatBytes(stats.articleImagesSize),
       gallerySize: formatBytes(stats.galleryImagesSize),
+      structuresSize: formatBytes(stats.structureImagesSize),
       fileCount: stats.fileCount,
     };
   };
@@ -74,10 +75,10 @@ export const useStorageValidation = () => {
 
   const checkStorageStatus = () => {
     if (!stats) return { isFull: false, percentage: 0 };
-    
+
     const percentage = getStoragePercentage(stats.totalSize);
     const isFull = isStorageFull(stats.totalSize);
-    
+
     return { isFull, percentage };
   };
 
@@ -87,5 +88,3 @@ export const useStorageValidation = () => {
     stats,
   };
 };
-
-

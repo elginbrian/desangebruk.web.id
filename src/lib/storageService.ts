@@ -5,6 +5,7 @@ export interface StorageStats {
   totalSize: number;
   articleImagesSize: number;
   galleryImagesSize: number;
+  structureImagesSize: number;
   fileCount: number;
   lastUpdated: Date;
 }
@@ -12,7 +13,7 @@ export interface StorageStats {
 export interface StorageItem {
   name: string;
   size: number;
-  type: "article" | "gallery";
+  type: "article" | "gallery" | "structure";
   path: string;
 }
 
@@ -20,13 +21,14 @@ const MAX_STORAGE_BYTES = 4.95 * 1024 * 1024 * 1024;
 
 export const getStorageStats = async (): Promise<StorageStats> => {
   try {
-    const [articlesStats, galleryStats] = await Promise.all([calculateFolderSize("articles"), calculateFolderSize("gallery")]);
+    const [articlesStats, galleryStats, structuresStats] = await Promise.all([calculateFolderSize("articles"), calculateFolderSize("gallery"), calculateFolderSize("structures")]);
 
     return {
-      totalSize: articlesStats.totalSize + galleryStats.totalSize,
+      totalSize: articlesStats.totalSize + galleryStats.totalSize + structuresStats.totalSize,
       articleImagesSize: articlesStats.totalSize,
       galleryImagesSize: galleryStats.totalSize,
-      fileCount: articlesStats.fileCount + galleryStats.fileCount,
+      structureImagesSize: structuresStats.totalSize,
+      fileCount: articlesStats.fileCount + galleryStats.fileCount + structuresStats.fileCount,
       lastUpdated: new Date(),
     };
   } catch (error) {
@@ -114,22 +116,21 @@ export const canUploadFile = async (fileSize: number, threshold: number = 95): P
     const stats = await getStorageStats();
     const currentUsage = stats.totalSize;
     const afterUpload = currentUsage + fileSize;
-    
+
     if (isStorageFull(afterUpload, threshold)) {
       const remainingSpace = getRemainingStorage(currentUsage);
       return {
         canUpload: false,
-        message: `Storage hampir penuh! Tersisa ${formatBytes(remainingSpace)}. File yang akan diupload (${formatBytes(fileSize)}) akan melebihi batas storage.`
+        message: `Storage hampir penuh! Tersisa ${formatBytes(remainingSpace)}. File yang akan diupload (${formatBytes(fileSize)}) akan melebihi batas storage.`,
       };
     }
-    
+
     return { canUpload: true };
   } catch (error) {
     console.error("Error checking storage capacity:", error);
-    return { 
-      canUpload: false, 
-      message: "Gagal mengecek kapasitas storage. Silakan coba lagi." 
+    return {
+      canUpload: false,
+      message: "Gagal mengecek kapasitas storage. Silakan coba lagi.",
     };
   }
 };
-

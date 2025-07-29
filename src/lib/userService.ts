@@ -9,7 +9,7 @@ export interface UserListItem extends UserProfile {
 export const getAllUsers = async (): Promise<UserListItem[]> => {
   try {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, orderBy("createdAt", "desc"));
+    const q = query(usersRef);
     const querySnapshot = await getDocs(q);
 
     const users: UserListItem[] = [];
@@ -19,6 +19,12 @@ export const getAllUsers = async (): Promise<UserListItem[]> => {
         id: doc.id,
         ...doc.data(),
       } as UserListItem);
+    });
+
+    users.sort((a, b) => {
+      const aDate = a.createdAt && typeof a.createdAt === "object" && "toDate" in a.createdAt ? (a.createdAt as any).toDate() : new Date(a.createdAt || 0);
+      const bDate = b.createdAt && typeof b.createdAt === "object" && "toDate" in b.createdAt ? (b.createdAt as any).toDate() : new Date(b.createdAt || 0);
+      return bDate.getTime() - aDate.getTime();
     });
 
     return users;
@@ -31,7 +37,7 @@ export const getAllUsers = async (): Promise<UserListItem[]> => {
 export const getUsersByRole = async (role: "admin" | "pending"): Promise<UserListItem[]> => {
   try {
     const usersRef = collection(db, "users");
-    const q = query(usersRef, where("role", "==", role), orderBy("createdAt", "desc"));
+    const q = query(usersRef, where("role", "==", role));
     const querySnapshot = await getDocs(q);
 
     const users: UserListItem[] = [];
@@ -41,6 +47,12 @@ export const getUsersByRole = async (role: "admin" | "pending"): Promise<UserLis
         id: doc.id,
         ...doc.data(),
       } as UserListItem);
+    });
+
+    users.sort((a, b) => {
+      const aDate = a.createdAt && typeof a.createdAt === "object" && "toDate" in a.createdAt ? (a.createdAt as any).toDate() : new Date(a.createdAt || 0);
+      const bDate = b.createdAt && typeof b.createdAt === "object" && "toDate" in b.createdAt ? (b.createdAt as any).toDate() : new Date(b.createdAt || 0);
+      return bDate.getTime() - aDate.getTime();
     });
 
     return users;
@@ -87,3 +99,4 @@ export const getUserStats = async () => {
     throw new Error("Failed to fetch user stats");
   }
 };
+
