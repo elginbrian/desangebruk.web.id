@@ -53,17 +53,11 @@ const StorageProgress = () => {
   return (
     <div className="px-4 py-3 border-t border-white/10">
       <div className="space-y-2">
-
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-white/90">
             <FiHardDrive size={14} />
             <span className="text-xs font-medium">Storage Firebase</span>
-            {(isNearlyFull || isFull) && (
-              <FiAlertTriangle 
-                size={12} 
-                className={`${isFull ? 'text-red-400' : 'text-yellow-400'} animate-pulse`}
-              />
-            )}
+            {(isNearlyFull || isFull) && <FiAlertTriangle size={12} className={`${isFull ? "text-red-400" : "text-yellow-400"} animate-pulse`} />}
           </div>
           <div className="flex items-center space-x-1">
             <button onClick={() => setShowDetails(!showDetails)} className="text-white/60 hover:text-white transition-colors">
@@ -75,7 +69,6 @@ const StorageProgress = () => {
           </div>
         </div>
 
-
         {isFull && (
           <div className="bg-red-500/20 border border-red-500/30 rounded-md p-2">
             <div className="flex items-center space-x-2">
@@ -84,7 +77,7 @@ const StorageProgress = () => {
             </div>
           </div>
         )}
-        
+
         {isNearlyFull && !isFull && (
           <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-md p-2">
             <div className="flex items-center space-x-2">
@@ -93,7 +86,6 @@ const StorageProgress = () => {
             </div>
           </div>
         )}
-
 
         <div className="space-y-1">
           <div className="flex justify-between items-center">
@@ -110,7 +102,6 @@ const StorageProgress = () => {
           <div className="text-xs text-white/60">Sisa: {progressData.remaining}</div>
         </div>
 
-
         {showDetails && (
           <div className="pt-2 space-y-1 border-t border-white/10">
             <div className="flex justify-between items-center">
@@ -122,12 +113,15 @@ const StorageProgress = () => {
               <span className="text-xs text-white/90">{progressData.gallerySize}</span>
             </div>
             <div className="flex justify-between items-center">
+              <span className="text-xs text-white/70">Gambar Struktur:</span>
+              <span className="text-xs text-white/90">{progressData.structuresSize}</span>
+            </div>
+            <div className="flex justify-between items-center">
               <span className="text-xs text-white/70">Total File:</span>
               <span className="text-xs text-white/90">{progressData.fileCount}</span>
             </div>
           </div>
         )}
-
 
         {progressData.percentage > 85 && (
           <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-2">
@@ -143,5 +137,3 @@ const StorageProgress = () => {
 };
 
 export default StorageProgress;
-
-

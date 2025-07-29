@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { setStorageRefreshCallback } from "@/lib/articleService";
 import { setStorageRefreshCallback as setGalleryStorageRefreshCallback } from "@/lib/galleryService";
+import { setStorageRefreshCallback as setStructureStorageRefreshCallback } from "@/lib/structureService";
 import { useStorageContext } from "@/contexts/StorageContext";
 
 export const useStorageRefreshInitializer = () => {
@@ -17,8 +18,8 @@ export const useStorageRefreshInitializer = () => {
 
     try {
       setStorageRefreshCallback(refreshCallback);
-      
       setGalleryStorageRefreshCallback(refreshCallback);
+      setStructureStorageRefreshCallback(refreshCallback);
     } catch (error) {
       console.error("Error setting storage refresh callbacks:", error);
     }
@@ -27,6 +28,7 @@ export const useStorageRefreshInitializer = () => {
       try {
         setStorageRefreshCallback(() => {});
         setGalleryStorageRefreshCallback(() => {});
+        setStructureStorageRefreshCallback(() => {});
       } catch (error) {
         console.error("Error cleaning up storage refresh callbacks:", error);
       }
@@ -35,4 +37,3 @@ export const useStorageRefreshInitializer = () => {
 };
 
 export default useStorageRefreshInitializer;
-

@@ -85,6 +85,13 @@ const DashboardPage = () => {
                   <FiBell />
                   Buat Pengumuman
                 </button>
+                <button
+                  onClick={() => (window.location.href = "/dashboard/structure/create")}
+                  className="w-full border border-[#1B3A6D] text-[#1B3A6D] py-2.5 px-4 rounded-lg text-sm font-medium hover:bg-[#1B3A6D] hover:text-white transition-colors flex items-center justify-center gap-2"
+                >
+                  <FiUsers />
+                  Tambah Struktur
+                </button>
               </div>
             </div>
             <RecentActivity />

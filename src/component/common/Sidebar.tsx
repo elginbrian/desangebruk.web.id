@@ -39,8 +39,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { icon: FiHome, text: "Dashboard", href: "/dashboard" },
     { icon: FiFileText, text: "Kelola Berita", href: "/dashboard/article" },
     { icon: FiBell, text: "Kelola Pengumuman", href: "/dashboard/announcement" },
+    { icon: FiUsers, text: "Kelola Struktur", href: "/dashboard/structure" },
     { icon: FiImage, text: "Kelola Galeri", href: "/dashboard/gallery" },
-    { icon: FiUsers, text: "Kelola Akun", href: "/dashboard/users" },
+    { icon: FiUser, text: "Kelola Akun", href: "/dashboard/users" },
     { icon: FiBookOpen, text: "Panduan Admin", href: "/dashboard/panduan" },
   ];
 

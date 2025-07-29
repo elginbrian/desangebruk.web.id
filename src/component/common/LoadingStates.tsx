@@ -145,7 +145,29 @@ export const DataTableWithStates = ({ columns, data, editRoute, onDelete, viewRo
   }
 
   if (data.length === 0) {
-    return <EmptyState title="Tidak ada data" description={emptyMessage} />;
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              {columns.map((column) => (
+                <th key={column.key} className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${column.className || ""}`}>
+                  {column.label}
+                </th>
+              ))}
+              {(editRoute || onDelete || viewRoute) && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>}
+            </tr>
+          </thead>
+          <tbody className="bg-white">
+            <tr>
+              <td colSpan={columns.length + (editRoute || onDelete || viewRoute ? 1 : 0)} className="px-6 py-12 text-center">
+                <EmptyState title="Tidak ada data" description={emptyMessage} />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
   }
 
   return (
